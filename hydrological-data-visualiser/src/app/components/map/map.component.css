@@ -1,10 +1,12 @@
 .map-container {
-    position: absolute;
+    position: relative;
+    height: 80vh;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     margin: 30px;
+    padding-left: 20vw;
   }
   
   .map-frame {
