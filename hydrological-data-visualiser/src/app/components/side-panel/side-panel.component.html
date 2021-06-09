@@ -1,0 +1,32 @@
+<div class="d-flex" id="wrapper">
+  <!-- Sidebar -->
+  <div class="bg-light border-right " id="sidebar-wrapper" [ngClass]="status ? 'hide' : 'show'">
+    <div class="list-group list-group-flush px-4 ">
+      <div id="longLang" *ngIf="clicked == true">
+        <br>
+        <p> Longitude: {{long}}</p>
+        <p *ngIf="clicked"> Latitude: {{lat}}</p>
+      </div>
+    </div>
+  </div>
+  <!-- /#sidebar-wrapper -->
+  <!-- Page Content -->
+  <div id="page-content-wrapper">
+    <nav class="navbar navbar-expand-lg">
+
+      <div class="container-fluid">
+        <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+        <!--        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"-->
+        <!--                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
+        <!--          <span class="navbar-toggler-icon"></span>-->
+        <!--        </button>-->
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <app-map (longEmitter)="setLong($event)" (latEmitter)="setLat($event)"
+               (clickedEmitter)="setClicked($event)"></app-map>
+    </div>
+  </div>
+  <!-- /#page-content-wrapper -->
+</div>
+<!-- /#wrapper -->

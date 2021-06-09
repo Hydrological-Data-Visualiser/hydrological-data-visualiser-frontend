@@ -6,14 +6,14 @@
     right: 0;
     bottom: 0;
     margin: 30px;
-    padding-left: 20vw;
+    /*padding-left: 20vw;*/
   }
-  
+
   .map-frame {
     border: 2px solid black;
     height: 100%;
   }
-  
+
   #map {
     height: 100%;
   }

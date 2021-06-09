@@ -7,18 +7,22 @@ import { AppComponent } from './app.component';
 import { MapComponent } from './components/map/map.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FormModalComponent } from './components/form-modal/form-modal.component';
+import { SidePanelComponent } from './components/side-panel/side-panel.component';
+import { AngularResizedEventModule } from 'angular-resize-event';
 
 @NgModule({
   declarations: [
     AppComponent,
     MapComponent,
     NavbarComponent,
-    FormModalComponent
+    FormModalComponent,
+    SidePanelComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    AngularResizedEventModule
   ],
   providers: [],
   bootstrap: [AppComponent]
