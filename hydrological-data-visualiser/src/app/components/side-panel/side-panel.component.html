@@ -2,10 +2,15 @@
   <!-- Sidebar -->
   <div class="bg-light border-right " id="sidebar-wrapper" [ngClass]="status ? 'hide' : 'show'">
     <div class="list-group list-group-flush px-4 ">
+      <div *ngIf="clicked == false">
+        <br>
+        <p class="text-md-center">Select the point on the map for which you want to know the details </p>
+      </div>
+
       <div id="longLang" *ngIf="clicked == true">
         <br>
         <p> Longitude: {{long}}</p>
-        <p *ngIf="clicked"> Latitude: {{lat}}</p>
+        <p> Latitude: {{lat}}</p>
       </div>
     </div>
   </div>
