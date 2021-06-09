@@ -3,58 +3,44 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Formularz</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Form</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <form (ngSubmit)="onSubmit()">
 
-            <!-- FORM -->
-            <div class="row align-items-center p-2">
-                <div class="col-auto">
-                  <label for="parametr1" class="col-form-label">Parametr 1</label>
+            <div class="row align-items-center p-2 form-group">
+                <div class="col-2">
+                  <label for="latitude" class="col-form-label">Latitude</label>
                 </div>
-                <div class="col-auto">
-                  <input type="text" id="parametr1" class="form-control" aria-describedby="passwordHelpInline">
+                <div class="col-3">
+                  <input type="text" id="latitude" class="form-control" 
+                  [(ngModel)]="model.latitude" name="latitude">
                 </div>
-                <div class="col-auto">
+                <!-- <div class="col-auto">
                   <span id="passwordHelpInline" class="form-text">
                     Warunki parametru 1
                   </span>
-                </div>
+                </div> -->
             </div>
 
             <div class="row align-items-center p-2">
-                <div class="col-auto">
-                  <label for="parametr2" class="col-form-label">Parametr 2</label>
+                <div class="col-2">
+                  <label for="longitude" class="col-form-label">Longitude</label>
                 </div>
-                <div class="col-auto">
-                  <input type="text" id="parametr2" class="form-control" aria-describedby="passwordHelpInline">
+                <div class="col-3">
+                  <input type="text" id="longitude" class="form-control" 
+                  [(ngModel)]="model.longitude" name="longitude">
                 </div>
-                <div class="col-auto">
+                <!-- <div class="col-auto">
                   <span id="passwordHelpInline" class="form-text">
                     Warunki parametru 2
                   </span>
-                </div>
+                </div> -->
             </div>
-
-            <div class="row align-items-center p-2">
-                <div class="col-auto">
-                  <label for="parametr3" class="col-form-label">Parametr 3</label>
-                </div>
-                <div class="col-auto">
-                  <input type="text" id="parametr3" class="form-control" aria-describedby="passwordHelpInline">
-                </div>
-                <div class="col-auto">
-                  <span id="passwordHelpInline" class="form-text">
-                    Warunki parametru 3
-                  </span>
-                </div>
-            </div>
-            
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
-          <button type="button" class="btn btn-primary">Wyślij</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
         </div>
       </div>
     </div>
