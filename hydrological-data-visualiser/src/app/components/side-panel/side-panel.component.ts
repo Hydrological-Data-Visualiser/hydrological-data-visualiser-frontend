@@ -11,20 +11,9 @@ export class SidePanelComponent implements OnInit {
   long = 0;
   lat = 0;
 
-  // @Input() long!: number;
-  // @Input() lat!: number;
-  // @Input('master') masterName = ''; // tslint:disable-line: no-input-rename
-
   constructor() {
 
   }
-
-//   @ViewChild(MapComponent) child!: MapComponent;
-// set pane(v: MapComponent) {
-//   this.long = v.long;
-//   this.lat = v.lat;
-//   console.log('aa' + this.long);
-// }
 
   ngOnInit(): void {
   }
@@ -44,5 +33,4 @@ export class SidePanelComponent implements OnInit {
   clickEvent(): void {
     this.status = !this.status;
   }
-
 }

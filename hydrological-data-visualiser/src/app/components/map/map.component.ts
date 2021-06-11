@@ -68,12 +68,10 @@ export class MapComponent implements AfterViewInit {
   addMarker(latlng: LatLngExpression): void {
     this.markers.forEach((s) => this.map.removeLayer(s));
     this.markers = [];
-    const newMarker = L.marker(latlng).addTo(this.map)
-      // .bindPopup('Ionic 4 <br> Leaflet.')
-      // .openPopup();
+    const newMarker = L.marker(latlng).addTo(this.map);
+    // .bindPopup('Ionic 4 <br> Leaflet.')
+    // .openPopup();
     this.markers.push(newMarker);
     console.log(this.markers);
   }
-
-
 }
