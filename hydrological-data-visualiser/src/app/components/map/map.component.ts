@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import { RiverService } from 'src/app/services/river.service';
+import { ChoroplethService } from 'src/app/services/choropleth.service';
 
 @Component({
   selector: 'app-map',
@@ -26,10 +27,11 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
   }
 
-  constructor(private riverService: RiverService) { }
+  constructor(private riverService: RiverService, private choroplethService: ChoroplethService) { }
 
   ngAfterViewInit(): void {
     this.initMap();
     this.riverService.showKocinkaRiver(this.map);
+    this.choroplethService.showExampleChoropleth(this.map);
   }
 }
