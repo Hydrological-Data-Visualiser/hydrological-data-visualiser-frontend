@@ -9,6 +9,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FormModalComponent } from './components/form-modal/form-modal.component';
 import { SidePanelComponent } from './components/side-panel/side-panel.component';
 import { AngularResizedEventModule } from 'angular-resize-event';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { AngularResizedEventModule } from 'angular-resize-event';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    AngularResizedEventModule
+    AngularResizedEventModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

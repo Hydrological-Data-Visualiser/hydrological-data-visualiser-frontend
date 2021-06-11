@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormInputData } from '../../model/form-input-data';
 
 @Component({
   selector: 'app-form-modal',
@@ -7,7 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FormModalComponent implements OnInit {
 
+  model = new FormInputData(50, 19);
+
   constructor() { }
+
+  onSubmit() {
+    console.log(this.model);
+  }
 
   ngOnInit(): void {
   }
