@@ -7,21 +7,20 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form (ngSubmit)="onSubmit()">
-
+          <form (ngSubmit)="onSubmit()" #dataForm="ngForm">
+            
             <div class="row align-items-center p-2 form-group">
                 <div class="col-2">
                   <label for="latitude" class="col-form-label">Latitude</label>
                 </div>
                 <div class="col-3">
-                  <input type="text" id="latitude" class="form-control" 
-                  [(ngModel)]="model.latitude" name="latitude">
+                  <input type="number" id="latitude" class="form-control" required
+                  [(ngModel)]="model.latitude" name="latitude" #latitude="ngModel">
                 </div>
-                <!-- <div class="col-auto">
-                  <span id="passwordHelpInline" class="form-text">
-                    Warunki parametru 1
-                  </span>
-                </div> -->
+                <div [hidden]="latitude.valid || latitude.pristine"
+                        class="alert alert-danger col-auto validation-msg">
+                    Latitude has to be a number.
+                  </div>
             </div>
 
             <div class="row align-items-center p-2">
@@ -29,17 +28,16 @@
                   <label for="longitude" class="col-form-label">Longitude</label>
                 </div>
                 <div class="col-3">
-                  <input type="text" id="longitude" class="form-control" 
-                  [(ngModel)]="model.longitude" name="longitude">
+                  <input type="number" id="longitude" class="form-control" required
+                  [(ngModel)]="model.longitude" name="longitude" #longitude="ngModel">
                 </div>
-                <!-- <div class="col-auto">
-                  <span id="passwordHelpInline" class="form-text">
-                    Warunki parametru 2
-                  </span>
-                </div> -->
+                <div [hidden]="longitude.valid || longitude.pristine"
+                        class="alert alert-danger col-auto validation-msg">
+                    Longitude has to be a number.
+                  </div>
             </div>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!dataForm.form.valid">Submit</button>
           </form>
         </div>
       </div>
