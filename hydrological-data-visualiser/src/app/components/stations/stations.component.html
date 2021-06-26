@@ -1,0 +1,30 @@
+<!-- Button trigger modal -->
+<div class="modal fade" id="stationsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg  modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Stations</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!--        <form (ngSubmit)="onSubmit()" #dataForm="ngForm">-->
+        <form #dataForm="ngForm">
+
+          <div class="row align-items-center p-2 form-group">
+            <div *ngFor="let station of list" class="col-4">
+              <div class="row">
+                <a href="#" (click)="zoomTo(station.id)" data-bs-dismiss="modal" *ngIf="station.longitude && station.latitude"><p> {{station.name}}</p></a>
+               <p *ngIf="!station.longitude || !station.latitude"> {{station.name}}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row align-items-center p-2">
+          </div>
+          <!--          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
+          <!--          <button type="submit" class="btn btn-primary" [disabled]="!dataForm.form.valid">Submit</button>-->
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

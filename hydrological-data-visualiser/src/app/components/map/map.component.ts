@@ -4,6 +4,7 @@ import {LatLngExpression} from 'leaflet';
 import {RiverService} from 'src/app/services/river.service';
 import {ResizedEvent} from 'angular-resize-event';
 import 'leaflet/dist/images/marker-shadow.png';
+import {StationsService} from '../../services/stations.service';
 
 @Component({
   selector: 'app-map',
@@ -12,19 +13,20 @@ import 'leaflet/dist/images/marker-shadow.png';
 })
 export class MapComponent implements AfterViewInit {
 
-  private map: any;
+  map: any;
   lat: number;
   long: number;
   clicked = false;
-  markers: Array<L.Marker<any>> = [];
+  marker: L.Marker<any> | undefined;
   @Output() longEmitter = new EventEmitter<number>();
   @Output() latEmitter = new EventEmitter<number>();
   @Output() clickedEmitter = new EventEmitter<boolean>();
 
+
   private initMap(): void {
     this.map = L.map('map', {
       center: [50.9030, 19.0550],
-      zoom: 3
+      zoom: 5
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -41,7 +43,6 @@ export class MapComponent implements AfterViewInit {
       const coord = e.latlng;
       this.lat = coord.lat;
       this.long = coord.lng;
-      console.log('You clicked the map at latitude: ' + this.lat + ' and longitude: ' + this.long);
       this.longEmitter.emit(this.long);
       this.latEmitter.emit(this.lat);
       this.clickedEmitter.emit(true);
@@ -50,15 +51,22 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  constructor(private riverService: RiverService) {
+  constructor(private riverService: RiverService, private stationService: StationsService) {
     this.lat = 0;
     this.long = 0;
+    this.stationService.map = this.map;
   }
 
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
     this.riverService.showKocinkaRiver(this.map);
+    this.stationService.map = this.map;
+    this.stationService.clickedMarker$.subscribe(a => {
+      if (this.marker) {
+        this.map.removeLayer(this.marker);
+      }
+    });
   }
 
   onResized(event: ResizedEvent): void {
@@ -66,12 +74,12 @@ export class MapComponent implements AfterViewInit {
   }
 
   addMarker(latlng: LatLngExpression): void {
-    this.markers.forEach((s) => this.map.removeLayer(s));
-    this.markers = [];
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+    }
     const newMarker = L.marker(latlng).addTo(this.map);
     // .bindPopup('Ionic 4 <br> Leaflet.')
     // .openPopup();
-    this.markers.push(newMarker);
-    console.log(this.markers);
+    this.marker = newMarker;
   }
 }

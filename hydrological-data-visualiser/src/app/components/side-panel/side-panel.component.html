@@ -9,10 +9,12 @@
         <br>
         <div class="row">
           <div class="col">
+            <p *ngIf="name">Station Name:</p>
             <p> Longitude:</p>
             <p> Latitude:</p>
           </div>
           <div class="col">
+            <p *ngIf="name">{{name}}</p>
             <p>{{long}}</p>
             <p>{{lat}}</p>
           </div>
