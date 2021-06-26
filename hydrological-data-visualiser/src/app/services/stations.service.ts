@@ -51,13 +51,13 @@ export class StationsService {
         let geoId: number | undefined;
         let station: Station | undefined;
         if (e.split(',')[0]) {
-          id = parseInt(e.split(',')[0].slice(1, -1), 10);
+          id = parseInt(e.split(',')[0], 10);
         }
         if (e.split(',')[1]) {
-          name = this.capitalize(e.split(',')[1].slice(1, -1));
+          name = this.capitalize(e.split(',')[1]);
         }
         if (e.split(',')[2]) {
-          geoId = parseInt(e.split(',')[2].slice(1, -1), 10);
+          geoId = parseInt(e.split(',')[2], 10);
         }
         if (e.split(',')[3]) {
           latitude = parseFloat(e.split(',')[3]);
