@@ -17,8 +17,8 @@ export class SearchFilterPipe implements PipeTransform {
     args = args.toLowerCase();
 
     return value.filter((data) => {
-      return (data.name).toLowerCase().includes(args);
-      // return (data.name).toLowerCase().startsWith(args);
+      // return (data.name).toLowerCase().includes(args);
+      return (data.name).toLowerCase().startsWith(args);
     });
   }
 }

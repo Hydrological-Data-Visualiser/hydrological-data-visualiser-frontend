@@ -9,7 +9,7 @@ import 'leaflet.markercluster';
   providedIn: 'root'
 })
 export class StationsService {
-  private stationFilePath = '/assets/data/wykaz_stacji.csv';
+  private stationFilePath = '/assets/data/test.csv';
   public map: any;
   private clickedMarker = new Subject<Station>();
   public clickedMarker$ = this.clickedMarker.asObservable();

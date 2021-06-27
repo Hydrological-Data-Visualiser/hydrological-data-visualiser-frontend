@@ -12,6 +12,7 @@ import {AngularResizedEventModule} from 'angular-resize-event';
 import {FormsModule} from '@angular/forms';
 import {StationsComponent} from './components/stations/stations.component';
 import {SearchFilterPipe} from './pipes/search-filter.pipe';
+import {ScrollingModule} from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {SearchFilterPipe} from './pipes/search-filter.pipe';
     AppRoutingModule,
     HttpClientModule,
     AngularResizedEventModule,
-    FormsModule
+    FormsModule,
+    ScrollingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -26,7 +26,9 @@ export class MapComponent implements AfterViewInit {
   private initMap(): void {
     this.map = L.map('map', {
       center: [50.9030, 19.0550],
-      zoom: 5
+      zoom: 5,
+      preferCanvas: true,
+      renderer: L.canvas()
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -77,9 +79,8 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    const newMarker = L.marker(latlng).addTo(this.map);
+    this.marker = L.marker(latlng).addTo(this.map);
     // .bindPopup('Ionic 4 <br> Leaflet.')
     // .openPopup();
-    this.marker = newMarker;
   }
 }

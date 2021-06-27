@@ -9,8 +9,8 @@ import {Station} from '../../model/Station';
 })
 export class StationsComponent implements AfterViewInit, OnInit {
   allStations: Station[] = [];
-  // searchTerm = ' ';
-  query: any;
+  query = '';
+  // items = Array.from({length: 200000}).map((_, i) => `Item ${i}`);
 
   constructor(private stationService: StationsService) {
   }
@@ -33,7 +33,10 @@ export class StationsComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
     this.stationService.stations$.subscribe(station => {
       if (station) {
-        this.allStations.push(station);
+        const newStations = this.allStations;
+        newStations.push(station);
+        this.allStations = [];
+        this.allStations = newStations;
       }
     });
   }
