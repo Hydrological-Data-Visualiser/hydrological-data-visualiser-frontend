@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Station} from '../model/Station';
 import * as L from 'leaflet';
 import {BehaviorSubject} from 'rxjs';
+import 'leaflet.markercluster';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,21 @@ export class StationsService {
   public map: any;
   private clickedMarker = new BehaviorSubject<Station | undefined>(undefined);
   public clickedMarker$ = this.clickedMarker.asObservable();
+  public group = new L.MarkerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true
+  });
+  private stations = new BehaviorSubject<Station | undefined>(undefined);
+  public stations$ = this.stations.asObservable();
 
   constructor(private http: HttpClient) {
+    this.stations$.subscribe(a => {
+      if (a) {
+        this.stationList.push(a);
+      }
+    });
+    this.getDataRecordsArrayFromCSVFile();
   }
 
   redIcon = new L.Icon({
@@ -27,7 +41,7 @@ export class StationsService {
   });
 
 
-  getDataRecordsArrayFromCSVFile(): Station[] {
+  getDataRecordsArrayFromCSVFile(): void {
     const options: {
       headers?: HttpHeaders;
       observe?: 'body';
@@ -70,15 +84,15 @@ export class StationsService {
           tab.push(station);
         }
         if (id && name && geoId && longitude && latitude) {
-          L.marker(new L.LatLng(latitude, longitude), {icon: this.redIcon}).addTo(this.map).on('click', event => {
+          const marker = L.marker(new L.LatLng(latitude, longitude), {icon: this.redIcon}).on('click', event => {
             this.clickedMarker.next(station);
-          })
-            .bindPopup(name);
+          }).bindPopup(name);
+          this.stations.next(station);
+          this.group.addLayer(marker);
+          this.map.addLayer(this.group);
         }
       }));
     });
-    this.stationList = tab;
-    return tab;
   }
 
   capitalize(s: string): string {

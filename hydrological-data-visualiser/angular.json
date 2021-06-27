@@ -30,7 +30,9 @@
             "styles": [
               "./node_modules/leaflet/dist/leaflet.css",
               "src/styles.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.min.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/leaflet.markercluster/dist/MarkerCluster.css",
+              "./node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"
             ],
             "scripts": [
               "./node_modules/@popperjs/core/dist/umd/popper.min.js",

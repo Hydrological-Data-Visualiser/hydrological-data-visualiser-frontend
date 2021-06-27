@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {StationsService} from 'src/app/services/stations.service';
 import {Station} from '../../model/Station';
 
@@ -8,7 +8,9 @@ import {Station} from '../../model/Station';
   styleUrls: ['./stations.component.css']
 })
 export class StationsComponent implements AfterViewInit, OnInit {
-  list: Station[] = [];
+  allStations: Station[] = [];
+  // searchTerm = ' ';
+  query: any;
 
   constructor(private stationService: StationsService) {
   }
@@ -17,10 +19,10 @@ export class StationsComponent implements AfterViewInit, OnInit {
   }
 
   zoomTo(id: number): void {
-    const station = this.list.filter(a => a.id === id)[0];
+    const station = this.allStations.filter(a => a.id === id)[0];
     const map = this.stationService.map;
     if (station.latitude && station.longitude) {
-      map.flyTo([station.latitude, station.longitude], 13, {
+      map.setView([station.latitude, station.longitude], 13, {
         animate: true,
         animation: true,
         // duration: 2
@@ -29,6 +31,10 @@ export class StationsComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit(): void {
-    this.list = this.stationService.getDataRecordsArrayFromCSVFile();
+    this.stationService.stations$.subscribe(station => {
+      if (station) {
+        this.allStations.push(station);
+      }
+    });
   }
 }

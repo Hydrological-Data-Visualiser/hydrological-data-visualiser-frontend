@@ -11,6 +11,7 @@ import {SidePanelComponent} from './components/side-panel/side-panel.component';
 import {AngularResizedEventModule} from 'angular-resize-event';
 import {FormsModule} from '@angular/forms';
 import {StationsComponent} from './components/stations/stations.component';
+import {SearchFilterPipe} from './pipes/search-filter.pipe';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import {StationsComponent} from './components/stations/stations.component';
     NavbarComponent,
     FormModalComponent,
     SidePanelComponent,
-    StationsComponent
+    StationsComponent,
+    SearchFilterPipe
   ],
   imports: [
     BrowserModule,
