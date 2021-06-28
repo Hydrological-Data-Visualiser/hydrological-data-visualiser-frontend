@@ -79,7 +79,13 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latlng).addTo(this.map);
+    this.marker = L.marker(latlng).addTo(this.map).on('click', a => {
+      this.map.removeLayer(this.marker);
+      this.marker = undefined;
+      this.longEmitter.emit(undefined);
+      this.latEmitter.emit(undefined);
+      this.clickedEmitter.emit(false);
+    });
     // .bindPopup('Ionic 4 <br> Leaflet.')
     // .openPopup();
   }

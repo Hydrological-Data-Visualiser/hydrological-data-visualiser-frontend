@@ -44,38 +44,61 @@ export class StationsService {
     } = {
       responseType: 'arraybuffer'
     };
+
+    function getDistinctLatLongStations(stations: Station[]): Station[] {
+      const tab: number[] = [];
+      const retVal: Station[] = [];
+      stations.forEach(a => {
+        const latitude = a.latitude;
+        if (latitude) {
+          if (!tab.includes(latitude)) {
+            tab.push(latitude);
+            retVal.push(a);
+          }
+        }
+      });
+      return retVal;
+    }
+
     this.http.get(this.stationFilePath, options)
       .subscribe((res) => {
-        const enc = new TextDecoder('utf-8');
+          const enc = new TextDecoder('utf-8');
+          // const dupa = getDistinctLatLong(enc.decode(res).split('\n'))
+          const stations = enc.decode(res).split('\n').map(elem => {
+            let latitude: number | undefined;
+            let longitude: number | undefined;
+            let name = '';
+            let id = 0;
+            let geoId = 0;
+            if (elem.split(',')[0]) {
+              id = parseInt(elem.split(',')[0], 10);
+            }
+            if (elem.split(',')[1]) {
+              name = this.capitalize(elem.split(',')[1]);
+            }
+            if (elem.split(',')[2]) {
+              geoId = parseInt(elem.split(',')[2], 10);
+            }
+            if (elem.split(',')[3]) {
+              latitude = parseFloat(elem.split(',')[3]);
+            }
+            if (elem.split(',')[4]) {
+              longitude = parseFloat(elem.split(',')[4]);
+            }
+            return new Station(id, name, geoId, latitude, longitude);
+          }).filter(a => {
+            return a.id !== 0 || a.name === '' || a.geoId !== 0;
+          });
 
-        (enc.decode(res).split('\n').forEach(e => {
-          let latitude: number | undefined;
-          let longitude: number | undefined;
-          let name: string | undefined;
-          let id: number | undefined;
-          let geoId: number | undefined;
-          if (e.split(',')[0]) {
-            id = parseInt(e.split(',')[0], 10);
-          }
-          if (e.split(',')[1]) {
-            name = this.capitalize(e.split(',')[1]);
-          }
-          if (e.split(',')[2]) {
-            geoId = parseInt(e.split(',')[2], 10);
-          }
-          if (e.split(',')[3]) {
-            latitude = parseFloat(e.split(',')[3]);
-          }
-          if (e.split(',')[4]) {
-            longitude = parseFloat(e.split(',')[4]);
-          }
-          if (id && name && geoId) {
-            const station = new Station(id, name, geoId, latitude, longitude);
-            this.stations.next(station);
-            this.createMarker(station);
-          }
-        }));
-      });
+          const distinctStations = getDistinctLatLongStations(stations);
+          distinctStations.forEach(e => {
+            if (e) {
+              this.stations.next(e);
+              this.createMarker(e);
+            }
+          });
+        }
+      );
   }
 
   capitalize(s: string): string {

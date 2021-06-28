@@ -22,6 +22,7 @@ export class StationsComponent implements AfterViewInit, OnInit {
     const station = this.allStations.filter(a => a.id === id)[0];
     const map = this.stationService.map;
     if (station.latitude && station.longitude) {
+      this.query = '';
       map.setView([station.latitude, station.longitude], 13, {
         animate: true,
         animation: true,
