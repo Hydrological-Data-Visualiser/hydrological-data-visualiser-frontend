@@ -32,6 +32,27 @@ export class StationsService {
     shadowSize: [41, 41]
   });
 
+  getColoredIcon(color : String){
+    const markerHtmlStyles = `
+      background-color: ${color};
+      width: 2rem;
+      height: 2rem;
+      display: block;
+      left: -1rem;
+      top: -1rem;
+      position: relative;
+      border-radius: 2rem 2rem 0;
+      transform: rotate(45deg);
+      border: 2px solid #000000`
+    
+    return L.divIcon({
+      iconAnchor: [0, 24],
+      popupAnchor: [1, -36],
+      shadowSize: [41, 41],
+      html: `<span style="${markerHtmlStyles}" />`
+    })
+  }
+
 
   getDataRecordsArrayFromCSVFile(): void {
     const options: {
@@ -107,7 +128,7 @@ export class StationsService {
 
   createMarker(station: Station): void {
     if (station.longitude && station.latitude) {
-      const marker = L.marker(new L.LatLng(station.latitude, station.longitude), {icon: this.redIcon}).on('click', event => {
+      const marker = L.marker(new L.LatLng(station.latitude, station.longitude), {icon: this.getColoredIcon('#00ffff')}).on('click', event => {
         this.clickedMarker.next(station);
       }).bindPopup(station.name);
       this.group.addLayer(marker);
