@@ -7,7 +7,8 @@ import { PreciptationDayData } from '../model/PreciptationDayData';
 })
 export class PrecipitationService {
 
-  precipitationFilePath = "precipitation.csv"
+  private precipitationFilePath = "precipitation.csv"
+  public precipitationDict : {[key: string]: number} = {}
 
   constructor(private http: HttpClient) {
     this.getDataRecordsArrayFromCSVFile();
@@ -28,7 +29,7 @@ export class PrecipitationService {
     this.http.get(this.precipitationFilePath, options)
       .subscribe((res) => {
           const enc = new TextDecoder('utf-8');
-          const stations = enc.decode(res).split('\n').map(elem => {
+          enc.decode(res).split('\n').map(elem => {
             let name = ''
             let stationId = 0
             let year = ''
@@ -51,15 +52,28 @@ export class PrecipitationService {
               day = elem.split(',')[4];
             }
             if (elem.split(',')[5]) {
-              precipitation = parseInt(elem.split(',')[2], 10);
+              precipitation = parseInt(elem.split(',')[5], 10);
             }
-            return new PreciptationDayData(stationId, name, year, month, day, precipitation);
-          }).filter(a => {
-            return a.stationID !== 0 || a.stationName === ''
+            
+            this.put(stationId, year, month, day, precipitation);
           });
         });
   }
+
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  }
+
+  // quick solution
+  put(stationId: number, year: string, month: string, day: string, value: number): void {
+    let key: string = stationId + "|" + year + "|" + month + "|" + day 
+    this.precipitationDict[key] = value
+  }
+  get(stationId: number, year: string, month: string, day: string): number {
+    let key: string = stationId + "|" + year + "|" + month + "|" + day
+    if(key in this.precipitationDict){
+      return this.precipitationDict[key]
+    } else 
+    return 0
   }
 }
