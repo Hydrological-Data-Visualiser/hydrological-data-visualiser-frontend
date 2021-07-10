@@ -53,7 +53,8 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  constructor(private riverService: RiverService, private stationService: StationsService) {
+  constructor(private riverService: RiverService, 
+              private stationService: StationsService) {
     this.lat = 0;
     this.long = 0;
     this.stationService.map = this.map;
