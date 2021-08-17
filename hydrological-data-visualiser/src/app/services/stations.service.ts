@@ -4,7 +4,7 @@ import {Station} from '../model/Station';
 import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
-import { PrecipitationService } from './precipitation.service';
+import {PrecipitationService} from './precipitation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +20,10 @@ export class StationsService {
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
 
-  constructor(private http: HttpClient, 
+  constructor(private http: HttpClient,
               private precipitationService: PrecipitationService) {
     // Callback used to chain calls
-    precipitationService.getDataRecordsArrayFromCSVFile(this)
+    precipitationService.getDataRecordsArrayFromCSVFile(this);
   }
 
   redIcon = new L.Icon({
@@ -35,7 +35,7 @@ export class StationsService {
     shadowSize: [41, 41]
   });
 
-  getColoredIcon(color : String){
+  getColoredIcon(color: string): L.DivIcon {
     const markerHtmlStyles = `
       background-color: ${color};
       width: 2rem;
@@ -46,14 +46,14 @@ export class StationsService {
       position: relative;
       border-radius: 2rem 2rem 0;
       transform: rotate(45deg);
-      border: 2px solid #000000`
-    
+      border: 2px solid #000000`;
+
     return L.divIcon({
       iconAnchor: [0, 24],
       popupAnchor: [1, -36],
       shadowSize: [41, 41],
       html: `<span style="${markerHtmlStyles}" />`
-    })
+    });
   }
 
 
@@ -68,7 +68,7 @@ export class StationsService {
     } = {
       responseType: 'arraybuffer'
     };
-    console.log("In")
+    console.log('In');
 
     function getDistinctLatLongStations(stations: Station[]): Station[] {
       const tab: number[] = [];
@@ -119,7 +119,7 @@ export class StationsService {
           distinctStations.forEach(e => {
             if (e) {
               this.stations.next(e);
-              let colorValue = this.precipitationService.get(e.id, "2020", "10", "18")*50
+              const colorValue = this.precipitationService.get(e.id, '2020', '10', '18') * 50;
               this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
             }
           });
@@ -130,13 +130,16 @@ export class StationsService {
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }
-  rgbToHex(r: number, g: number, b: number): String {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+
+  rgbToHex(r: number, g: number, b: number): string {
+    // tslint:disable-next-line:no-bitwise
+    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
-  createMarker(station: Station, colorHex: String): void {
+  createMarker(station: Station, colorHex: string): void {
     if (station.longitude && station.latitude) {
-      const marker = L.marker(new L.LatLng(station.latitude, station.longitude), {icon: this.getColoredIcon(colorHex)}).on('click', event => {
+      const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
+        {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
       }).bindPopup(station.name);
       this.group.addLayer(marker);

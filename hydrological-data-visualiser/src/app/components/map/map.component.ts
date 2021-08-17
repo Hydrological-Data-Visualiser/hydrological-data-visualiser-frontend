@@ -22,7 +22,6 @@ export class MapComponent implements AfterViewInit {
   @Output() latEmitter = new EventEmitter<number>();
   @Output() clickedEmitter = new EventEmitter<boolean>();
 
-
   private initMap(): void {
     this.map = L.map('map', {
       center: [50.9030, 19.0550],
@@ -53,7 +52,7 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  constructor(private riverService: RiverService, 
+  constructor(private riverService: RiverService,
               private stationService: StationsService) {
     this.lat = 0;
     this.long = 0;
@@ -80,7 +79,7 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latlng).addTo(this.map).on('click', a => {
+    this.marker = L.marker(latlng, {icon: this.stationService.redIcon}).addTo(this.map).on('click', a => {
       this.map.removeLayer(this.marker);
       this.marker = undefined;
       this.longEmitter.emit(undefined);

@@ -13,6 +13,7 @@ import {FormsModule} from '@angular/forms';
 import {StationsComponent} from './components/stations/stations.component';
 import {SearchFilterPipe} from './pipes/search-filter.pipe';
 import {ScrollingModule} from '@angular/cdk/scrolling';
+import { CalendarModule } from '@syncfusion/ej2-angular-calendars';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
     HttpClientModule,
     AngularResizedEventModule,
     FormsModule,
-    ScrollingModule
+    ScrollingModule,
+    CalendarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

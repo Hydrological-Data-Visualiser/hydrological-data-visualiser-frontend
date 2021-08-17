@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~11.2.10",
     "@angular/router": "~11.2.10",
     "@popperjs/core": "^2.9.2",
+    "@syncfusion/ej2-angular-calendars": "^19.2.55",
     "@types/leaflet.markercluster": "^1.4.4",
     "angular-leaflet": "^0.0.17",
     "angular-resize-event": "^2.1.0",
