@@ -58,7 +58,6 @@ export class StationsService {
     });
   }
 
-
   getDataRecordsArrayFromCSVFile(): void {
     const options: {
       headers?: HttpHeaders;
@@ -75,7 +74,6 @@ export class StationsService {
     this.http.get(this.stationFilePath, options)
       .subscribe((res) => {
           const enc = new TextDecoder('utf-8');
-          // const dupa = getDistinctLatLong(enc.decode(res).split('\n'))
           this.stationList = enc.decode(res).split('\n').map(elem => {
             let latitude: number | undefined;
             let longitude: number | undefined;
@@ -104,15 +102,6 @@ export class StationsService {
             this.stations.next(e);
             return e;
           });
-          // this.putMarkers(stations, '2020', '10', '18' );
-          // const distinctStations = getDistinctLatLongStations(stations);
-          // distinctStations.forEach(e => {
-          //   if (e) {
-          //     this.stations.next(e);
-          //     const colorValue = this.precipitationService.get(e.id, '2020', '10', '18') * 50;
-          //     this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
-          //   }
-          // });
         }
       );
   }
@@ -133,20 +122,13 @@ export class StationsService {
   }
 
   putMarkers(year: string, month: string, day: string): void {
-    // this.markers.forEach(e => {
-    //     this.map.removeLayer(e);
-    //     console.log("Removing" + e);
-    //   }
-    // );
-    this.map.removeLayer(this.group);
     this.group.clearLayers();
-    // this.markers = [];
-    // this.map.removeLayer(this.markers);
     const distinctStations = this.getDistinctLatLongStations(this.stationList);
-    distinctStations.forEach(e => {
-      if (e) {
-        const colorValue = this.precipitationService.get(e.id, year, month, day) * 50;
-        this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
+    distinctStations.forEach(station => {
+      if (station) {
+        const rainValue = this.precipitationService.get(station.id, year, month, day);
+        const colorValue = rainValue * 50;
+        this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
       }
     });
   }
@@ -160,15 +142,14 @@ export class StationsService {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
-  createMarker(station: Station, colorHex: string): void {
+  createMarker(station: Station, colorHex: string, rainValue: number): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      }).bindPopup(station.name);
+      }).bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
-      // this.markers.push(marker);
     }
   }
 }
