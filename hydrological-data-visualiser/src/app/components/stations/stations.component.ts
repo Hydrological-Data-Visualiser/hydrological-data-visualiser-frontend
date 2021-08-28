@@ -40,5 +40,6 @@ export class StationsComponent implements AfterViewInit, OnInit {
         this.allStations = newStations;
       }
     });
+    // this.allStations =  this.stationService.stationList;
   }
 }

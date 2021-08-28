@@ -19,6 +19,8 @@ export class StationsService {
   });
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
+  public stationList: Station[] = [];
+  private markers: L.Marker[] = [];
 
   constructor(private http: HttpClient,
               private precipitationService: PrecipitationService) {
@@ -70,26 +72,11 @@ export class StationsService {
     };
     console.log('In');
 
-    function getDistinctLatLongStations(stations: Station[]): Station[] {
-      const tab: number[] = [];
-      const retVal: Station[] = [];
-      stations.forEach(a => {
-        const latitude = a.latitude;
-        if (latitude) {
-          if (!tab.includes(latitude)) {
-            tab.push(latitude);
-            retVal.push(a);
-          }
-        }
-      });
-      return retVal;
-    }
-
     this.http.get(this.stationFilePath, options)
       .subscribe((res) => {
           const enc = new TextDecoder('utf-8');
           // const dupa = getDistinctLatLong(enc.decode(res).split('\n'))
-          const stations = enc.decode(res).split('\n').map(elem => {
+          this.stationList = enc.decode(res).split('\n').map(elem => {
             let latitude: number | undefined;
             let longitude: number | undefined;
             let name = '';
@@ -113,18 +100,55 @@ export class StationsService {
             return new Station(id, name, geoId, latitude, longitude);
           }).filter(a => {
             return a.id !== 0 || a.name === '' || a.geoId !== 0;
+          }).map(e => {
+            this.stations.next(e);
+            return e;
           });
-
-          const distinctStations = getDistinctLatLongStations(stations);
-          distinctStations.forEach(e => {
-            if (e) {
-              this.stations.next(e);
-              const colorValue = this.precipitationService.get(e.id, '2020', '10', '18') * 50;
-              this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
-            }
-          });
+          // this.putMarkers(stations, '2020', '10', '18' );
+          // const distinctStations = getDistinctLatLongStations(stations);
+          // distinctStations.forEach(e => {
+          //   if (e) {
+          //     this.stations.next(e);
+          //     const colorValue = this.precipitationService.get(e.id, '2020', '10', '18') * 50;
+          //     this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
+          //   }
+          // });
         }
       );
+  }
+
+  getDistinctLatLongStations(stations: Station[]): Station[] {
+    const tab: number[] = [];
+    const retVal: Station[] = [];
+    stations.forEach(a => {
+      const latitude = a.latitude;
+      if (latitude) {
+        if (!tab.includes(latitude)) {
+          tab.push(latitude);
+          retVal.push(a);
+        }
+      }
+    });
+    return retVal;
+  }
+
+  putMarkers(year: string, month: string, day: string): void {
+    // this.markers.forEach(e => {
+    //     this.map.removeLayer(e);
+    //     console.log("Removing" + e);
+    //   }
+    // );
+    this.map.removeLayer(this.group);
+    this.group.clearLayers();
+    // this.markers = [];
+    // this.map.removeLayer(this.markers);
+    const distinctStations = this.getDistinctLatLongStations(this.stationList);
+    distinctStations.forEach(e => {
+      if (e) {
+        const colorValue = this.precipitationService.get(e.id, year, month, day) * 50;
+        this.createMarker(e, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255));
+      }
+    });
   }
 
   capitalize(s: string): string {
@@ -144,6 +168,7 @@ export class StationsService {
       }).bindPopup(station.name);
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
+      // this.markers.push(marker);
     }
   }
 }

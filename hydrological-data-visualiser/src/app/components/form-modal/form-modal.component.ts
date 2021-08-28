@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormInputData} from '../../model/form-input-data';
+import {StationsService} from '../../services/stations.service';
 
 @Component({
   selector: 'app-form-modal',
@@ -12,14 +13,31 @@ export class FormModalComponent implements OnInit {
   public value: Date = new Date();
   model = new FormInputData(50, 19);
 
-  constructor() {
+  constructor(private stationService: StationsService) {
   }
 
   onSubmit(): void {
-    console.log(this.model, this.value);
+    console.log(this.value);
+    const date = this.value;
+    const year = date.getFullYear().toString();
+    const month = this.dateComponentToString(date.getMonth());
+    const day = this.dateComponentToString(date.getDay());
+    this.stationService.putMarkers(year, month, day);
+  }
+
+  dateComponentToString(month: number): string {
+    month = month + 1;
+    if (month < 10) {
+      return '0' + month.toString();
+    } else {
+      return month.toString();
+    }
   }
 
   ngOnInit(): void {
   }
 
+  onValueChange(args: any): void {
+    this.value = args.value;
+  }
 }

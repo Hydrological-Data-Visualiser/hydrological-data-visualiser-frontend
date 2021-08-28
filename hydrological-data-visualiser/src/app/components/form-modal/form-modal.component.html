@@ -37,10 +37,12 @@
           <!--                  </div>-->
           <!--            </div>-->
           <div class="row align-items-center p-2">
-            <ejs-calendar id=calendar [value]='value' [firstDayOfWeek]='1' (input)="value" ></ejs-calendar>
+            <ejs-calendar  (change)="onValueChange($event)" id=calendar [value]='value' [firstDayOfWeek]='1'></ejs-calendar>
+            <span id="selected">Selected Value: </span>
+
           </div>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" [disabled]="!dataForm.form.valid">Submit</button>
+          <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Submit</button>
         </form>
       </div>
     </div>
