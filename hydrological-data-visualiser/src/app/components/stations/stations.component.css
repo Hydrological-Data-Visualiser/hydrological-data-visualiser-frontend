@@ -1,0 +1,20 @@
+a {
+  color: #003566;
+  /*text-decoration: none;*/
+}
+
+a:hover {
+  color: #ffc300;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.example-viewport {
+  height: 200px;
+  width: 200px;
+  border: 1px solid black;
+}
+
+.example-item {
+  height: 50px;
+}

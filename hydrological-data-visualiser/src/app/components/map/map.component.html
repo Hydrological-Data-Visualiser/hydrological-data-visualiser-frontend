@@ -1,5 +1,12 @@
-<div class="map-container">
-    <div class="map-frame">
-      <div id="map"></div>
+<div class="row">
+<!--  <div class="col-2">-->
+<!--    <app-side-panel></app-side-panel>-->
+<!--  </div>-->
+  <div class="col-12">
+    <div class="map-container" (resized)="onResized($event)">
+      <div class="map-frame">
+        <div id="map"></div>
+      </div>
     </div>
   </div>
+</div>

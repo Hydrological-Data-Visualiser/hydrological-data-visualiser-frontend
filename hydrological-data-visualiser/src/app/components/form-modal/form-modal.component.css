@@ -1,0 +1,8 @@
+button {
+    margin: 5px;
+}
+
+.validation-msg {
+    margin: 0px;
+    padding: 6px 12px 6px 12px;
+}
