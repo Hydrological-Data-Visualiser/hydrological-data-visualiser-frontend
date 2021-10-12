@@ -18,3 +18,7 @@ a:hover {
 .example-item {
   height: 50px;
 }
+.col {
+  flex: 0 0 20%;
+  max-width: 20%;
+}
