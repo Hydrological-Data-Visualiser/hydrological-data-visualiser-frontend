@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {StationsService} from './stations.service';
+import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
 
 @Injectable({
   providedIn: 'root'
@@ -54,24 +55,33 @@ export class PrecipitationService {
             precipitation = parseFloat(elemSplit[5]);
           }
 
-          this.put(stationId, year, month, day, precipitation);
+          // this.put(stationId, year, month, day, precipitation);
         });
         stationService.getDataRecordsArrayFromGetRequest();
       });
+  }
+
+  getDataRecordsArrayFromGetRequest(stationService: StationsService): void {
+    stationService.getDataRecordsArrayFromGetRequest();
+
+    this.http.get<PreciptationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
+      data.forEach(a => {
+        this.put(a.stationId, a.date.toString(), a.dailyPrecipitation);
+      });
+    });
   }
 
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }
 
-  put(stationId: number, year: string, month: string, day: string, value: number): void {
-    const key: string = this.genKey(stationId, year, month, day);
+  put(stationId: number, date: string, value: number): void {
+    const key: string = this.genKey(stationId, date);
     this.precipitationDict[key] = value;
   }
 
-  get(stationId: number, year: string, month: string, day: string): number {
-    const key: string = this.genKey(stationId, year, month, day);
-    // console.log("get " + stationId + " " + this.precipitationDict[key])
+  get(stationId: number, date: string): number {
+    const key: string = this.genKey(stationId, date);
     if (key in this.precipitationDict && !isNaN(this.precipitationDict[key])) {
       return this.precipitationDict[key];
     } else {
@@ -79,8 +89,8 @@ export class PrecipitationService {
     }
   }
 
-  genKey(stationId: number, year: string, month: string, day: string): string {
-    return String(stationId) + '|' + year + '|' + month + '|' + day;
+  genKey(stationId: number, date: string): string {
+    // date format YYYY-MM-DD
+    return String(stationId) + '|' + date;
   }
-
 }

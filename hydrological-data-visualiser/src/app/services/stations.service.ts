@@ -25,7 +25,7 @@ export class StationsService {
   constructor(private http: HttpClient,
               private precipitationService: PrecipitationService) {
     // Callback used to chain calls
-    precipitationService.getDataRecordsArrayFromCSVFile(this);
+    precipitationService.getDataRecordsArrayFromGetRequest(this);
   }
 
   redIcon = new L.Icon({
@@ -112,7 +112,6 @@ export class StationsService {
       this.stations$.subscribe(value => {
         this.stationList.push(value);
       });
-
       data.forEach(value => {
         this.stations.next(new Station(
           value.id,
@@ -140,12 +139,13 @@ export class StationsService {
     return retVal;
   }
 
-  putMarkers(year: string, month: string, day: string): void {
+  putMarkers(date: string): void {
     this.group.clearLayers();
     const distinctStations = this.getDistinctLatLongStations(this.stationList);
     distinctStations.forEach(station => {
       if (station) {
-        const rainValue = this.precipitationService.get(station.id, year, month, day);
+        const rainValue = this.precipitationService.get(station.id, date);
+        console.log(rainValue);
         const colorValue = rainValue * 50;
         this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
       }
