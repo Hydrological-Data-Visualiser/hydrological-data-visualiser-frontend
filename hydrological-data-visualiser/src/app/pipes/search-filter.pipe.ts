@@ -1,5 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Station} from '../model/Station';
+import {Station} from '../model/station';
 
 @Pipe({
   name: 'searchFilter'

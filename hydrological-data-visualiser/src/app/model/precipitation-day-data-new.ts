@@ -1,4 +1,4 @@
-export class PreciptationDayDataNew {
+export class PrecipitationDayDataNew {
   constructor(
     public id: number,
     public stationId: number,

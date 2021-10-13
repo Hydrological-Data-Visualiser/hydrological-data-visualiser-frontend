@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {StationsService} from './stations.service';
-import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +64,7 @@ export class PrecipitationService {
   getDataRecordsArrayFromGetRequest(stationService: StationsService): void {
     stationService.getDataRecordsArrayFromGetRequest();
 
-    this.http.get<PreciptationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
+    this.http.get<PrecipitationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
       data.forEach(a => {
         this.put(a.stationId, a.date.toString(), a.dailyPrecipitation);
       });

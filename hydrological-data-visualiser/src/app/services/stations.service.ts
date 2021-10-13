@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Station} from '../model/Station';
+import {Station} from '../model/station';
 import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
