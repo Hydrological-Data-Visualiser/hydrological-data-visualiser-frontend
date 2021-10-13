@@ -11,7 +11,7 @@ export class SearchFilterPipe implements PipeTransform {
       return null;
     }
     if (!args) {
-      return value;
+      return [];
     }
 
     args = args.toLowerCase();

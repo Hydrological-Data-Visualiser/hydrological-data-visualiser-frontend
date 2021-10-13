@@ -58,6 +58,7 @@ export class StationsService {
     });
   }
 
+  // not used
   getDataRecordsArrayFromCSVFile(): void {
     const options: {
       headers?: HttpHeaders;
@@ -104,6 +105,24 @@ export class StationsService {
           });
         }
       );
+  }
+
+  getDataRecordsArrayFromGetRequest(): void {
+    this.http.get<Station[]>('https://imgw-mock.herokuapp.com/stations').subscribe(data => {
+      this.stations$.subscribe(value => {
+        this.stationList.push(value);
+      });
+
+      data.forEach(value => {
+        this.stations.next(new Station(
+          value.id,
+          value.name.charAt(0).toUpperCase() + value.name.slice(1).toLowerCase(),
+          value.geoId,
+          value.latitude,
+          value.longitude
+        ));
+      });
+    });
   }
 
   getDistinctLatLongStations(stations: Station[]): Station[] {

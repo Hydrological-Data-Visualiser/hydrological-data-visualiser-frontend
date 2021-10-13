@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {StationsService} from 'src/app/services/stations.service';
 import {Station} from '../../model/Station';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-stations',
@@ -10,9 +11,10 @@ import {Station} from '../../model/Station';
 export class StationsComponent implements AfterViewInit, OnInit {
   allStations: Station[] = [];
   query = '';
+
   // items = Array.from({length: 200000}).map((_, i) => `Item ${i}`);
 
-  constructor(private stationService: StationsService) {
+  constructor(private stationService: StationsService, private http: HttpClient) {
   }
 
   ngAfterViewInit(): void {
@@ -32,14 +34,8 @@ export class StationsComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit(): void {
-    this.stationService.stations$.subscribe(station => {
-      if (station) {
-        const newStations = this.allStations;
-        newStations.push(station);
-        this.allStations = [];
-        this.allStations = newStations;
-      }
-    });
-    // this.allStations =  this.stationService.stationList;
+     this.stationService.stations$.subscribe(station => {
+       this.allStations.push(station);
+     });
   }
 }

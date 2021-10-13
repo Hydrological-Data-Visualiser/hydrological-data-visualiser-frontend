@@ -56,7 +56,7 @@ export class PrecipitationService {
 
           this.put(stationId, year, month, day, precipitation);
         });
-        stationService.getDataRecordsArrayFromCSVFile();
+        stationService.getDataRecordsArrayFromGetRequest();
       });
   }
 
