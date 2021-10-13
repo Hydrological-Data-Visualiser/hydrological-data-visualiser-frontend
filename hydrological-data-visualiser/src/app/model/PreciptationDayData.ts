@@ -1,7 +1,7 @@
 export class PreciptationDayData {
     constructor(
         public stationID: number,
-        public stationName: String,
+        public stationName: string,
         public year: string,
         public month: string,
         public day: string,

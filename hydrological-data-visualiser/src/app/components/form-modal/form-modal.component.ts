@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormInputData} from '../../model/form-input-data';
 import {StationsService} from '../../services/stations.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-form-modal',
@@ -19,19 +20,8 @@ export class FormModalComponent implements OnInit {
   onSubmit(): void {
     console.log(this.value);
     const date = this.value;
-    const year = date.getFullYear().toString();
-    const month = this.dateComponentToString(date.getMonth());
-    const day = this.dateComponentToString(date.getDay());
-    this.stationService.putMarkers(year, month, day);
-  }
-
-  dateComponentToString(month: number): string {
-    month = month + 1;
-    if (month < 10) {
-      return '0' + month.toString();
-    } else {
-      return month.toString();
-    }
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    this.stationService.putMarkers(formattedDate);
   }
 
   ngOnInit(): void {
