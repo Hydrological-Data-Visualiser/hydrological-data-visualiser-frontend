@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
+import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
 
 @Injectable({
   providedIn: 'root'
@@ -141,14 +142,16 @@ export class StationsService {
 
   putMarkers(date: string): void {
     this.group.clearLayers();
-    const distinctStations = this.getDistinctLatLongStations(this.stationList);
-    distinctStations.forEach(station => {
-      if (station) {
-        const rainValue = this.precipitationService.get(station.id, date);
-        console.log(rainValue);
-        const colorValue = rainValue * 50;
-        this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-      }
+    this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}`).subscribe(data => {
+      data.forEach(precipitation => {
+        this.http.get<Station[]>(`https://imgw-mock.herokuapp.com/stations?id=${precipitation.stationId}`).subscribe(station => {
+          const rainValue = precipitation.dailyPrecipitation;
+          const colorValue = rainValue * 50;
+          if (station[0]) {
+            this.createMarker(station[0], this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          }
+        });
+      });
     });
   }
 
@@ -166,7 +169,7 @@ export class StationsService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      }).bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+      }).bindPopup(this.capitalize(station.name) + ' ' + rainValue.toString() + 'mm');
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
