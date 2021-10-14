@@ -6,7 +6,6 @@ import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
 import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
-import {mark} from "@angular/compiler-cli/src/ngtsc/perf/src/clock";
 
 @Injectable({
   providedIn: 'root'
@@ -150,7 +149,7 @@ export class StationsService {
           const colorValue = rainValue * 50;
           this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
         } else {
-          this.createMarker(station, this.rgbToHex(Math.max(0, 0), Math.max(0, 0), 0), NaN);
+          this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
         }
       });
     });
