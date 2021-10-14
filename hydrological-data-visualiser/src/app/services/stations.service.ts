@@ -6,6 +6,7 @@ import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
 import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
+import {mark} from "@angular/compiler-cli/src/ngtsc/perf/src/clock";
 
 @Injectable({
   providedIn: 'root'
@@ -142,15 +143,15 @@ export class StationsService {
 
   putMarkers(date: string): void {
     this.group.clearLayers();
-    this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}`).subscribe(data => {
-      data.forEach(precipitation => {
-        this.http.get<Station[]>(`https://imgw-mock.herokuapp.com/stations?id=${precipitation.stationId}`).subscribe(station => {
-          const rainValue = precipitation.dailyPrecipitation;
+    this.getDistinctLatLongStations(this.stationList).forEach(station => {
+      this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
+        if (data.length > 0) {
+          const rainValue = data[0].dailyPrecipitation;
           const colorValue = rainValue * 50;
-          if (station[0]) {
-            this.createMarker(station[0], this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          }
-        });
+          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+        } else {
+          this.createMarker(station, this.rgbToHex(Math.max(0, 0), Math.max(0, 0), 0), NaN);
+        }
       });
     });
   }
@@ -169,7 +170,13 @@ export class StationsService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      }).bindPopup(this.capitalize(station.name) + ' ' + rainValue.toString() + 'mm');
+      });
+      if (!isNaN(rainValue)) {
+        marker.bindPopup(this.capitalize(station.name) + ' ' + rainValue.toString() + 'mm');
+      }
+      else {
+        marker.bindPopup(this.capitalize(station.name) + '  no rain data');
+      }
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
