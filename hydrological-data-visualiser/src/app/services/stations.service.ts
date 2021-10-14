@@ -170,13 +170,7 @@ export class StationsService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      });
-      if (!isNaN(rainValue)) {
-        marker.bindPopup(this.capitalize(station.name) + ' ' + rainValue.toString() + 'mm');
-      }
-      else {
-        marker.bindPopup(this.capitalize(station.name) + '  no rain data');
-      }
+      }).bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
