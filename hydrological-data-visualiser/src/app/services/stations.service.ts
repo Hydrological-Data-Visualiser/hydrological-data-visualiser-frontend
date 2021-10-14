@@ -169,7 +169,12 @@ export class StationsService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      }).bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+      });
+      if (!isNaN(rainValue)) {
+        marker.bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+      } else {
+        marker.bindPopup(station.name + ' no rain data');
+      }
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
