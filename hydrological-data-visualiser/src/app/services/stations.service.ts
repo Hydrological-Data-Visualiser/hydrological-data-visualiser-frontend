@@ -25,8 +25,7 @@ export class StationsService {
 
   constructor(private http: HttpClient,
               private precipitationService: PrecipitationService) {
-    // Callback used to chain calls
-    precipitationService.getDataRecordsArrayFromGetRequest(this);
+    this.getDataRecordsArrayFromGetRequest()
   }
 
   redIcon = new L.Icon({
