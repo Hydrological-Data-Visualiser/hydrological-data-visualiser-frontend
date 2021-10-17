@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {StationsService} from '../../services/stations.service';
+import * as moment from 'moment';
+import {FormInputData} from '../../model/form-input-data';
 
 @Component({
   selector: 'app-side-panel',
@@ -7,11 +9,17 @@ import {StationsService} from '../../services/stations.service';
   styleUrls: ['./side-panel.component.css']
 })
 export class SidePanelComponent implements OnInit {
+  // details attributes
   status = true;
   clicked = false;
   long: number | undefined;
   lat: number | undefined;
   name: string | undefined;
+  // form attributes
+  public minDate: Date = new Date('05/07/2017');
+  public maxDate: Date = new Date('08/27/2017');
+  public value: Date = new Date();
+  model = new FormInputData(50, 19);
 
   constructor(private stationService: StationsService) {
   }
@@ -42,5 +50,16 @@ export class SidePanelComponent implements OnInit {
 
   clickEvent(): void {
     this.status = !this.status;
+  }
+//  form methods below
+  onSubmit(): void {
+    console.log(this.value);
+    const date = this.value;
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    this.stationService.putMarkers(formattedDate);
+  }
+
+  onValueChange(args: any): void {
+    this.value = args.value;
   }
 }

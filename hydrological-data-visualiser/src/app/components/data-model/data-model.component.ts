@@ -4,15 +4,11 @@ import {StationsService} from '../../services/stations.service';
 import * as moment from 'moment';
 
 @Component({
-  selector: 'app-form-modal',
-  templateUrl: './form-modal.component.html',
-  styleUrls: ['./form-modal.component.css']
+  selector: 'app-data-model',
+  templateUrl: './data-model.component.html',
+  styleUrls: ['./data-model.component.css']
 })
-export class FormModalComponent implements OnInit {
-  public minDate: Date = new Date('05/07/2017');
-  public maxDate: Date = new Date('08/27/2017');
-  public value: Date = new Date();
-  model = new FormInputData(50, 19);
+export class DataModelComponent implements OnInit {
 
   constructor(private stationService: StationsService) {
   }
