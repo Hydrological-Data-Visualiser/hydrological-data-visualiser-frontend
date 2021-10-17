@@ -60,7 +60,8 @@ export class PrecipitationService {
         stationService.getDataRecordsArrayFromGetRequest();
       });
   }
-
+  
+  // unused
   getDataRecordsArrayFromGetRequest(stationService: StationsService): void {
     stationService.getDataRecordsArrayFromGetRequest();
 
