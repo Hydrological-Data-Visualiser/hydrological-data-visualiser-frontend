@@ -34,7 +34,7 @@ import { CalendarModule } from '@syncfusion/ej2-angular-calendars';
     ScrollingModule,
     CalendarModule
   ],
-  providers: [],
+  providers: [SidePanelComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {

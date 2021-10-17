@@ -6,6 +6,7 @@ import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class StationsService {
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
   public stationList: Station[] = [];
-  private markers: L.Marker[] = [];
+  private markers: { [key: number]: L.Marker } = {};
 
   constructor(private http: HttpClient) {
   }
@@ -178,8 +179,34 @@ export class StationsService {
       } else {
         marker.bindPopup(station.name + ' no rain data');
       }
+      this.markers[station.id] = marker
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
+  }
+
+  updateMarkers(date: Date): Promise<void> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    return Promise.all(this.getDistinctLatLongStations(this.stationList).map( station =>
+      this.http.get<PrecipitationDayDataNew[]> 
+      (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}&stationId=${station.id.toString()}`).toPromise().then( data => {
+        let result: [Station, string, number] = [station, this.rgbToHex(0, 0, 0), NaN]
+        if (data.length > 0) {
+          const rainValue = data[0].dailyPrecipitation;
+          const colorValue = rainValue * 50;
+          result = [station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue];
+        } 
+        return result;
+      })
+    )).then( list =>
+      // synchronize marker update
+      list.forEach(tuple => this.updateMarker(tuple[0], tuple[1], tuple[2]))
+    )
+  }
+
+  updateMarker(station: Station, colorHex: string, rainValue: number): void {
+    const marker = this.markers[station.id]
+    marker.setIcon(this.getColoredIcon(colorHex))
+    marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm')
   }
 }
