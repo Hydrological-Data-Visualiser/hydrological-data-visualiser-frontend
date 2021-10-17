@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {StationsService} from '../../services/stations.service';
 import * as moment from 'moment';
 import {FormInputData} from '../../model/form-input-data';
+import {DataProviderService} from '../../services/data-provider.service';
 
 @Component({
   selector: 'app-side-panel',
@@ -21,11 +21,11 @@ export class SidePanelComponent implements OnInit {
   public value: Date = new Date();
   model = new FormInputData(50, 19);
 
-  constructor(private stationService: StationsService) {
+  constructor(private dataProvider: DataProviderService) {
   }
 
   ngOnInit(): void {
-    this.stationService.clickedMarker$.subscribe(a => {
+    this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
       this.lat = a?.latitude;
       this.long = a?.longitude;
       this.name = a?.name;
@@ -56,7 +56,7 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     const date = this.value;
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    this.stationService.putMarkers(formattedDate);
+    this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
   }
 
   onValueChange(args: any): void {

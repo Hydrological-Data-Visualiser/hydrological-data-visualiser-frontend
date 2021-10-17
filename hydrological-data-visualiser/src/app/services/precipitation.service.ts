@@ -9,11 +9,12 @@ import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 export class PrecipitationService {
   private precipitationFilePath = '/assets/data/precipitation.csv';
   public precipitationDict: { [key: string]: number } = {};
+  public status = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private stationService: StationsService) {
   }
 
-  getDataRecordsArrayFromCSVFile(stationService: StationsService): void {
+  getDataRecordsArrayFromCSVFile(): void {
     const options: {
       headers?: HttpHeaders;
       observe?: 'body';
@@ -57,18 +58,21 @@ export class PrecipitationService {
 
           // this.put(stationId, year, month, day, precipitation);
         });
-        stationService.getDataRecordsArrayFromGetRequest();
+        this.stationService.getDataRecordsArrayFromGetRequest();
       });
   }
 
-  getDataRecordsArrayFromGetRequest(stationService: StationsService): void {
-    stationService.getDataRecordsArrayFromGetRequest();
-
+  getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
+    this.stationService.getDataRecordsArrayFromGetRequest();
+    const precipitationList: PrecipitationDayDataNew[] = [];
     this.http.get<PrecipitationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
       data.forEach(a => {
         this.put(a.stationId, a.date.toString(), a.dailyPrecipitation);
+        precipitationList.push(a);
       });
     });
+
+    return precipitationList;
   }
 
   capitalize(s: string): string {

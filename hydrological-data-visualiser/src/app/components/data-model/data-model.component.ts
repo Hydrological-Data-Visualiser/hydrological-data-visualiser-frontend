@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {FormInputData} from '../../model/form-input-data';
-import {StationsService} from '../../services/stations.service';
-import * as moment from 'moment';
+import {DataModelBase} from '../../model/data-model-base';
+import {DataProviderService} from '../../services/data-provider.service';
 
 @Component({
   selector: 'app-data-model',
@@ -10,20 +9,35 @@ import * as moment from 'moment';
 })
 export class DataModelComponent implements OnInit {
 
-  constructor(private stationService: StationsService) {
-  }
-
-  onSubmit(): void {
-    console.log(this.value);
-    const date = this.value;
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    this.stationService.putMarkers(formattedDate);
+  constructor(private dataProvider: DataProviderService) {
   }
 
   ngOnInit(): void {
   }
 
-  onValueChange(args: any): void {
-    this.value = args.value;
+  getModels(): DataModelBase[] {
+    return this.dataProvider.getModels();
+  }
+
+  getModelStatus(modelName: string): boolean {
+    switch (modelName) {
+      case 'IMGW':
+        return this.dataProvider.getPrecipitationService().status;
+      case 'river':
+        return this.dataProvider.getRiverService().status;
+      default:
+        return false;
+    }
+  }
+
+  changeModelStatus(modelName: string, status: boolean): void {
+    switch (modelName) {
+      case 'IMGW':
+        this.dataProvider.getPrecipitationService().status = status;
+        break;
+      case 'river':
+        this.dataProvider.getRiverService().status = status;
+        break;
+    }
   }
 }

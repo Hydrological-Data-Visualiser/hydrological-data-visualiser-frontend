@@ -22,10 +22,8 @@ export class StationsService {
   public stationList: Station[] = [];
   private markers: L.Marker[] = [];
 
-  constructor(private http: HttpClient,
-              private precipitationService: PrecipitationService) {
+  constructor(private http: HttpClient) {
     // Callback used to chain calls
-    precipitationService.getDataRecordsArrayFromGetRequest(this);
   }
 
   redIcon = new L.Icon({
@@ -139,17 +137,21 @@ export class StationsService {
     return retVal;
   }
 
-  putMarkers(date: string): void {
-    this.group.clearLayers();
-    const distinctStations = this.getDistinctLatLongStations(this.stationList);
-    distinctStations.forEach(station => {
-      if (station) {
-        const rainValue = this.precipitationService.get(station.id, date);
-        console.log(rainValue);
-        const colorValue = rainValue * 50;
-        this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-      }
-    });
+  putMarkers(date: string, precipitationService: PrecipitationService): void {
+    if (precipitationService.status) {
+      this.group.clearLayers();
+      const distinctStations = this.getDistinctLatLongStations(this.stationList);
+      distinctStations.forEach(station => {
+        if (station) {
+          const rainValue = precipitationService.get(station.id, date);
+          console.log(rainValue);
+          const colorValue = rainValue * 50;
+          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+        }
+      });
+    } else {
+      this.group.clearLayers();
+    }
   }
 
   capitalize(s: string): string {
