@@ -5,7 +5,7 @@ import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
-import {PrecipitationDayDataNew} from '../model/PreciptationDayDataNew';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -141,7 +141,7 @@ export class StationsService {
     if (precipitationService.status) {
       this.group.clearLayers();
       this.getDistinctLatLongStations(this.stationList).forEach(station => {
-        this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
+        this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
           if (data.length > 0) {
             const rainValue = data[0].dailyPrecipitation;
             const colorValue = rainValue * 50;
