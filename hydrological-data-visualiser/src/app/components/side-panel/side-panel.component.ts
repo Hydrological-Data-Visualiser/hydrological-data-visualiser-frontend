@@ -36,11 +36,15 @@ export class SidePanelComponent implements OnInit {
   }
 
   setLong(newItem: number): void {
-    this.long = Number(newItem.toFixed(6));
+    if (newItem) {
+      this.long = Number(newItem.toFixed(6));
+    }
   }
 
   setLat(newItem: number): void {
-    this.lat = Number(newItem.toFixed(6));
+    if (newItem) {
+      this.lat = Number(newItem.toFixed(6));
+    }
   }
 
   setClicked(newItem: boolean): void {
