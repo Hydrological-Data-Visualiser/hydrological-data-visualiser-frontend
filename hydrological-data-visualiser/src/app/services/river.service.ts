@@ -7,19 +7,22 @@ import * as L from 'leaflet';
 })
 export class RiverService {
   kocinka = '/assets/data/kocinka.geojson';
+  public status = false;
 
   constructor(private http: HttpClient) {
   }
 
   showKocinkaRiver(map: L.Map): void {
-    this.http.get(this.kocinka).subscribe((res: any) => {
-      const cords = res.features[0].geometry.coordinates;
-      for (let i = 0; i < cords.length - 1; i++) {
-        const table = [[cords[i][1], cords[i][0]], [cords[i + 1][1], cords[i + 1][0]]];
-        const color = this.getColor((Number(cords[i][2]) + Number(cords[i + 1][2])) / 2);
-        L.polyline(table, {color}).addTo(map);
-      }
-    });
+    if (status) {
+      this.http.get(this.kocinka).subscribe((res: any) => {
+        const cords = res.features[0].geometry.coordinates;
+        for (let i = 0; i < cords.length - 1; i++) {
+          const table = [[cords[i][1], cords[i][0]], [cords[i + 1][1], cords[i + 1][0]]];
+          const color = this.getColor((Number(cords[i][2]) + Number(cords[i + 1][2])) / 2);
+          L.polyline(table, {color}).addTo(map);
+        }
+      });
+    }
   }
 
   getColor(d: number): string {

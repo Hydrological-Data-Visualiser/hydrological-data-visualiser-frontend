@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Station} from '../model/Station';
+import {Station} from '../model/station';
 import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
-import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -23,9 +23,7 @@ export class StationsService {
   public stationList: Station[] = [];
   private markers: L.Marker[] = [];
 
-  constructor(private http: HttpClient,
-              private precipitationService: PrecipitationService) {
-    this.getDataRecordsArrayFromGetRequest()
+  constructor(private http: HttpClient) {
   }
 
   redIcon = new L.Icon({
@@ -139,19 +137,23 @@ export class StationsService {
     return retVal;
   }
 
-  putMarkers(date: string): void {
-    this.group.clearLayers();
-    this.getDistinctLatLongStations(this.stationList).forEach(station => {
-      this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
-        if (data.length > 0) {
-          const rainValue = data[0].dailyPrecipitation;
-          const colorValue = rainValue * 50;
-          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-        } else {
-          this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
-        }
+  putMarkers(date: string, precipitationService: PrecipitationService): void {
+    if (precipitationService.status) {
+      this.group.clearLayers();
+      this.getDistinctLatLongStations(this.stationList).forEach(station => {
+        this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
+          if (data.length > 0) {
+            const rainValue = data[0].dailyPrecipitation;
+            const colorValue = rainValue * 50;
+            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          } else {
+            this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
+          }
+        });
       });
-    });
+    } else {
+      this.group.clearLayers();
+    }
   }
 
   capitalize(s: string): string {

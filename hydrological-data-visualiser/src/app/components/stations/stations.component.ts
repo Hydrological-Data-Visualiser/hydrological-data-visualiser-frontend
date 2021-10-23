@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {StationsService} from 'src/app/services/stations.service';
-import {Station} from '../../model/Station';
+import {Station} from '../../model/station';
 import {HttpClient} from '@angular/common/http';
 
 @Component({

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {StationsService} from './stations.service';
-import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +9,12 @@ import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
 export class PrecipitationService {
   private precipitationFilePath = '/assets/data/precipitation.csv';
   public precipitationDict: { [key: string]: number } = {};
+  public status = false;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private stationService: StationsService) {
   }
 
-  getDataRecordsArrayFromCSVFile(stationService: StationsService): void {
+  getDataRecordsArrayFromCSVFile(): void {
     const options: {
       headers?: HttpHeaders;
       observe?: 'body';
@@ -57,19 +58,21 @@ export class PrecipitationService {
 
           // this.put(stationId, year, month, day, precipitation);
         });
-        stationService.getDataRecordsArrayFromGetRequest();
+        this.stationService.getDataRecordsArrayFromGetRequest();
       });
   }
-  
-  // unused
-  getDataRecordsArrayFromGetRequest(stationService: StationsService): void {
-    stationService.getDataRecordsArrayFromGetRequest();
 
-    this.http.get<PreciptationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
+  getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
+    this.stationService.getDataRecordsArrayFromGetRequest();
+    const precipitationList: PrecipitationDayDataNew[] = [];
+    this.http.get<PrecipitationDayDataNew[]>('https://imgw-mock.herokuapp.com/precipitation').subscribe(data => {
       data.forEach(a => {
         this.put(a.stationId, a.date.toString(), a.dailyPrecipitation);
+        precipitationList.push(a);
       });
     });
+
+    return precipitationList;
   }
 
   capitalize(s: string): string {
