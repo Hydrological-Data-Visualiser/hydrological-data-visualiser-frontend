@@ -106,7 +106,7 @@ export class StationsService {
   }
 
   getDataRecordsArrayFromGetRequest(): void {
-    this.http.get<Station[]>('https://imgw-mock.herokuapp.com/stations').subscribe(data => {
+    this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations').subscribe(data => {
       this.stations$.subscribe(value => {
         this.stationList.push(value);
       });
@@ -141,15 +141,17 @@ export class StationsService {
     if (precipitationService.status) {
       this.group.clearLayers();
       this.getDistinctLatLongStations(this.stationList).forEach(station => {
-        this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
-          if (data.length > 0) {
-            const rainValue = data[0].dailyPrecipitation;
-            const colorValue = rainValue * 50;
-            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          } else {
-            this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
-          }
-        });
+        this.http.get<PrecipitationDayDataNew[]>
+        (`https://imgw-mock.herokuapp.com/imgw/data?date=${date}&stationId=${station.id.toString()}`)
+          .subscribe(data => {
+            if (data.length > 0) {
+              const rainValue = data[0].dailyPrecipitation;
+              const colorValue = rainValue * 50;
+              this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+            } else {
+              this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
+            }
+          });
       });
     } else {
       this.group.clearLayers();
