@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
+import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
 
 @Injectable({
   providedIn: 'root'
@@ -140,14 +141,16 @@ export class StationsService {
   putMarkers(date: string, precipitationService: PrecipitationService): void {
     if (precipitationService.status) {
       this.group.clearLayers();
-      const distinctStations = this.getDistinctLatLongStations(this.stationList);
-      distinctStations.forEach(station => {
-        if (station) {
-          const rainValue = precipitationService.get(station.id, date);
-          console.log(rainValue);
-          const colorValue = rainValue * 50;
-          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-        }
+      this.getDistinctLatLongStations(this.stationList).forEach(station => {
+        this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}&stationId=${station.id.toString()}`).subscribe(data => {
+          if (data.length > 0) {
+            const rainValue = data[0].dailyPrecipitation;
+            const colorValue = rainValue * 50;
+            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          } else {
+            this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
+          }
+        });
       });
     } else {
       this.group.clearLayers();
@@ -168,7 +171,12 @@ export class StationsService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
-      }).bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+      });
+      if (!isNaN(rainValue)) {
+        marker.bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+      } else {
+        marker.bindPopup(station.name + ' no rain data');
+      }
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }

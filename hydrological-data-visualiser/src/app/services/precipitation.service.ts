@@ -11,7 +11,7 @@ export class PrecipitationService {
   public precipitationDict: { [key: string]: number } = {};
   public status = false;
 
-  constructor(private http: HttpClient, private stationService: StationsService) {
+  constructor(private http: HttpClient) {
   }
 
   getDataRecordsArrayFromCSVFile(): void {
@@ -71,8 +71,6 @@ export class PrecipitationService {
         precipitationList.push(a);
       });
     });
-
-    return precipitationList;
   }
 
   capitalize(s: string): string {
