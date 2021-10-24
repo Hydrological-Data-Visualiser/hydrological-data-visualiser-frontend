@@ -63,6 +63,7 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     const date = this.value;
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    this.animationService.stop();
     this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
   }
 

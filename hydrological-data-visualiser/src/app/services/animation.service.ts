@@ -33,6 +33,13 @@ export class AnimationService {
     }
   }
 
+  stop() {
+    if(this.currentPlayData != null){
+      this.currentPlayData.stopPlaying()
+    }
+    this.currentPlayData = null
+  }
+
 }
 
 class PlayData {
