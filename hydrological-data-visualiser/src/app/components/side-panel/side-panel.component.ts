@@ -22,7 +22,11 @@ export class SidePanelComponent implements OnInit {
   public maxDate: Date = new Date('08/27/2017');
   public value: Date = new Date();
   model = new FormInputData(50, 19);
-  animationModel = new AnimationInputData(0, 0)
+  // animation
+  animationModel = new AnimationInputData(0, 0);
+  animationStart: string | undefined;
+  animationLength: number | undefined;
+  animationNow: string | undefined;
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
   }
@@ -74,8 +78,16 @@ export class SidePanelComponent implements OnInit {
   // animation methods
   playAnimation(): void {
     const date = this.value;
-    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs)
+    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationLength = this.animationModel.steps
+
+    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this)
     this.animationService.play()
+  }
+
+  setAnimationNow(animationNow: string): void {
+    console.log(animationNow)
+    this.animationNow = animationNow
   }
 
   pauseAnimation(): void {

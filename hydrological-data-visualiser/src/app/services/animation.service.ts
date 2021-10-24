@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as moment from 'moment';
 import { SidePanelComponent } from '../components/side-panel/side-panel.component';
 import { PrecipitationService } from './precipitation.service';
 import { StationsService } from './stations.service';
@@ -11,11 +12,11 @@ export class AnimationService {
 
   constructor(private stationsService: StationsService) { }
 
-  public setAnimation(startStep: Date, steps: number, timestepMs: number) {
+  public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent) {
     if(this.currentPlayData != null){
       this.currentPlayData.stopPlaying()
     }
-    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService)
+    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, sidepanel)
     this.currentPlayData = playData
   }
 
@@ -50,7 +51,8 @@ class PlayData {
   constructor (private startStep: Date, 
                private steps: number, 
                private timestepMs: number, 
-               private stationsService: StationsService) {}
+               private stationsService: StationsService,
+               private sidepanel: SidePanelComponent) {}
 
   playState(): void {
     setTimeout(() => {
@@ -63,10 +65,9 @@ class PlayData {
       }
 
       this.currentStep = (this.currentStep + 1) % this.steps
-      //console.log("Frame: " + this.currentStep)
       const frameDate = new Date(this.startStep.valueOf());
       frameDate.setDate(frameDate.getDate() + this.currentStep);
-      //this.sidePanelComponent.setCurrentDate(frameDate)
+      this.sidepanel.setAnimationNow((moment(frameDate)).format('YYYY-MM-DD'));
       this.setFrame(frameDate).then( () => {
         this.playState()
       })
