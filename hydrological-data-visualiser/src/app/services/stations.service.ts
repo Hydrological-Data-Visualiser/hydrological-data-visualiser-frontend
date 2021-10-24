@@ -187,21 +187,22 @@ export class StationsService {
 
   updateMarkers(date: Date): Promise<void> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return Promise.all(this.getDistinctLatLongStations(this.stationList).map( station =>
-      this.http.get<PrecipitationDayDataNew[]> 
-      (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}&stationId=${station.id.toString()}`).toPromise().then( data => {
-        let result: [Station, string, number] = [station, this.rgbToHex(0, 0, 0), NaN]
-        if (data.length > 0) {
-          const rainValue = data[0].dailyPrecipitation;
+    const stations = this.getDistinctLatLongStations(this.stationList);
+    const usedStations: Station[] = [];
+    return this.http.get<PrecipitationDayDataNew[]> 
+      (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`).toPromise().then( data => {
+        data.forEach(rainData => {
+          const rainValue = rainData.dailyPrecipitation;
           const colorValue = rainValue * 50;
-          result = [station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue];
-        } 
-        return result;
+          const filteredStations = stations.filter(station => station.id === rainData.stationId);
+          if (filteredStations.length > 0) {
+            const station = filteredStations[0];
+            //result[0] = filteredStations[0]
+            //usedStations.push(station);
+            this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          }
       })
-    )).then( list =>
-      // synchronize marker update
-      list.forEach(tuple => this.updateMarker(tuple[0], tuple[1], tuple[2]))
-    )
+    })
   }
 
   updateMarker(station: Station, colorHex: string, rainValue: number): void {

@@ -63,15 +63,22 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     const date = this.value;
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs)
     this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
-  }
-
-  play(): void {
-    this.animationService.play()
   }
 
   onValueChange(args: any): void {
     this.value = args.value;
   }
+
+  // animation methods
+  playAnimation(): void {
+    const date = this.value;
+    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs)
+    this.animationService.play()
+  }
+
+  pauseAnimation(): void {
+    this.animationService.pause()
+  }
+
 }

@@ -42,6 +42,11 @@
                 <ejs-calendar (change)="onValueChange($event)" id=calendar [value]='value' [firstDayOfWeek]='1'></ejs-calendar>
                 <span id="selected">Selected Value: </span>
               </div>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Show</button>
+              
+              <!-- Animation -->
+              <label for="days" class="col-form-label">Animation span: </label>
               <div class="col-3">
                 <input type="number" id="days" class="form-control" required [(ngModel)]="animationModel.steps" 
                 name="days" #days="ngModel">
@@ -51,9 +56,8 @@
                 <input type="number" id="timestep" class="form-control" required 
                 [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </div>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Submit</button>
-              <button type="button" class="btn btn-primary" (click)="play()" data-bs-dismiss="modal">Play</button>
+              <button type="submit" class="btn btn-primary" (click)="playAnimation()">Play</button>
+              <button type="button" class="btn btn-primary" (click)="pauseAnimation()">Pause/Unpause</button>
             </form>
           </div>
         </div>
