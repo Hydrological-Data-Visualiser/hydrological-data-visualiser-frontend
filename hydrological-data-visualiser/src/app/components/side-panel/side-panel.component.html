@@ -102,6 +102,9 @@
         </div>
       </div>
     </nav> 
+    <div class="progress" style="height: 2px;">
+      <div class="progress-bar" style="width: {{animationPercentage}}%" role="progressbar" [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
     <div class="container-fluid">
       <app-map (longEmitter)="setLong($event)" (latEmitter)="setLat($event)"
                (clickedEmitter)="setClicked($event)"></app-map>

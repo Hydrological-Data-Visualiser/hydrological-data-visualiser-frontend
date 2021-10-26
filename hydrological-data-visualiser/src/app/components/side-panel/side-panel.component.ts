@@ -27,6 +27,7 @@ export class SidePanelComponent implements OnInit {
   animationStart: string | undefined;
   animationLength: number | undefined;
   animationNow: string | undefined;
+  animationPercentage: number | undefined;
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
   }
@@ -85,8 +86,11 @@ export class SidePanelComponent implements OnInit {
     this.animationService.play()
   }
 
-  setAnimationNow(animationNow: string): void {
+  // called by animationService
+  setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
     console.log(animationNow)
+    if(this.animationLength != undefined)
+      this.animationPercentage = currentFrame * 100 / (this.animationLength-1);
     this.animationNow = animationNow
   }
 

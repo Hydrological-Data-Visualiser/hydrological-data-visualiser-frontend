@@ -46,7 +46,7 @@ export class AnimationService {
 class PlayData {
   private playing: Boolean = true
   private paused: Boolean = false
-  private currentStep: number = 0
+  private currentStep: number = -1
 
   constructor (private startStep: Date, 
                private steps: number, 
@@ -67,7 +67,7 @@ class PlayData {
       this.currentStep = (this.currentStep + 1) % this.steps
       const frameDate = new Date(this.startStep.valueOf());
       frameDate.setDate(frameDate.getDate() + this.currentStep);
-      this.sidepanel.setAnimationNow((moment(frameDate)).format('YYYY-MM-DD'));
+      this.sidepanel.setAnimationPlaybackData((moment(frameDate)).format('YYYY-MM-DD'), this.currentStep);
       this.setFrame(frameDate).then( () => {
         this.playState()
       })
