@@ -10,7 +10,7 @@
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
           <div class="modal-body">
-            <form (ngSubmit)="onSubmit()" #dataForm="ngForm">
+            <form #dataForm="ngForm">
               <!--            <div class="row align-items-center p-2 form-group">-->
               <!--                <div class="col-2">-->
               <!--                  <label for="latitude" class="col-form-label">Latitude</label>-->
@@ -43,7 +43,21 @@
                 <span id="selected">Selected Value: </span>
               </div>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Submit</button>
+              <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Show</button>
+              
+              <!-- Animation -->
+              <label for="days" class="col-form-label">Animation span: </label>
+              <div class="col-3">
+                <input type="number" id="days" class="form-control" required [(ngModel)]="animationModel.steps" 
+                name="days" #days="ngModel">
+              </div>
+              <label for="timestep" class="col-form-label">Animation Timestep [ms]</label>
+              <div class="col-3">
+                <input type="number" id="timestep" class="form-control" required 
+                [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
+              </div>
+              <button type="submit" class="btn btn-primary" (click)="playAnimation()">Play</button>
+              <button type="button" class="btn btn-primary" (click)="pauseAnimation()">Pause/Unpause</button>
             </form>
           </div>
         </div>
@@ -73,11 +87,24 @@
   </div>
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
-
       <div class="container-fluid">
-        <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+        <div class="col">
+          <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+        </div> 
+        <div class="col">
+          <p>Start At: {{animationStart}}</p>
+        </div>
+        <div class="col">
+          <p>Now: {{animationNow}}</p>
+        </div>
+        <div class="col">
+          <p>Length: {{animationLength}}</p>
+        </div>
       </div>
-    </nav>
+    </nav> 
+    <div class="progress" style="height: 2px;">
+      <div class="progress-bar" style="width: {{animationPercentage}}%" role="progressbar" [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
     <div class="container-fluid">
       <app-map (longEmitter)="setLong($event)" (latEmitter)="setLat($event)"
                (clickedEmitter)="setClicked($event)"></app-map>

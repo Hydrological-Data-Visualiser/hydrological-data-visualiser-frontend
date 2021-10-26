@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import * as moment from 'moment';
+import { AnimationInputData } from 'src/app/model/animation-input-data';
+import { AnimationService } from 'src/app/services/animation.service';
 import {FormInputData} from '../../model/form-input-data';
 import {DataProviderService} from '../../services/data-provider.service';
 
@@ -20,8 +22,14 @@ export class SidePanelComponent implements OnInit {
   public maxDate: Date = new Date('08/27/2017');
   public value: Date = new Date();
   model = new FormInputData(50, 19);
+  // animation
+  animationModel = new AnimationInputData(0, 0);
+  animationStart: string | undefined;
+  animationLength: number | undefined;
+  animationNow: string | undefined;
+  animationPercentage: number | undefined;
 
-  constructor(private dataProvider: DataProviderService) {
+  constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
   }
 
   ngOnInit(): void {
@@ -60,10 +68,34 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     const date = this.value;
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    this.animationService.stop();
     this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
   }
 
   onValueChange(args: any): void {
     this.value = args.value;
   }
+
+  // animation methods
+  playAnimation(): void {
+    const date = this.value;
+    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationLength = this.animationModel.steps
+
+    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this)
+    this.animationService.play()
+  }
+
+  // called by animationService
+  setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
+    console.log(animationNow)
+    if(this.animationLength != undefined)
+      this.animationPercentage = currentFrame * 100 / (this.animationLength-1);
+    this.animationNow = animationNow
+  }
+
+  pauseAnimation(): void {
+    this.animationService.pause()
+  }
+
 }
