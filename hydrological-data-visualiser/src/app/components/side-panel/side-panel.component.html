@@ -1,22 +1,85 @@
 <div class="d-flex" id="wrapper">
   <div class="bg-light border-right " id="sidebar-wrapper" [ngClass]="status ? 'hide' : 'show'">
     <div class="list-group list-group-flush px-4 ">
-      <div *ngIf="clicked == false">
-        <br>
-        <p class="text-md-center">Select the point on the map for which you want to know the details </p>
-      </div>
-      <div id="longLang" *ngIf="clicked == true">
-        <br>
-        <div class="row">
-          <div class="col">
-            <p *ngIf="name">Station Name:</p>
-            <p> Longitude:</p>
-            <p> Latitude:</p>
+      <nav>
+        <div class="nav nav-tabs" id="nav-side-panel" role="tablist">
+          <button class="nav-link active" id="nav-form-tab" data-bs-toggle="tab" data-bs-target="#nav-form" type="button" role="tab" aria-controls="nav-form" aria-selected="true">Form</button>
+          <button class="nav-link" id="nav-details-tab" data-bs-toggle="tab" data-bs-target="#nav-details" type="button" role="tab" aria-controls="nav-details" aria-selected="false">Details</button>
+        </div>
+      </nav>
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
+          <div class="modal-body">
+            <form #dataForm="ngForm">
+              <!--            <div class="row align-items-center p-2 form-group">-->
+              <!--                <div class="col-2">-->
+              <!--                  <label for="latitude" class="col-form-label">Latitude</label>-->
+              <!--                </div>-->
+              <!--                <div class="col-3">-->
+              <!--                  <input type="number" id="latitude" class="form-control" required-->
+              <!--                  [(ngModel)]="model.latitude" name="latitude" #latitude="ngModel">-->
+              <!--                </div>-->
+              <!--                <div [hidden]="latitude.valid || latitude.pristine"-->
+              <!--                        class="alert alert-danger col-auto validation-msg">-->
+              <!--                    Latitude has to be a number.-->
+              <!--                  </div>-->
+              <!--            </div>-->
+
+              <!--            <div class="row align-items-center p-2">-->
+              <!--                <div class="col-2">-->
+              <!--                  <label for="longitude" class="col-form-label">Longitude</label>-->
+              <!--                </div>-->
+              <!--                <div class="col-3">-->
+              <!--                  <input type="number" id="longitude" class="form-control" required-->
+              <!--                  [(ngModel)]="model.longitude" name="longitude" #longitude="ngModel">-->
+              <!--                </div>-->
+              <!--                <div [hidden]="longitude.valid || longitude.pristine"-->
+              <!--                        class="alert alert-danger col-auto validation-msg">-->
+              <!--                    Longitude has to be a number.-->
+              <!--                  </div>-->
+              <!--            </div>-->
+              <div class="row align-items-center p-2">
+                <ejs-calendar (change)="onValueChange($event)" id=calendar [value]='value' [firstDayOfWeek]='1'></ejs-calendar>
+                <span id="selected">Selected Value: </span>
+              </div>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary" (click)="onSubmit()" [disabled]="!dataForm.form.valid" data-bs-dismiss="modal" >Show</button>
+              
+              <!-- Animation -->
+              <label for="days" class="col-form-label">Animation span: </label>
+              <div class="col-3">
+                <input type="number" id="days" class="form-control" required [(ngModel)]="animationModel.steps" 
+                name="days" #days="ngModel">
+              </div>
+              <label for="timestep" class="col-form-label">Animation Timestep [ms]</label>
+              <div class="col-3">
+                <input type="number" id="timestep" class="form-control" required 
+                [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
+              </div>
+              <button type="submit" class="btn btn-primary" (click)="playAnimation()">Play</button>
+              <button type="button" class="btn btn-primary" (click)="pauseAnimation()">Pause/Unpause</button>
+            </form>
           </div>
-          <div class="col">
-            <p *ngIf="name">{{name}}</p>
-            <p>{{long}}</p>
-            <p>{{lat}}</p>
+        </div>
+        <div class="tab-pane fade" id="nav-details" role="tabpanel" aria-labelledby="nav-details-tab">
+          <div *ngIf="clicked == false">
+            <br>
+            <p class="text-md-center">Select the point on the map for which you want to know the details </p>
+          </div>
+          <div id="longLang" *ngIf="clicked == true">
+            <br>
+            <div class="row">
+              <div class="col">
+                <p *ngIf="name">Station Name:</p>
+                <p> Longitude:</p>
+                <p> Latitude:</p>
+              </div>
+              <div class="col">
+                <p *ngIf="name">{{name}}</p>
+                <p>{{long}}</p>
+                <p>{{lat}}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -24,11 +87,24 @@
   </div>
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
-
       <div class="container-fluid">
-        <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+        <div class="col">
+          <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+        </div> 
+        <div class="col">
+          <p>Start At: {{animationStart}}</p>
+        </div>
+        <div class="col">
+          <p>Now: {{animationNow}}</p>
+        </div>
+        <div class="col">
+          <p>Length: {{animationLength}}</p>
+        </div>
       </div>
-    </nav>
+    </nav> 
+    <div class="progress" style="height: 2px;">
+      <div class="progress-bar" style="width: {{animationPercentage}}%" role="progressbar" [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
     <div class="container-fluid">
       <app-map (longEmitter)="setLong($event)" (latEmitter)="setLat($event)"
                (clickedEmitter)="setClicked($event)"></app-map>

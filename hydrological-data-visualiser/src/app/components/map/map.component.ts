@@ -1,10 +1,9 @@
 import {AfterViewInit, Component, EventEmitter, Output} from '@angular/core';
 import * as L from 'leaflet';
 import {LatLngExpression} from 'leaflet';
-import {RiverService} from 'src/app/services/river.service';
 import {ResizedEvent} from 'angular-resize-event';
 import 'leaflet/dist/images/marker-shadow.png';
-import {StationsService} from '../../services/stations.service';
+import {DataProviderService} from '../../services/data-provider.service';
 
 @Component({
   selector: 'app-map',
@@ -52,19 +51,18 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-  constructor(private riverService: RiverService,
-              private stationService: StationsService) {
+  constructor(private dataProvider: DataProviderService) {
     this.lat = 0;
     this.long = 0;
-    this.stationService.map = this.map;
+    this.dataProvider.getStationsService().map = this.map;
   }
 
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
-    this.riverService.showKocinkaRiver(this.map);
-    this.stationService.map = this.map;
-    this.stationService.clickedMarker$.subscribe(a => {
+    this.dataProvider.getRiverService().showKocinkaRiver(this.map);
+    this.dataProvider.getStationsService().map = this.map;
+    this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
       if (this.marker) {
         this.map.removeLayer(this.marker);
       }
@@ -79,7 +77,7 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latlng, {icon: this.stationService.redIcon}).addTo(this.map).on('click', a => {
+    this.marker = L.marker(latlng, {icon: this.dataProvider.getStationsService().redIcon}).addTo(this.map).on('click', a => {
       this.map.removeLayer(this.marker);
       this.marker = undefined;
       this.longEmitter.emit(undefined);

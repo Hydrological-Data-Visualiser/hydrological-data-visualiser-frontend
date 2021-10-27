@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Station} from '../model/Station';
+import {Station} from '../model/station';
 import * as L from 'leaflet';
 import {Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
-import {PreciptationDayDataNew} from '../model/PreciptationDayDataNew';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -21,11 +22,9 @@ export class StationsService {
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
   public stationList: Station[] = [];
-  private markers: L.Marker[] = [];
+  private markers: { [key: number]: L.Marker } = {};
 
-  constructor(private http: HttpClient,
-              private precipitationService: PrecipitationService) {
-    this.getDataRecordsArrayFromGetRequest()
+  constructor(private http: HttpClient) {
   }
 
   redIcon = new L.Icon({
@@ -108,7 +107,7 @@ export class StationsService {
   }
 
   getDataRecordsArrayFromGetRequest(): void {
-    this.http.get<Station[]>('https://imgw-mock.herokuapp.com/stations').subscribe(data => {
+    this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations').subscribe(data => {
       this.stations$.subscribe(value => {
         this.stationList.push(value);
       });
@@ -143,7 +142,7 @@ export class StationsService {
     this.group.clearLayers();
     const stations = this.getDistinctLatLongStations(this.stationList);
     const usedStations: Station[] = [];
-    this.http.get<PreciptationDayDataNew[]>(`https://imgw-mock.herokuapp.com/precipitation?date=${date}`).subscribe(data => {
+    this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`).subscribe(data => {
       data.forEach(rainData => {
         const rainValue = rainData.dailyPrecipitation;
         const colorValue = rainValue * 50;
@@ -181,8 +180,35 @@ export class StationsService {
       } else {
         marker.bindPopup(station.name + ' no rain data');
       }
+      this.markers[station.id] = marker
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
+  }
+
+  updateMarkers(date: Date): Promise<void> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    const stations = this.getDistinctLatLongStations(this.stationList);
+    const usedStations: Station[] = [];
+    return this.http.get<PrecipitationDayDataNew[]>
+      (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`).toPromise().then( data => {
+        data.forEach(rainData => {
+          const rainValue = rainData.dailyPrecipitation;
+          const colorValue = rainValue * 50;
+          const filteredStations = stations.filter(station => station.id === rainData.stationId);
+          if (filteredStations.length > 0) {
+            const station = filteredStations[0];
+            //result[0] = filteredStations[0]
+            //usedStations.push(station);
+            this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          }
+      })
+    })
+  }
+
+  updateMarker(station: Station, colorHex: string, rainValue: number): void {
+    const marker = this.markers[station.id]
+    marker.setIcon(this.getColoredIcon(colorHex))
+    marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm')
   }
 }

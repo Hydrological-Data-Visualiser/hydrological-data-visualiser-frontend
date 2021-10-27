@@ -1,0 +1,33 @@
+<!-- Button trigger modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Data Models</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="font-weight-bold">Choose data models</p>
+
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <!-- Default checked -->
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="imgw" [checked]="getModelStatus('IMGW')"
+              (change)="changeModelStatus('IMGW', !getModelStatus('IMGW'))">
+              <label class="custom-control-label" for="imgw">precipitation data from IMGW API</label>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <!-- Default checked -->
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="kocinka" [checked]="getModelStatus('river')"
+              (change)="changeModelStatus('river', !getModelStatus('river'))">
+              <label class="custom-control-label" for="kocinka">Kocinka river!</label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

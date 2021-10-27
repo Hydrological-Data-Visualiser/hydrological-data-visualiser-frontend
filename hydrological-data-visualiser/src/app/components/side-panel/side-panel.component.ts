@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {StationsService} from '../../services/stations.service';
+import * as moment from 'moment';
+import { AnimationInputData } from 'src/app/model/animation-input-data';
+import { AnimationService } from 'src/app/services/animation.service';
+import {FormInputData} from '../../model/form-input-data';
+import {DataProviderService} from '../../services/data-provider.service';
 
 @Component({
   selector: 'app-side-panel',
@@ -7,17 +11,29 @@ import {StationsService} from '../../services/stations.service';
   styleUrls: ['./side-panel.component.css']
 })
 export class SidePanelComponent implements OnInit {
+  // details attributes
   status = true;
   clicked = false;
   long: number | undefined;
   lat: number | undefined;
   name: string | undefined;
+  // form attributes
+  public minDate: Date = new Date('05/07/2017');
+  public maxDate: Date = new Date('08/27/2017');
+  public value: Date = new Date();
+  model = new FormInputData(50, 19);
+  // animation
+  animationModel = new AnimationInputData(0, 0);
+  animationStart: string | undefined;
+  animationLength: number | undefined;
+  animationNow: string | undefined;
+  animationPercentage: number | undefined;
 
-  constructor(private stationService: StationsService) {
+  constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
   }
 
   ngOnInit(): void {
-    this.stationService.clickedMarker$.subscribe(a => {
+    this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
       this.lat = a?.latitude;
       this.long = a?.longitude;
       this.name = a?.name;
@@ -47,4 +63,39 @@ export class SidePanelComponent implements OnInit {
   clickEvent(): void {
     this.status = !this.status;
   }
+//  form methods below
+  onSubmit(): void {
+    console.log(this.value);
+    const date = this.value;
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    this.animationService.stop();
+    this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
+  }
+
+  onValueChange(args: any): void {
+    this.value = args.value;
+  }
+
+  // animation methods
+  playAnimation(): void {
+    const date = this.value;
+    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationLength = this.animationModel.steps
+
+    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this)
+    this.animationService.play()
+  }
+
+  // called by animationService
+  setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
+    console.log(animationNow)
+    if(this.animationLength != undefined)
+      this.animationPercentage = currentFrame * 100 / (this.animationLength-1);
+    this.animationNow = animationNow
+  }
+
+  pauseAnimation(): void {
+    this.animationService.pause()
+  }
+
 }
