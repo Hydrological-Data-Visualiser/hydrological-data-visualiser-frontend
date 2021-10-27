@@ -13,17 +13,17 @@
           <li class="list-group-item">
             <!-- Default checked -->
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="imgw" [checked]="getModelStatus('IMGW')"
+              <input type="checkbox" class="custom-control-input m-1" id="imgw" [checked]="getModelStatus('IMGW')"
               (change)="changeModelStatus('IMGW', !getModelStatus('IMGW'))">
-              <label class="custom-control-label" for="imgw">precipitation data from IMGW API</label>
+              <label class="custom-control-label" for="imgw">Precipitation data from IMGW API</label>
             </div>
           </li>
           <li class="list-group-item">
             <!-- Default checked -->
             <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" id="kocinka" [checked]="getModelStatus('river')"
+              <input type="checkbox" class="custom-control-input m-1" id="kocinka" [checked]="getModelStatus('river')"
               (change)="changeModelStatus('river', !getModelStatus('river'))">
-              <label class="custom-control-label" for="kocinka">Kocinka river!</label>
+              <label class="custom-control-label" for="kocinka">Kocinka river</label>
             </div>
           </li>
         </ul>

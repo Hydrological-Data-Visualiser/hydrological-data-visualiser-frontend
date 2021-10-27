@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import * as moment from 'moment';
-import { AnimationInputData } from 'src/app/model/animation-input-data';
-import { AnimationService } from 'src/app/services/animation.service';
+import {AnimationInputData} from 'src/app/model/animation-input-data';
+import {AnimationService} from 'src/app/services/animation.service';
 import {FormInputData} from '../../model/form-input-data';
 import {DataProviderService} from '../../services/data-provider.service';
 
@@ -12,6 +12,7 @@ import {DataProviderService} from '../../services/data-provider.service';
 })
 export class SidePanelComponent implements OnInit {
   // details attributes
+  paused = false;
   status = true;
   clicked = false;
   long: number | undefined;
@@ -23,7 +24,7 @@ export class SidePanelComponent implements OnInit {
   public value: Date = new Date();
   model = new FormInputData(50, 19);
   // animation
-  animationModel = new AnimationInputData(0, 0);
+  animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
   animationLength: number | undefined;
   animationNow: string | undefined;
@@ -63,6 +64,7 @@ export class SidePanelComponent implements OnInit {
   clickEvent(): void {
     this.status = !this.status;
   }
+
 //  form methods below
   onSubmit(): void {
     console.log(this.value);
@@ -78,6 +80,7 @@ export class SidePanelComponent implements OnInit {
 
   // animation methods
   playAnimation(): void {
+    this.paused = false;
     const date = this.value;
     this.animationStart = (moment(date)).format('YYYY-MM-DD');
     this.animationLength = this.animationModel.steps
@@ -88,14 +91,16 @@ export class SidePanelComponent implements OnInit {
 
   // called by animationService
   setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
-    console.log(animationNow)
-    if(this.animationLength != undefined)
-      this.animationPercentage = currentFrame * 100 / (this.animationLength-1);
-    this.animationNow = animationNow
+    console.log(animationNow);
+    if (this.animationLength !== undefined) {
+      this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
+    }
+    this.animationNow = animationNow;
   }
 
   pauseAnimation(): void {
-    this.animationService.pause()
+    this.paused = !this.paused;
+    this.animationService.pause();
   }
 
 }
