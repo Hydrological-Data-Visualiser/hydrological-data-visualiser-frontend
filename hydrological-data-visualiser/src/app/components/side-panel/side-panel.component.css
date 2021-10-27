@@ -19,6 +19,18 @@
   margin-left: 0;
 }
 
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5vh;
+}
+
+input[type="number"] {
+  width: 5vw;
+}
+
+
 @media (min-width: 768px) {
   #sidebar-wrapper {
     margin-left: 0;
