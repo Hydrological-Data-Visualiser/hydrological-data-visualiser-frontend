@@ -18,6 +18,7 @@ export class StationsService {
   public clickedMarker$ = this.clickedMarker.asObservable();
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
+    maxClusterRadius: zoom => 130 - zoom * 10
   });
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
