@@ -47,23 +47,33 @@
                               [firstDayOfWeek]='1'></ejs-calendar>
               </div>
               <div class="buttons">
-                <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Close</button> -->
                 <button type="submit" class="btn btn-primary btn-dark m-1" (click)="onSubmit()"
                         [disabled]="!dataForm.form.valid" data-bs-dismiss="modal">Show
                 </button>
               </div>
               <!-- Animation -->
-              <label for="days" class="col-form-label">Animation span: </label>
-              <div class="col-3">
-                <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
-                       name="days" #days="ngModel">
+              <hr/>
+              <h6 class="text-center">Animation</h6>
+              <div class="row mt-1">
+                <div class="col-7">
+                  <label for="days" class="col-form-label">Span: </label>
+                </div>
+                <div class="col-5">
+                  <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
+                        name="days" #days="ngModel">
+                </div>
               </div>
-              <label for="timestep" class="col-form-label">Animation Timestep [ms]:</label>
-              <div class="col-3">
-                <input type="number" id="timestep" class="form-control"
-                       [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
+              <div class="row mt-1">
+                <div class="col-7">
+                  <label for="timestep" class="col-form-label">Timestep [ms]:</label>
+                </div>
+                <div class="col-5">
+                  <input type="number" id="timestep" class="form-control"
+                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
+                </div>
               </div>
-              <div class="buttons">
+              <div class="buttons mt-2">
                 <button *ngIf="!paused" type="button" class="btn btn-secondary  m-1" (click)="pauseAnimation()">Pause
                 </button>
                 <button *ngIf="paused" type="button" class="btn btn-secondary m-1 " (click)="pauseAnimation()">Unpause
@@ -115,7 +125,7 @@
       </div>
     </nav>
     <div class="progress" style="height: 2px;">
-      <div class="progress-bar" style="width: {{animationPercentage}}%" role="progressbar"
+      <div class="progress-bar" style="width: {{animationPercentage}}%; transition:none" role="progressbar"
            [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
     <div class="container-fluid">
