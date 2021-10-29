@@ -38,6 +38,10 @@ export class PrecipitationService {
     (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`);
   }
 
+  getPrecipitationDataForSpecificStringDate(date: string): Observable<PrecipitationDayDataNew[]> {
+    return this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`);
+  }
+
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }

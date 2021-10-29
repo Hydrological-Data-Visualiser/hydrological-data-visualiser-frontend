@@ -98,7 +98,7 @@ export class StationsService {
       this.group.clearLayers();
       const stations = this.getDistinctLatLongStations(this.stationList);
       const usedStations: Station[] = [];
-      this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`).subscribe(data => {
+      precipitationService.getPrecipitationDataForSpecificStringDate(date).subscribe(data => {
         data.forEach(rainData => {
           const rainValue = rainData.dailyPrecipitation;
           const colorValue = rainValue * 50;
