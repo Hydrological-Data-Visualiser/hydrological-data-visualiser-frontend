@@ -8,7 +8,7 @@ import {LatLng} from 'leaflet';
   providedIn: 'root'
 })
 export class RiverService {
-  public status = true;
+  public status = false;
   public map: any;
   private river: LatLng[] = [];
   private riverLayer = L.layerGroup();
@@ -22,6 +22,7 @@ export class RiverService {
     } else {
       this.http.get<RiverPoint[]>('https://imgw-mock.herokuapp.com/kocinka/data').subscribe((res: RiverPoint[]) => {
         for (let i = 0; i < res.length - 1; i++) {
+          this.river = [];
           this.river.push(new LatLng(res[i].latitude, res[i].longitude));
           this.river.push(new LatLng(res[i + 1].latitude, res[i + 1].longitude));
           const color = this.getColor((Number(res[i].value) + Number(res[i + 1].value)) / 2);
