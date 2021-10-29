@@ -1,69 +1,21 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {StationsService} from './stations.service';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
+import {Observable} from 'rxjs';
+import {Station} from '../model/station';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrecipitationService {
-  private precipitationFilePath = '/assets/data/precipitation.csv';
   public precipitationDict: { [key: string]: number } = {};
   public status = false;
 
-  constructor(private http: HttpClient, private stationService: StationsService) {
-  }
-
-  getDataRecordsArrayFromCSVFile(): void {
-    const options: {
-      headers?: HttpHeaders;
-      observe?: 'body';
-      params?: HttpParams;
-      reportProgress?: boolean;
-      responseType: 'arraybuffer';
-      withCredentials?: boolean;
-    } = {
-      responseType: 'arraybuffer'
-    };
-
-    this.http.get(this.precipitationFilePath, options)
-      .subscribe((res) => {
-        const enc = new TextDecoder('utf-8');
-        enc.decode(res).split('\n').map(elem => {
-          const elemSplit = elem.split(',');
-          let name = '';
-          let stationId = 0;
-          let year = '';
-          let month = '';
-          let day = '';
-          let precipitation = 0;
-          if (elemSplit[0]) {
-            stationId = parseInt(elemSplit[0], 10);
-          }
-          if (elemSplit[1]) {
-            name = this.capitalize(elemSplit[1]);
-          }
-          if (elemSplit[2]) {
-            year = elemSplit[2];
-          }
-          if (elemSplit[3]) {
-            month = elemSplit[3];
-          }
-          if (elemSplit[4]) {
-            day = elemSplit[4];
-          }
-          if (elemSplit[5]) {
-            precipitation = parseFloat(elemSplit[5]);
-          }
-
-          // this.put(stationId, year, month, day, precipitation);
-        });
-        this.stationService.getDataRecordsArrayFromGetRequest();
-      });
+  constructor(private http: HttpClient) {
   }
 
   getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
-    this.stationService.getDataRecordsArrayFromGetRequest();
     const precipitationList: PrecipitationDayDataNew[] = [];
     this.http.get<PrecipitationDayDataNew[]>('https://imgw-mock.herokuapp.com/imgw/data').subscribe(data => {
       data.forEach(a => {
@@ -73,6 +25,21 @@ export class PrecipitationService {
     });
 
     return precipitationList;
+  }
+
+  getPrecipitationDataForSpecificDateAndStation(date: string, station: Station): Observable<PrecipitationDayDataNew[]> {
+    return this.http.get<PrecipitationDayDataNew[]>
+        (`https://imgw-mock.herokuapp.com/imgw/data?date=${date}&stationId=${station.id.toString()}`);
+  }
+
+  getPrecipitationDataForSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    return this.http.get<PrecipitationDayDataNew[]>
+    (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`);
+  }
+
+  getPrecipitationDataForSpecificStringDate(date: string): Observable<PrecipitationDayDataNew[]> {
+    return this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`);
   }
 
   capitalize(s: string): string {
