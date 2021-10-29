@@ -10,13 +10,13 @@ import { StationsService } from './stations.service';
 export class AnimationService {
   private currentPlayData: PlayData | null = null
 
-  constructor(private stationsService: StationsService) { }
+  constructor(private stationsService: StationsService, private precipitationService: PrecipitationService) { }
 
   public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent) {
     if(this.currentPlayData != null){
       this.currentPlayData.stopPlaying()
     }
-    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, sidepanel)
+    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, this.precipitationService, sidepanel)
     this.currentPlayData = playData
   }
 
@@ -48,10 +48,11 @@ class PlayData {
   private paused: Boolean = false
   private currentStep: number = -1
 
-  constructor (private startStep: Date, 
-               private steps: number, 
-               private timestepMs: number, 
+  constructor (private startStep: Date,
+               private steps: number,
+               private timestepMs: number,
                private stationsService: StationsService,
+               private precipitationService: PrecipitationService,
                private sidepanel: SidePanelComponent) {}
 
   playState(): void {
@@ -86,7 +87,7 @@ class PlayData {
   }
 
   private setFrame(date: Date): Promise<void> {
-    return this.stationsService.updateMarkers(date)
+    return this.stationsService.updateMarkers(date, this.precipitationService);
   }
 
   stopPlaying(): void { this.playing = false }
