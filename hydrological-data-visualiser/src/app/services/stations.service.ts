@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import {Observable, Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
+import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class StationsService {
   public clickedMarker$ = this.clickedMarker.asObservable();
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
+    maxClusterRadius: zoom => 130 - zoom * 10
   });
   private stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
@@ -94,17 +96,23 @@ export class StationsService {
   putMarkers(date: string, precipitationService: PrecipitationService): void {
     if (precipitationService.status) {
       this.group.clearLayers();
-      this.getDistinctLatLongStations(this.stationList).forEach(station => {
-        precipitationService.getPrecipitationDataForSpecificDateAndStation(date, station)
-          .subscribe(data => {
-            if (data.length > 0) {
-              const rainValue = data[0].dailyPrecipitation;
-              const colorValue = rainValue * 50;
-              this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-            } else {
-              this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
-            }
-          });
+      const stations = this.getDistinctLatLongStations(this.stationList);
+      const usedStations: Station[] = [];
+      this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`).subscribe(data => {
+        data.forEach(rainData => {
+          const rainValue = rainData.dailyPrecipitation;
+          const colorValue = rainValue * 50;
+          const filteredStations = stations.filter(station => station.id === rainData.stationId);
+          if (filteredStations.length > 0) {
+            const station = filteredStations[0];
+            usedStations.push(station);
+            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          }
+        });
+        const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
+        unusedStations.forEach(station => {
+          this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
+        });
       });
     } else {
       this.group.clearLayers();
@@ -131,7 +139,7 @@ export class StationsService {
       } else {
         marker.bindPopup(station.name + ' no rain data');
       }
-      this.markers[station.id] = marker
+      this.markers[station.id] = marker;
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
     }
@@ -148,12 +156,12 @@ export class StationsService {
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {
             const station = filteredStations[0];
-            //result[0] = filteredStations[0]
-            //usedStations.push(station);
+            // result[0] = filteredStations[0]
+            // usedStations.push(station);
             this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
           }
-      })
-    })
+      });
+    });
   }
 
   updateMarker(station: Station, colorHex: string, rainValue: number): void {
