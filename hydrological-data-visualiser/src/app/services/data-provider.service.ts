@@ -5,6 +5,7 @@ import {ImgwModel} from '../model/imgw-model';
 import {DataType} from '../model/data-type';
 import {StationsService} from './stations.service';
 import {RiverService} from './river.service';
+import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ export class DataProviderService {
   constructor(
     private precipitationService: PrecipitationService,
     private stationsService: StationsService,
-    private riverService: RiverService
+    private riverService: RiverService,
+    private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService
   ) {
     precipitationService.getDataRecordsArrayFromGetRequest();
   }
@@ -31,6 +33,10 @@ export class DataProviderService {
   getRiverService(): RiverService {
     return this.riverService;
   }
+
+  getKocinkaSurfaceHeightService(): KocinkaSurfaceHeightService {
+    return this.kocinkaSurfaceHeightService;
+}
 
   getModels(): DataModelBase[] {
     return [new ImgwModel(
