@@ -72,7 +72,7 @@ export class SidePanelComponent implements OnInit {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
     this.animationService.stop();
     this.dataProvider.getRiverService().showKocinkaRiver();
-    this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
+    this.dataProvider.getPrecipitationService().draw(formattedDate);
     this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
   }
 

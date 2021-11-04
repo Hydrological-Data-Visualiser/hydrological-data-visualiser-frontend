@@ -63,6 +63,7 @@ export class MapComponent implements AfterViewInit {
     this.dataProvider.getRiverService().map = this.map;
     this.dataProvider.getRiverService().showKocinkaRiver();
     this.dataProvider.getStationsService().map = this.map;
+    this.dataProvider.getPrecipitationService().map = this.map;
     this.dataProvider.getKocinkaSurfaceHeightService().map = this.map;
     this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
       if (this.marker) {

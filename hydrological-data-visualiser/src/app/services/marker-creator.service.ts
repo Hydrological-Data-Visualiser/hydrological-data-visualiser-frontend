@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {Station} from '../model/station';
 import * as L from 'leaflet';
-import {PrecipitationService} from './precipitation.service';
-import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import * as moment from 'moment';
+import {HydrologicalDataBase} from '../model/hydrological-data-base';
 
 @Injectable({
   providedIn: 'root'
@@ -45,22 +44,22 @@ export class MarkerCreatorService {
     });
   }
 
-  putMarkers(status: boolean, stations: Station[], data: Observable<PrecipitationDayDataNew[]>, date: string): void {
+  putMarkers(status: boolean, stations: Station[], data: Observable<HydrologicalDataBase[]>, date: string): void {
     if (status) {
       this.group.clearLayers();
       const usedStations: Station[] = [];
       data.subscribe(d => {
         d.filter(a => (moment(a.date)).format('YYYY-MM-DD') === date)
           .forEach(rainData => {
-          const rainValue = rainData.dailyPrecipitation;
-          const colorValue = rainValue * 50;
-          const filteredStations = stations.filter(station => station.id === rainData.stationId);
-          if (filteredStations.length > 0) {
-            const station = filteredStations[0];
-            usedStations.push(station);
-            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          }
-        });
+            const rainValue = rainData.value;
+            const colorValue = rainValue * 50;
+            const filteredStations = stations.filter(station => station.id === rainData.stationId);
+            if (filteredStations.length > 0) {
+              const station = filteredStations[0];
+              usedStations.push(station);
+              this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+            }
+          });
         const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
         unusedStations.forEach(station => {
           this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
@@ -88,12 +87,13 @@ export class MarkerCreatorService {
     }
   }
 
-  updateMarkers(date: Date, stations: Station[], data: Observable<PrecipitationDayDataNew[]>): Promise<void> {
+  updateMarkers(date: string, stations: Station[], data: Observable<HydrologicalDataBase[]>): Promise<void> {
     const usedStations: Station[] = [];
     return data
       .toPromise().then( d => {
-        d.forEach(rainData => {
-          const rainValue = rainData.dailyPrecipitation;
+        d.filter(item => (moment(item.date)).format('YYYY-MM-DD') === date)
+          .forEach(rainData => {
+          const rainValue = rainData.value;
           const colorValue = rainValue * 50;
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {

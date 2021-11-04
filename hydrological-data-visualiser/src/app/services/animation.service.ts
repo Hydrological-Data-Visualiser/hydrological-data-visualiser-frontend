@@ -87,7 +87,8 @@ class PlayData {
   }
 
   private setFrame(date: Date): Promise<void> {
-    return this.stationsService.updateMarkers(date, this.precipitationService);
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    return this.precipitationService.updateMarkers(formattedDate, this.precipitationService.getStations(), this.precipitationService.getData());
   }
 
   stopPlaying(): void { this.playing = false }
