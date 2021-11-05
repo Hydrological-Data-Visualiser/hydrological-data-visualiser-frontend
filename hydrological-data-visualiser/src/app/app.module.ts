@@ -28,6 +28,7 @@ import { GeojsonComponent } from './components/geojson/geojson.component';
 import { GeotiffComponent } from './components/geotiff/geotiff.component';
 import {MatButtonModule} from '@angular/material/button';
 import {SidePanelService} from "./components/side-panel/side-panel-service";
+import { LegendComponent } from './components/legend/legend.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import {SidePanelService} from "./components/side-panel/side-panel-service";
     SearchFilterPipe,
     GeojsonComponent,
     GeotiffComponent,
+    LegendComponent
   ],
     imports: [
         BrowserModule,
