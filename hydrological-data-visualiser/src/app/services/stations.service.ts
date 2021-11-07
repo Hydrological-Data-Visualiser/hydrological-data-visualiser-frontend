@@ -100,7 +100,7 @@ export class StationsService {
       const usedStations: Station[] = [];
       precipitationService.getPrecipitationDataForSpecificStringDate(date).subscribe(data => {
         data.forEach(rainData => {
-          const rainValue = rainData.dailyPrecipitation;
+          const rainValue = rainData.value;
           const colorValue = rainValue * 50;
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {
@@ -151,7 +151,7 @@ export class StationsService {
     return precipitationService.getPrecipitationDataForSpecificDate(date)
       .toPromise().then( data => {
         data.forEach(rainData => {
-          const rainValue = rainData.dailyPrecipitation;
+          const rainValue = rainData.value;
           const colorValue = rainValue * 50;
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {

@@ -19,7 +19,7 @@ export class PrecipitationService {
     const precipitationList: PrecipitationDayDataNew[] = [];
     this.http.get<PrecipitationDayDataNew[]>('https://imgw-mock.herokuapp.com/imgw/data').subscribe(data => {
       data.forEach(a => {
-        this.put(a.stationId, a.date.toString(), a.dailyPrecipitation);
+        this.put(a.stationId, a.date.toString(), a.value);
         precipitationList.push(a);
       });
     });

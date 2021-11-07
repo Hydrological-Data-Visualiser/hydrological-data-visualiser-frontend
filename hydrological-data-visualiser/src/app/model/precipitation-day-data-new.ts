@@ -6,7 +6,7 @@ export class PrecipitationDayDataNew implements HydrologicalDataBase {
     public id: number,
     public stationId: number,
     public date: Date,
-    public dailyPrecipitation: number
+    public value: number
   ) {
   }
 }
