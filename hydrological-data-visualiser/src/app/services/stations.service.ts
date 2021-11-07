@@ -146,7 +146,7 @@ export class StationsService {
       const usedStations: Station[] = [];
       this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`).subscribe(data => {
         data.forEach(rainData => {
-          const rainValue = rainData.dailyPrecipitation;
+          const rainValue = rainData.value;
           const colorValue = rainValue * 50;
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {
@@ -198,7 +198,7 @@ export class StationsService {
     return this.http.get<PrecipitationDayDataNew[]>
     (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`).toPromise().then(data => {
       data.forEach(rainData => {
-        const rainValue = rainData.dailyPrecipitation;
+        const rainValue = rainData.value;
         const colorValue = rainValue * 50;
         const filteredStations = stations.filter(station => station.id === rainData.stationId);
         if (filteredStations.length > 0) {
