@@ -60,7 +60,8 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
-    this.dataProvider.getRiverService().showKocinkaRiver(this.map);
+    this.dataProvider.getRiverService().map = this.map;
+    this.dataProvider.getRiverService().showKocinkaRiver();
     this.dataProvider.getStationsService().map = this.map;
     this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
       if (this.marker) {
