@@ -57,7 +57,7 @@ export class PrecipitationService extends MarkerCreatorService{
     const precipitationList: HydrologicalDataBase[] = [];
     observable.subscribe(data => {
       data.forEach(a => {
-        this.put(a.stationId, a.date.toString(), a.dailyPrecipitation); // idk if it is still necessary
+        this.put(a.stationId, a.date.toString(), a.value); // idk if it is still necessary
         precipitationList.push(this.toBase(a));
       });
     });
