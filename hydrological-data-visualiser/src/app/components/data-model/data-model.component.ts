@@ -25,6 +25,8 @@ export class DataModelComponent implements OnInit {
         return this.dataProvider.getPrecipitationService().status;
       case 'river':
         return this.dataProvider.getRiverService().status;
+      case 'riverPressure':
+        return this.dataProvider.getKocinkaSurfaceHeightService().status;
       default:
         return false;
     }
@@ -37,6 +39,9 @@ export class DataModelComponent implements OnInit {
         break;
       case 'river':
         this.dataProvider.getRiverService().status = status;
+        break;
+      case 'riverPressure':
+        this.dataProvider.getKocinkaSurfaceHeightService().status = status;
         break;
     }
   }

@@ -57,7 +57,7 @@ export class StationsService {
     });
   }
 
-  private getStations(): Observable<Station[]> {
+  public getStations(): Observable<Station[]> {
     return this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations');
   }
 
@@ -93,31 +93,31 @@ export class StationsService {
     return retVal;
   }
 
-  putMarkers(date: string, precipitationService: PrecipitationService): void {
-    if (precipitationService.status) {
-      this.group.clearLayers();
-      const stations = this.getDistinctLatLongStations(this.stationList);
-      const usedStations: Station[] = [];
-      precipitationService.getPrecipitationDataForSpecificStringDate(date).subscribe(data => {
-        data.forEach(rainData => {
-          const rainValue = rainData.value;
-          const colorValue = rainValue * 50;
-          const filteredStations = stations.filter(station => station.id === rainData.stationId);
-          if (filteredStations.length > 0) {
-            const station = filteredStations[0];
-            usedStations.push(station);
-            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          }
-        });
-        const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
-        unusedStations.forEach(station => {
-          this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
-        });
-      });
-    } else {
-      this.group.clearLayers();
-    }
-  }
+  // putMarkers(date: string, precipitationService: PrecipitationService): void {
+  //   if (precipitationService.status) {
+  //     this.group.clearLayers();
+  //     const stations = this.getDistinctLatLongStations(this.stationList);
+  //     const usedStations: Station[] = [];
+  //     precipitationService.getPrecipitationDataForSpecificStringDate(date).subscribe(data => {
+  //       data.forEach(rainData => {
+  //         const rainValue = rainData.dailyPrecipitation;
+  //         const colorValue = rainValue * 50;
+  //         const filteredStations = stations.filter(station => station.id === rainData.stationId);
+  //         if (filteredStations.length > 0) {
+  //           const station = filteredStations[0];
+  //           usedStations.push(station);
+  //           this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+  //         }
+  //       });
+  //       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
+  //       unusedStations.forEach(station => {
+  //         this.createMarker(station, this.rgbToHex(0, 0, 0), NaN);
+  //       });
+  //     });
+  //   } else {
+  //     this.group.clearLayers();
+  //   }
+  // }
 
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
@@ -128,45 +128,45 @@ export class StationsService {
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
-  createMarker(station: Station, colorHex: string, rainValue: number): void {
-    if (station.longitude && station.latitude) {
-      const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
-        {icon: this.getColoredIcon(colorHex)}).on('click', event => {
-        this.clickedMarker.next(station);
-      });
-      if (!isNaN(rainValue)) {
-        marker.bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
-      } else {
-        marker.bindPopup(station.name + ' no rain data');
-      }
-      this.markers[station.id] = marker;
-      this.group.addLayer(marker);
-      this.map.addLayer(this.group);
-    }
-  }
-
-  updateMarkers(date: Date, precipitationService: PrecipitationService): Promise<void> {
-    const stations = this.getDistinctLatLongStations(this.stationList);
-    const usedStations: Station[] = [];
-    return precipitationService.getPrecipitationDataForSpecificDate(date)
-      .toPromise().then( data => {
-        data.forEach(rainData => {
-          const rainValue = rainData.value;
-          const colorValue = rainValue * 50;
-          const filteredStations = stations.filter(station => station.id === rainData.stationId);
-          if (filteredStations.length > 0) {
-            const station = filteredStations[0];
-            // result[0] = filteredStations[0]
-            // usedStations.push(station);
-            this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          }
-      });
-    });
-  }
-
-  updateMarker(station: Station, colorHex: string, rainValue: number): void {
-    const marker = this.markers[station.id];
-    marker.setIcon(this.getColoredIcon(colorHex));
-    marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
-  }
+  // createMarker(station: Station, colorHex: string, rainValue: number): void {
+  //   if (station.longitude && station.latitude) {
+  //     const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
+  //       {icon: this.getColoredIcon(colorHex)}).on('click', event => {
+  //       this.clickedMarker.next(station);
+  //     });
+  //     if (!isNaN(rainValue)) {
+  //       marker.bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+  //     } else {
+  //       marker.bindPopup(station.name + ' no rain data');
+  //     }
+  //     this.markers[station.id] = marker;
+  //     this.group.addLayer(marker);
+  //     this.map.addLayer(this.group);
+  //   }
+  // }
+  //
+  // updateMarkers(date: Date, precipitationService: PrecipitationService): Promise<void> {
+  //   const stations = this.getDistinctLatLongStations(this.stationList);
+  //   const usedStations: Station[] = [];
+  //   return precipitationService.getPrecipitationDataForSpecificDate(date)
+  //     .toPromise().then( data => {
+  //       data.forEach(rainData => {
+  //         const rainValue = rainData.dailyPrecipitation;
+  //         const colorValue = rainValue * 50;
+  //         const filteredStations = stations.filter(station => station.id === rainData.stationId);
+  //         if (filteredStations.length > 0) {
+  //           const station = filteredStations[0];
+  //           // result[0] = filteredStations[0]
+  //           // usedStations.push(station);
+  //           this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+  //         }
+  //     });
+  //   });
+  // }
+  //
+  // updateMarker(station: Station, colorHex: string, rainValue: number): void {
+  //   const marker = this.markers[station.id];
+  //   marker.setIcon(this.getColoredIcon(colorHex));
+  //   marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
+  // }
 }
