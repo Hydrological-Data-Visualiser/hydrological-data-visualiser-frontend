@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {DataModelBase} from '../model/data-model-base';
 import {PrecipitationService} from './precipitation.service';
-import {ImgwModel} from '../model/imgw-model';
 import {DataType} from '../model/data-type';
 import {StationsService} from './stations.service';
 import {RiverService} from './river.service';
+import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,8 @@ export class DataProviderService {
   constructor(
     private precipitationService: PrecipitationService,
     private stationsService: StationsService,
-    private riverService: RiverService
+    private riverService: RiverService,
+    private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService
   ) {
     precipitationService.getDataRecordsArrayFromGetRequest();
   }
@@ -32,8 +33,12 @@ export class DataProviderService {
     return this.riverService;
   }
 
+  getKocinkaSurfaceHeightService(): KocinkaSurfaceHeightService {
+    return this.kocinkaSurfaceHeightService;
+}
+
   getModels(): DataModelBase[] {
-    return [new ImgwModel(
+    return [new DataModelBase(
       // TODO: modelName and description parameters SHOULD be provided by a result of a GET /info request from IMGW API
       'IMGW',
       'Precipitation data from IMGW API.',

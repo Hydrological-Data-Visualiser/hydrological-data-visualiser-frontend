@@ -26,6 +26,14 @@
               <label class="custom-control-label" for="kocinka">Kocinka river</label>
             </div>
           </li>
+          <li class="list-group-item">
+            <!-- Default checked -->
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input m-1" id="kocinkaSurfaceHeight" [checked]="getModelStatus('riverPressure')"
+                     (change)="changeModelStatus('riverPressure', !getModelStatus('riverPressure'))">
+              <label class="custom-control-label" for="kocinkaSurfaceHeight">Kocinka river - water surface height</label>
+            </div>
+          </li>
         </ul>
       </div>
     </div>

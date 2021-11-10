@@ -97,7 +97,8 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
     this.updateHourList(date);
     this.dataProvider.getRiverService().showKocinkaRiver();
-    this.dataProvider.getStationsService().putMarkers(formattedDate, this.dataProvider.getPrecipitationService());
+    this.dataProvider.getPrecipitationService().draw(formattedDate);
+    this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
   }
 
   onValueChange(event: any): void {
