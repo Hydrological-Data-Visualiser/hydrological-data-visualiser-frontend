@@ -7,6 +7,11 @@
   transition: margin .25s ease-out;
 }
 
+.example-custom-date-class {
+  background: orange;
+  border-radius: 100%;
+}
+
 #sidebar-wrapper .list-group {
   width: 20rem;
 }

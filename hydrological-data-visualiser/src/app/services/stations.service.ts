@@ -5,7 +5,6 @@ import * as L from 'leaflet';
 import {Observable, Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
-import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
@@ -149,19 +148,17 @@ export class StationsService {
     const stations = this.getDistinctLatLongStations(this.stationList);
     const usedStations: Station[] = [];
     return precipitationService.getPrecipitationDataForSpecificDate(date)
-      .toPromise().then( data => {
+      .toPromise().then(data => {
         data.forEach(rainData => {
           const rainValue = rainData.value;
           const colorValue = rainValue * 50;
           const filteredStations = stations.filter(station => station.id === rainData.stationId);
           if (filteredStations.length > 0) {
             const station = filteredStations[0];
-            // result[0] = filteredStations[0]
-            // usedStations.push(station);
             this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
           }
+        });
       });
-    });
   }
 
   updateMarker(station: Station, colorHex: string, rainValue: number): void {
