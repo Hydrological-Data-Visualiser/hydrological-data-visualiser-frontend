@@ -72,7 +72,7 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    this.dataProvider.getPrecipitationService().getPrecipitationDataForSpecificDate(formattedDate).subscribe(
+    this.dataProvider.getPrecipitationService().getDataFromSpecificDate(formattedDate).subscribe(
       a => {
         a.forEach(b => {
             const date = new Date(b.date);
