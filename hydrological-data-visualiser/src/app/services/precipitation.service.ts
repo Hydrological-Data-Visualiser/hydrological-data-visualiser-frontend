@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
 import {MarkerCreatorService} from './marker-creator.service';
 import {DataModelBase} from '../model/data-model-base';
+import {ColorService} from './color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ export class PrecipitationService extends MarkerCreatorService {
   public status = false;
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, colorService: ColorService) {
+    super(colorService);
     this.getInfo();
   }
 
@@ -96,6 +97,14 @@ export class PrecipitationService extends MarkerCreatorService {
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
+  getMinValue(): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/min`);
+  }
+
+  getMaxValue(): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/max`);
+  }
+
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }
@@ -130,5 +139,15 @@ export class PrecipitationService extends MarkerCreatorService {
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  onSet(){
+    this.getMinValue().subscribe( minValue =>
+      this.getMaxValue().subscribe( maxValue => {
+        console.log(minValue)
+        console.log(maxValue)
+        this.colorService.setColorMap(minValue, maxValue, "#FFF000", "000FFF")
+      })
+    )
   }
 }

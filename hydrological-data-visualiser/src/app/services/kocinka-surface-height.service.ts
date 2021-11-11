@@ -6,6 +6,7 @@ import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {MarkerCreatorService} from './marker-creator.service';
 import * as moment from 'moment';
 import {DataModelBase} from '../model/data-model-base';
+import {ColorService} from './color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
   public status = false;
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, colorService: ColorService) {
+    super(colorService);
     this.getInfo();
   }
 

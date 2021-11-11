@@ -13,12 +13,14 @@ export class ColorService {
   @Injectable({
     providedIn: 'root'
   })
-  private colormap: any = interpolate(["#000000", "#0000FF"])
+  private colormap: any = interpolate(["#FFFFFF", "#0000FF"])
   private minValue: number = 0
-  private maxValue: number = 1000
+  private maxValue: number = 50 // mock values
   
-  setColorMap(startValue: string, endValue: string): void {
-    this.colormap = interpolate([startValue, endValue])
+  setColorMap(minValue: number, maxValue: number, startColor: string, endColor: string): void {
+    this.minValue = minValue
+    this.maxValue = maxValue
+    this.colormap = interpolate([startColor, endColor])
   }
 
   getColor(value: number): string {
