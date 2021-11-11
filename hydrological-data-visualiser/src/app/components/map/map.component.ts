@@ -60,7 +60,7 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
-    this.dataProvider.getRiverService().map = this.map;
+    this.dataProvider.getKocinkaRandomService().map = this.map;
     // this.dataProvider.getStationsService().map = this.map;
     this.dataProvider.getPrecipitationService().map = this.map;
     this.dataProvider.getKocinkaSurfaceHeightService().map = this.map;

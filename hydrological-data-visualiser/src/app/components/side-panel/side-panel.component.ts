@@ -2,7 +2,6 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import * as moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
-import {FormInputData} from '../../model/form-input-data';
 import {DataProviderService} from '../../services/data-provider.service';
 import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
 
@@ -123,7 +122,7 @@ export class SidePanelComponent implements OnInit {
       );
 
     if (this.dataProvider.selectedModel === 'river') {
-      this.dataProvider.getRiverService().showKocinkaRiver();
+      this.dataProvider.getKocinkaRandomService().showKocinkaRiver(this.value.toDateString());
     }
     if (this.dataProvider.selectedModel === 'IMGW') {
       const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');

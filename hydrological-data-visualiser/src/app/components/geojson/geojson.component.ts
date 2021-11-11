@@ -18,7 +18,7 @@ export class GeojsonComponent implements OnInit {
 
   handleFileInput(files: FileList): void {
     this.fileToUpload = files.item(0);
-    (this.fileToUpload?.text().then(a => L.geoJSON(JSON.parse(a)).addTo(this.dataProvider.getRiverService().map)
+    (this.fileToUpload?.text().then(a => L.geoJSON(JSON.parse(a)).addTo(this.dataProvider.getKocinkaRandomService().map)
     ));
   }
 }

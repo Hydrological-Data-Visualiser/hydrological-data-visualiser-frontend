@@ -27,7 +27,7 @@ export class DataModelComponent implements OnInit {
     // TODO: scroll to data
 
     this.dataProvider.getKocinkaSurfaceHeightService().clear();
-    this.dataProvider.getRiverService().clear();
+    this.dataProvider.getKocinkaRandomService().clear();
     this.dataProvider.getPrecipitationService().clear();
   }
 }
