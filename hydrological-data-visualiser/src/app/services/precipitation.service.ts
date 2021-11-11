@@ -15,10 +15,11 @@ export class PrecipitationService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/imgw';
   public precipitationDict: { [key: string]: number } = {};
   public status = false;
-  public info: DataModelBase = this.getInfo();
+  public info!: DataModelBase;
 
   constructor(private http: HttpClient) {
     super();
+    this.getInfo();
   }
 
   draw(date: Date): void {
@@ -127,10 +128,8 @@ export class PrecipitationService extends MarkerCreatorService {
     );
   }
 
-  getInfo(): DataModelBase {
-    let res!: DataModelBase;
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
-    return res;
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
   clear(): void {

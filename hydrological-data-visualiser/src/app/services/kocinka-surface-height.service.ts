@@ -16,10 +16,11 @@ import {DataModelBase} from '../model/data-model-base';
 export class KocinkaSurfaceHeightService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/kocinkaPressure';
   public status = false;
-  public info: DataModelBase = this.getInfo();
+  public info!: DataModelBase;
 
   constructor(private http: HttpClient) {
     super();
+    this.getInfo();
   }
 
   getStationsObservable(): Observable<Station[]> {
@@ -67,10 +68,8 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
     );
   }
 
-  getInfo(): DataModelBase {
-    let res!: DataModelBase;
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
-    return res;
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
   clear(): void {

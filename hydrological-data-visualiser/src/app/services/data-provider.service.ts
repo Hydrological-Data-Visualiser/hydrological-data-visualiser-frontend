@@ -6,6 +6,7 @@ import {RiverService} from './river.service';
 import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
 import {HttpClient} from '@angular/common/http';
 import {KocinkaRandomService} from './kocinka-random.service';
+import {KocinkaTemperatureService} from './kocinka-temperature.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class DataProviderService {
   apis: string[] = [
     this.precipitationService.url,
     this.kocinkaRandom.url,
-    this.kocinkaSurfaceHeightService.url
+    this.kocinkaSurfaceHeightService.url,
+    this.kocinkaTemperatureService.url
   ];
 
   constructor(
@@ -26,7 +28,8 @@ export class DataProviderService {
     private precipitationService: PrecipitationService,
     private stationsService: StationsService,
     private kocinkaRandom: KocinkaRandomService,
-    private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService
+    private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService,
+    private kocinkaTemperatureService: KocinkaTemperatureService
   ) {
     // precipitationService.getDataRecordsArrayFromGetRequest();
     this.getModels();
@@ -47,6 +50,11 @@ export class DataProviderService {
   getKocinkaSurfaceHeightService(): KocinkaSurfaceHeightService {
     return this.kocinkaSurfaceHeightService;
   }
+
+  getKocinkaTemperatureService(): KocinkaTemperatureService {
+    return this.kocinkaTemperatureService;
+  }
+
 
   getModels(): void {
     this.apis.forEach(api => {

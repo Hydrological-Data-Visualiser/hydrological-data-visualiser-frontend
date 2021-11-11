@@ -29,5 +29,6 @@ export class DataModelComponent implements OnInit {
     this.dataProvider.getKocinkaSurfaceHeightService().clear();
     this.dataProvider.getKocinkaRandomService().clear();
     this.dataProvider.getPrecipitationService().clear();
+    this.dataProvider.getKocinkaTemperatureService().clear();
   }
 }

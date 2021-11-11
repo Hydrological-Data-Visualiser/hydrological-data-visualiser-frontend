@@ -12,20 +12,19 @@ import * as moment from 'moment';
 export class KocinkaRandomService extends RiverService {
   public url = 'https://imgw-mock.herokuapp.com/kocinka';
   public status = false;
-  public info: DataModelBase = this.getInfo();
+  public info!: DataModelBase;
 
   constructor(private http: HttpClient) {
     super();
+    this.getInfo();
   }
 
   showKocinkaRiver(date: Date): void {
     this.drawRiver(this.getDataFromDateAsObservableUsingDate(date));
   }
 
-  getInfo(): DataModelBase {
-    let res!: DataModelBase;
-    this.http.get<DataModelBase>(`${this.url}/info`).toPromise().then(info => res = info);
-    return res;
+  getInfo(): void  {
+    this.http.get<DataModelBase>(`${this.url}/info`).toPromise().then(info => this.info = info);
   }
 
   getDataRecordsArrayFromGetRequest(): RiverPoint[] {

@@ -73,13 +73,13 @@ export class SidePanelComponent implements OnInit {
     this.hours = [];
     let dataProvider: any;
     switch (this.dataProvider.selectedModel) {
-      case 'river' :
+      case this.dataProvider.getKocinkaRandomService().info.id :
         dataProvider = this.dataProvider.getKocinkaRandomService();
         break;
-      case 'IMGW':
+      case this.dataProvider.getPrecipitationService().info.id:
         dataProvider = this.dataProvider.getPrecipitationService();
         break;
-      case 'riverPressure':
+      case this.dataProvider.getKocinkaSurfaceHeightService().info.id:
         dataProvider = this.dataProvider.getKocinkaSurfaceHeightService();
         break;
       default:
