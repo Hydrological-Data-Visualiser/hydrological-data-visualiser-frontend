@@ -52,12 +52,12 @@ export class MarkerCreatorService {
     data.subscribe(d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
-        const colorValue = rainValue * 50;
         const filteredStations = stations.filter(station => station.id === rainData.stationId);
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
           usedStations.push(station);
-          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+          const color = this.colorService.getColor(rainValue)
+          this.createMarker(station, this.rgbStringToHex(color), rainValue);
         }
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
@@ -97,7 +97,6 @@ export class MarkerCreatorService {
             // usedStations.push(station);
             const color = this.colorService.getColor(rainValue)
             this.updateMarker(station, this.rgbStringToHex(color), rainValue);
-            // this.updateMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
           }
         });
       });

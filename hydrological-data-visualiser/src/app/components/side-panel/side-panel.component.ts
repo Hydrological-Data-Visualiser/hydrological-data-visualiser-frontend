@@ -4,6 +4,8 @@ import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
+import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
+import { LegendComponent } from '../legend/legend.component';
 
 @Component({
   selector: 'app-side-panel',
