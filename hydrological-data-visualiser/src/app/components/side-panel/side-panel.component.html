@@ -25,20 +25,20 @@
                 <mat-datepicker #picker [dateClass]="dateClass"></mat-datepicker>
               </mat-form-field>
 
-                <mat-form-field>
+              <mat-form-field>
                 <mat-label>Choose hour</mat-label>
-                <mat-select *ngIf="blocked" [(value)]="selectedHour" disabled>
-                  <mat-option *ngFor="let food of hours" [value]="food">
-                    {{food}}
+                <mat-select *ngIf="blocked" disabled>
+                </mat-select>
+                <mat-select *ngIf="!blocked">
+                  <mat-option *ngFor="let hour of hours" (onSelectionChange)="onHourChange(hour)" [value]="hour">
+                    {{hour}}
                   </mat-option>
                 </mat-select>
-                  <mat-select *ngIf="!blocked" [(value)]="selectedHour">
-                    <mat-option *ngFor="let food of hours" [value]="food">
-                      {{food}}
-                    </mat-option>
-                  </mat-select>
               </mat-form-field>
-
+              <div>
+                <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show</button>
+              </div>
+              <br>
 
               <label for="days" class="col-form-label">Animation span: </label>
               <div class="col-3">

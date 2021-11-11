@@ -22,20 +22,20 @@ export class StationsComponent implements AfterViewInit, OnInit {
 
   zoomTo(id: number): void {
     const station = this.allStations.filter(a => a.id === id)[0];
-    const map = this.stationService.map;
-    if (station.latitude && station.longitude) {
-      this.query = '';
-      map.setView([station.latitude, station.longitude], 13, {
-        animate: true,
-        animation: true,
+    // const map = this.stationService.map;
+    // if (station.latitude && station.longitude) {
+    //   this.query = '';
+    //   map.setView([station.latitude, station.longitude], 13, {
+    //     animate: true,
+    //     animation: true,
         // duration: 2
-      });
-    }
+      // });
+    // }
   }
 
   ngOnInit(): void {
-     this.stationService.stations$.subscribe(station => {
-       this.allStations.push(station);
-     });
+     // this.stationService.stations$.subscribe(station => {
+     //   this.allStations.push(station);
+     // });
   }
 }

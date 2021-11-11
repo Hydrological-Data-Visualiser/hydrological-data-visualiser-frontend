@@ -23,6 +23,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatNativeDateModule} from '@angular/material/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
+import {MatRadioModule} from "@angular/material/radio";
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import {MatSelectModule} from '@angular/material/select';
     MatCardModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [SidePanelComponent],
   bootstrap: [AppComponent]

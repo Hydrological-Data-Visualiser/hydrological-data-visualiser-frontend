@@ -11,6 +11,8 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // @ts-ignore
+    document.getElementById('modelsButton').click();
   }
 
 }

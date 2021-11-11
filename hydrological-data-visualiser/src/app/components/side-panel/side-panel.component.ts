@@ -24,10 +24,10 @@ export class SidePanelComponent implements OnInit {
   public minDate: Date = new Date('05/07/2017');
   public maxDate: Date = new Date('08/27/2017');
   public value: Date = new Date();
+  public hour: string | undefined;
   blocked = true;
   // hour
   hours: string[] = [];
-  selectedHour: any;
   // animation
   animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
@@ -39,14 +39,14 @@ export class SidePanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
-      this.lat = a?.latitude;
-      this.long = a?.longitude;
-      this.name = a?.name;
-      if (a?.latitude && a.name && a.longitude) {
-        this.clicked = true;
-      }
-    });
+    // this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
+    //   this.lat = a?.latitude;
+    //   this.long = a?.longitude;
+    //   this.name = a?.name;
+    //   if (a?.latitude && a.name && a.longitude) {
+    //     this.clicked = true;
+    //   }
+    // });
   }
 
   setLong(newItem: number): void {
@@ -72,40 +72,80 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    this.dataProvider.getPrecipitationService().getDataFromSpecificDate(formattedDate).subscribe(
-      a => {
-        a.forEach(b => {
-            const date = new Date(b.date);
-            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    if (this.dataProvider.selectedModel === 'river') {
+      this.hours.push('00:00:00');
+    }
+    if (this.dataProvider.selectedModel === 'IMGW') {
+      this.dataProvider.getPrecipitationService().getDataInstantFromSpecificDate(formattedDate).subscribe(
+        a => {
+          a.forEach(b => {
+              const date = new Date(b.date);
+              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
 
-            const value = (moment(nowUtc)).format('HH:mm:ss');
+              const value = (moment(nowUtc)).format('HH:mm:ss');
 
-            if (this.hours.filter(hour => hour === value).length === 0) {
-              this.hours.push(value);
+              if (this.hours.filter(hour => hour === value).length === 0) {
+                this.hours.push(value);
+              }
             }
-          }
-        );
-      }
-    );
+          );
+        }
+      );
+    }
+
+    if (this.dataProvider.selectedModel === 'riverPressure') {
+      this.dataProvider.getKocinkaSurfaceHeightService().getDataFromSpecificDate(formattedDate).subscribe(
+        a => {
+          a.forEach(b => {
+              const date = new Date(b.date);
+              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+              const value = (moment(nowUtc)).format('HH:mm:ss');
+
+              if (this.hours.filter(hour => hour === value).length === 0) {
+                this.hours.push(value);
+              }
+            }
+          );
+        }
+      );
+    }
   }
 
-//  form methods below
   onSubmit(): void {
-    const date = this.value;
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    this.animationService.stop();
-    this.updateHourList(date);
-    this.dataProvider.getRiverService().showKocinkaRiver();
-    this.dataProvider.getPrecipitationService().draw(formattedDate);
-    this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
+    console.log(this.value);
+    this.value
+      .setHours(
+        Number.parseInt(this.hour!.substr(0, 2), 10),
+        Number.parseInt(this.hour!.substr(3, 2), 10),
+        Number.parseInt(this.hour!.substr(6, 2), 10)
+      );
+
+    if (this.dataProvider.selectedModel === 'river') {
+      this.dataProvider.getRiverService().showKocinkaRiver();
+    }
+    if (this.dataProvider.selectedModel === 'IMGW') {
+      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.dataProvider.getPrecipitationService().draw(formattedDate);
+    }
+    if (this.dataProvider.selectedModel === 'riverPressure') {
+      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
+    }
+  }
+
+  onHourChange(hour: string): void {
+    this.hour = hour;
   }
 
   onValueChange(event: any): void {
-    console.log(event.value);
+    this.hour = undefined;
+    this.hours = [];
     this.value = event.value;
-    this.onSubmit();
     this.blocked = false;
+    this.updateHourList(new Date(event.value));
+    this.animationService.stop();
   }
 
   // animation methods
@@ -139,7 +179,7 @@ export class SidePanelComponent implements OnInit {
       const date = cellDate.getDate();
 
       // Highlight the 1st and 20th day of each month.
-      return date === 1 || date === 20 ? 'example-custom-date-class' : '';
+      return date === 1 ? 'example-custom-date-class' : '';
     }
     return '';
   }

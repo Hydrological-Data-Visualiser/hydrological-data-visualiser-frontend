@@ -1,40 +1,24 @@
 <!-- Button trigger modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade " id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Data Models</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h1 class="modal-title" id="exampleModalLabel">Data Models</h1>
+        <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="font-weight-bold">Choose data models</p>
+        <p class="font-weight-bold">Choose data model</p>
 
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <!-- Default checked -->
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input m-1" id="imgw" [checked]="getModelStatus('IMGW')"
-              (change)="changeModelStatus('IMGW', !getModelStatus('IMGW'))">
-              <label class="custom-control-label" for="imgw">Precipitation data from IMGW API</label>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <!-- Default checked -->
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input m-1" id="kocinka" [checked]="getModelStatus('river')"
-              (change)="changeModelStatus('river', !getModelStatus('river'))">
-              <label class="custom-control-label" for="kocinka">Kocinka river</label>
-            </div>
-          </li>
-          <li class="list-group-item">
-            <!-- Default checked -->
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input m-1" id="kocinkaSurfaceHeight" [checked]="getModelStatus('riverPressure')"
-                     (change)="changeModelStatus('riverPressure', !getModelStatus('riverPressure'))">
-              <label class="custom-control-label" for="kocinkaSurfaceHeight">Kocinka river - water surface height</label>
-            </div>
-          </li>
-        </ul>
+        <mat-radio-group
+          aria-labelledby="example-radio-group-label"
+          class="example-radio-group"
+          [(ngModel)]="selectedModel">
+          <mat-radio-button class="example-radio-button" *ngFor="let model of getModels()" [value]=model
+                            (change)="changeModelStatus(model.id)">
+            {{model.name}} - {{model.description}} - {{model.dataType}}
+          </mat-radio-button>
+        </mat-radio-group>
+
       </div>
     </div>
   </div>
