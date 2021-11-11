@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Station} from '../model/station';
@@ -8,19 +8,22 @@ import {PrecipitationService} from './precipitation.service';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
 import {delay} from 'rxjs/operators';
 import * as moment from 'moment';
+import {DataModelBase} from '../model/data-model-base';
 
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaSurfaceHeightService extends MarkerCreatorService{
+export class KocinkaSurfaceHeightService extends MarkerCreatorService {
+  public url = 'https://imgw-mock.herokuapp.com/kocinkaPressure';
   public status = false;
+  public info: DataModelBase = this.getInfo();
 
   constructor(private http: HttpClient) {
     super();
   }
 
   getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>(`https://imgw-mock.herokuapp.com/kocinkaPressure/stations`);
+    return this.http.get<Station[]>(`${this.url}/stations`);
   }
 
   getStations(): Station[] {
@@ -43,13 +46,18 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService{
   }
 
   getData(): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/kocinkaPressure/data`);
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
   }
 
   getDataFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
     return this.http.get<PrecipitationDayDataNew[]>
-    (`https://imgw-mock.herokuapp.com/kocinkaPressure/data?date=${formattedDate}`);
+    (`${this.url}/data?date=${formattedDate}`);
+  }
+
+  getDataInstantFromSpecificDate(date: string): Observable<PrecipitationDayDataNew[]> {
+    return this.http.get<PrecipitationDayDataNew[]>
+    (`${this.url}/data?dateInstant=${date}`);
   }
 
   mapObservableToArrayData(observable: Observable<PrecipitationDayDataNew[]>): HydrologicalDataBase[] {
@@ -61,7 +69,9 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService{
       });
       complete = true;
     });
-    while (!complete) { delay(100); }
+    while (!complete) {
+      delay(100);
+    }
     return precipitationList;
   }
 
@@ -76,9 +86,24 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService{
 
   draw(date: string): void {
     this.putMarkers(
-      this.status,
       this.getStations(),
-      this.getData(),
+      this.getDataInstantFromSpecificDate(date),
       date);
+  }
+
+  getInfo(): DataModelBase {
+    let res!: DataModelBase;
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
+    return res;
+  }
+
+  getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
+    let result: PrecipitationDayDataNew[] = [];
+    this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`).subscribe((res: PrecipitationDayDataNew[]) => result = res);
+    return result;
+  }
+
+  clear(): void {
+    this.group.clearLayers();
   }
 }

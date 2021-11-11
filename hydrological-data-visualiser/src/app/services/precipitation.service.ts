@@ -6,28 +6,32 @@ import {Station} from '../model/station';
 import * as moment from 'moment';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
 import {MarkerCreatorService} from './marker-creator.service';
+import {DataModelBase} from '../model/data-model-base';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PrecipitationService extends MarkerCreatorService{
+export class PrecipitationService extends MarkerCreatorService {
+  public url = 'https://imgw-mock.herokuapp.com/imgw';
   public precipitationDict: { [key: string]: number } = {};
   public status = false;
+  public info: DataModelBase = this.getInfo();
 
   constructor(private http: HttpClient) {
     super();
   }
 
   draw(date: string): void {
-    this.putMarkers(
-      this.status,
-      this.getStations(),
-      this.getPrecipitationDataForSpecificStringDate(date),
-      date);
+    this.getStationsObservable().subscribe(stations => {
+      this.putMarkers(
+        this.getDistinctLatLongStations(stations),
+        this.getPrecipitationDataForSpecificStringDate(date),
+        date);
+    });
   }
 
   getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations');
+    return this.http.get<Station[]>(`${this.url}/stations`);
   }
 
   getData(): Observable<PrecipitationDayDataNew[]> {
@@ -53,6 +57,22 @@ export class PrecipitationService extends MarkerCreatorService{
     return stat;
   }
 
+  getDistinctLatLongStations(stations: Station[]): Station[] {
+    const tab: number[] = [];
+    const retVal: Station[] = [];
+    stations.forEach(a => {
+      const latitude = a.latitude;
+      if (latitude) {
+        if (!tab.includes(latitude)) {
+          tab.push(latitude);
+          retVal.push(a);
+        }
+      }
+    });
+    return retVal;
+  }
+
+
   mapObservableToArrayData(observable: Observable<PrecipitationDayDataNew[]>): HydrologicalDataBase[] {
     const precipitationList: HydrologicalDataBase[] = [];
     observable.subscribe(data => {
@@ -71,17 +91,17 @@ export class PrecipitationService extends MarkerCreatorService{
 
   getPrecipitationDataForSpecificDateAndStation(date: string, station: Station): Observable<PrecipitationDayDataNew[]> {
     return this.http.get<PrecipitationDayDataNew[]>
-        (`https://imgw-mock.herokuapp.com/imgw/data?date=${date}&stationId=${station.id.toString()}`);
+    (`${this.url}/data?date=${date}&stationId=${station.id.toString()}`);
   }
 
-  getDataFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataInstantFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
     return this.http.get<PrecipitationDayDataNew[]>
-    (`https://imgw-mock.herokuapp.com/imgw/data?date=${formattedDate}`);
+    (`${this.url}/data?instant=${formattedDate}`);
   }
 
   getPrecipitationDataForSpecificStringDate(date: string): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`https://imgw-mock.herokuapp.com/imgw/data?date=${date}`);
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${date}`);
   }
 
   capitalize(s: string): string {
@@ -114,5 +134,15 @@ export class PrecipitationService extends MarkerCreatorService{
       data.date,
       data.dailyPrecipitation
     );
+  }
+
+  getInfo(): DataModelBase {
+    let res!: DataModelBase;
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
+    return res;
+  }
+
+  clear(): void {
+    this.group.clearLayers();
   }
 }

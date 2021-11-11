@@ -5,26 +5,25 @@ import * as L from 'leaflet';
 import {Observable, Subject} from 'rxjs';
 import 'leaflet.markercluster';
 import {PrecipitationService} from './precipitation.service';
-import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StationsService {
-  public map: any;
-  private clickedMarker = new Subject<Station>();
-  public clickedMarker$ = this.clickedMarker.asObservable();
-  public group = new L.MarkerClusterGroup({
-    showCoverageOnHover: false,
-    maxClusterRadius: zoom => 130 - zoom * 10
-  });
-  private stations = new Subject<Station>();
-  public stations$ = this.stations.asObservable();
-  public stationList: Station[] = [];
-  private markers: { [key: number]: L.Marker } = {};
+  // public map: any;
+  // private clickedMarker = new Subject<Station>();
+  // public clickedMarker$ = this.clickedMarker.asObservable();
+  // public group = new L.MarkerClusterGroup({
+  //   showCoverageOnHover: false,
+  //   maxClusterRadius: zoom => 130 - zoom * 10
+  // });
+  // private stations = new Subject<Station>();
+  // public stations$ = this.stations.asObservable();
+  // public stationList: Station[] = [];
+  // private markers: { [key: number]: L.Marker } = {};
 
   constructor(private http: HttpClient) {
-    this.getAndParseStationsDataFromGetRequest();
+    // this.getAndParseStationsDataFromGetRequest();
   }
 
   redIcon = new L.Icon({
@@ -57,41 +56,41 @@ export class StationsService {
     });
   }
 
-  public getStations(): Observable<Station[]> {
-    return this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations');
-  }
-
-  getAndParseStationsDataFromGetRequest(): void {
-    this.getStations().subscribe(data => {
-      this.stations$.subscribe(value => {
-        this.stationList.push(value);
-      });
-      data.forEach(value => {
-        this.stations.next(new Station(
-          value.id,
-          value.name.charAt(0).toUpperCase() + value.name.slice(1).toLowerCase(),
-          value.geoId,
-          value.latitude,
-          value.longitude
-        ));
-      });
-    });
-  }
-
-  getDistinctLatLongStations(stations: Station[]): Station[] {
-    const tab: number[] = [];
-    const retVal: Station[] = [];
-    stations.forEach(a => {
-      const latitude = a.latitude;
-      if (latitude) {
-        if (!tab.includes(latitude)) {
-          tab.push(latitude);
-          retVal.push(a);
-        }
-      }
-    });
-    return retVal;
-  }
+  // public getStations(): Observable<Station[]> {
+  //   return this.http.get<Station[]>('https://imgw-mock.herokuapp.com/imgw/stations');
+  // }
+  //
+  // getAndParseStationsDataFromGetRequest(): void {
+  //   this.getStations().subscribe(data => {
+  //     this.stations$.subscribe(value => {
+  //       this.stationList.push(value);
+  //     });
+  //     data.forEach(value => {
+  //       this.stations.next(new Station(
+  //         value.id,
+  //         value.name.charAt(0).toUpperCase() + value.name.slice(1).toLowerCase(),
+  //         value.geoId,
+  //         value.latitude,
+  //         value.longitude
+  //       ));
+  //     });
+  //   });
+  // }
+  //
+  // getDistinctLatLongStations(stations: Station[]): Station[] {
+  //   const tab: number[] = [];
+  //   const retVal: Station[] = [];
+  //   stations.forEach(a => {
+  //     const latitude = a.latitude;
+  //     if (latitude) {
+  //       if (!tab.includes(latitude)) {
+  //         tab.push(latitude);
+  //         retVal.push(a);
+  //       }
+  //     }
+  //   });
+  //   return retVal;
+  // }
 
   // putMarkers(date: string, precipitationService: PrecipitationService): void {
   //   if (precipitationService.status) {
@@ -119,14 +118,14 @@ export class StationsService {
   //   }
   // }
 
-  capitalize(s: string): string {
-    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-  }
-
-  rgbToHex(r: number, g: number, b: number): string {
-    // tslint:disable-next-line:no-bitwise
-    return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-  }
+  // capitalize(s: string): string {
+  //   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  // }
+  //
+  // rgbToHex(r: number, g: number, b: number): string {
+  //   // tslint:disable-next-line:no-bitwise
+  //   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  // }
 
   // createMarker(station: Station, colorHex: string, rainValue: number): void {
   //   if (station.longitude && station.latitude) {

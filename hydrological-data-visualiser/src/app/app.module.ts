@@ -9,11 +9,22 @@ import {NavbarComponent} from './components/navbar/navbar.component';
 import {DataModelComponent} from './components/data-model/data-model.component';
 import {SidePanelComponent} from './components/side-panel/side-panel.component';
 import {AngularResizedEventModule} from 'angular-resize-event';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {StationsComponent} from './components/stations/stations.component';
 import {SearchFilterPipe} from './pipes/search-filter.pipe';
 import {ScrollingModule} from '@angular/cdk/scrolling';
-import { CalendarModule } from '@syncfusion/ej2-angular-calendars';
+import {CalendarModule} from '@syncfusion/ej2-angular-calendars';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {
+  MatFormFieldModule,
+} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatCardModule} from '@angular/material/card';
+import {MatSelectModule} from '@angular/material/select';
+import {MatRadioModule} from "@angular/material/radio";
+import { GeojsonComponent } from './components/geojson/geojson.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +34,8 @@ import { CalendarModule } from '@syncfusion/ej2-angular-calendars';
     DataModelComponent,
     SidePanelComponent,
     StationsComponent,
-    SearchFilterPipe
+    SearchFilterPipe,
+    GeojsonComponent
   ],
   imports: [
     BrowserModule,
@@ -32,7 +44,16 @@ import { CalendarModule } from '@syncfusion/ej2-angular-calendars';
     AngularResizedEventModule,
     FormsModule,
     ScrollingModule,
-    CalendarModule
+    CalendarModule,
+    BrowserAnimationsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule,
+    MatCardModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [SidePanelComponent],
   bootstrap: [AppComponent]

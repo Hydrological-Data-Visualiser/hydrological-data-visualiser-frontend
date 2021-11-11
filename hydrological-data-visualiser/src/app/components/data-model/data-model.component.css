@@ -6,3 +6,12 @@ button {
   margin: 0px;
   padding: 6px 12px 6px 12px;
 }
+.example-radio-group {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+}
+
+.example-radio-button {
+  margin: 5px;
+}

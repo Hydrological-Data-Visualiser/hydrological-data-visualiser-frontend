@@ -1,101 +1,122 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as moment from 'moment';
-import { SidePanelComponent } from '../components/side-panel/side-panel.component';
-import { PrecipitationService } from './precipitation.service';
-import { StationsService } from './stations.service';
+import {SidePanelComponent} from '../components/side-panel/side-panel.component';
+import {PrecipitationService} from './precipitation.service';
+import {StationsService} from './stations.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnimationService {
-  private currentPlayData: PlayData | null = null
+  private currentPlayData: PlayData | null = null;
 
-  constructor(private stationsService: StationsService, private precipitationService: PrecipitationService) { }
+  constructor(private stationsService: StationsService, private precipitationService: PrecipitationService) {
+  }
 
-  public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent) {
-    if(this.currentPlayData != null){
-      this.currentPlayData.stopPlaying()
+  public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent): void {
+    if (this.currentPlayData != null) {
+      this.currentPlayData.stopPlaying();
     }
-    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, this.precipitationService, sidepanel)
-    this.currentPlayData = playData
+    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, this.precipitationService, sidepanel);
+    this.currentPlayData = playData;
   }
 
-  play() {
-    if(this.currentPlayData != null) this.currentPlayData.playState()
+  play(): void {
+    if (this.currentPlayData != null) {
+      this.currentPlayData.playState();
+    }
   }
 
-  pause() {
-    if(this.currentPlayData != null) {
-      if(this.currentPlayData.isPaused()) {
-        this.currentPlayData.unpause()
+  pause(): void {
+    if (this.currentPlayData != null) {
+      if (this.currentPlayData.isPaused()) {
+        this.currentPlayData.unpause();
       } else {
-        this.currentPlayData.pause()
+        this.currentPlayData.pause();
       }
     }
   }
 
-  stop() {
-    if(this.currentPlayData != null){
-      this.currentPlayData.stopPlaying()
+  stop(): void {
+    if (this.currentPlayData != null) {
+      this.currentPlayData.stopPlaying();
     }
-    this.currentPlayData = null
+    this.currentPlayData = null;
   }
 
 }
 
 class PlayData {
-  private playing: Boolean = true
-  private paused: Boolean = false
-  private currentStep: number = -1
+  private playing = true;
+  private paused = false;
+  private currentStep = -1;
 
-  constructor (private startStep: Date,
-               private steps: number,
-               private timestepMs: number,
-               private stationsService: StationsService,
-               private precipitationService: PrecipitationService,
-               private sidepanel: SidePanelComponent) {}
+  constructor(private startStep: Date,
+              private steps: number,
+              private timestepMs: number,
+              private stationsService: StationsService,
+              private precipitationService: PrecipitationService,
+              private sidepanel: SidePanelComponent) {
+  }
 
   playState(): void {
     setTimeout(() => {
-      if(this.paused) {
-        this.pauseState()
-        return
+      if (this.paused) {
+        this.pauseState();
+        return;
       }
-      if(!this.playing) {
-        return
+      if (!this.playing) {
+        return;
       }
 
-      this.currentStep = (this.currentStep + 1) % this.steps
+      this.currentStep = (this.currentStep + 1) % this.steps;
       const frameDate = new Date(this.startStep.valueOf());
       frameDate.setDate(frameDate.getDate() + this.currentStep);
       this.sidepanel.setAnimationPlaybackData((moment(frameDate)).format('YYYY-MM-DD'), this.currentStep);
-      this.setFrame(frameDate).then( () => {
-        this.playState()
-      })
-    }, this.timestepMs)
+      this.setFrame(frameDate).then(() => {
+        this.playState();
+      });
+    }, this.timestepMs);
   }
 
   private pauseState(): void {
     setTimeout(() => {
-      if(!this.playing) return
-      if(this.paused) this.pauseState()
-      else {
-        this.playState()
-        return
+      if (!this.playing) {
+        return;
       }
-    }, 100)
+      if (this.paused) {
+        this.pauseState();
+      } else {
+        this.playState();
+        return;
+      }
+    }, 100);
   }
 
   private setFrame(date: Date): Promise<void> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.precipitationService.updateMarkers(formattedDate, this.precipitationService.getStations(), this.precipitationService.getData());
+    return this.precipitationService
+      .updateMarkers(formattedDate, this.precipitationService.getStations(), this.precipitationService.getData());
   }
 
-  stopPlaying(): void { this.playing = false }
-  isPlaying(): Boolean { return this.playing }
+  stopPlaying(): void {
+    this.playing = false;
+  }
 
-  pause(): void { this.paused = true }
-  unpause(): void { this.paused = false }
-  isPaused(): Boolean { return this.paused }
+  isPlaying(): boolean {
+    return this.playing;
+  }
+
+  pause(): void {
+    this.paused = true;
+  }
+
+  unpause(): void {
+    this.paused = false;
+  }
+
+  isPaused(): boolean {
+    return this.paused;
+  }
 
 }

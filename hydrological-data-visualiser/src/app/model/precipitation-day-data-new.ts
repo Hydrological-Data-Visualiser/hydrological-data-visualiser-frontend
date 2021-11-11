@@ -6,7 +6,7 @@ export class PrecipitationDayDataNew extends HydrologicalDataBase {
     public id: number,
     public stationId: number,
     public date: Date,
-    public dailyPrecipitation: number
+    public dailyPrecipitation: number,
     public value: number
   ) {
     super(id, stationId, date, value);

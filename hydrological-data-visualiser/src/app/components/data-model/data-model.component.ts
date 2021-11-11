@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataProviderService} from '../../services/data-provider.service';
 
@@ -8,6 +8,7 @@ import {DataProviderService} from '../../services/data-provider.service';
   styleUrls: ['./data-model.component.css']
 })
 export class DataModelComponent implements OnInit {
+  selectedModel!: DataModelBase;
 
   constructor(private dataProvider: DataProviderService) {
   }
@@ -16,33 +17,17 @@ export class DataModelComponent implements OnInit {
   }
 
   getModels(): DataModelBase[] {
-    return this.dataProvider.getModels();
+    return this.dataProvider.dataModels;
   }
 
-  getModelStatus(modelName: string): boolean {
-    switch (modelName) {
-      case 'IMGW':
-        return this.dataProvider.getPrecipitationService().status;
-      case 'river':
-        return this.dataProvider.getRiverService().status;
-      case 'riverPressure':
-        return this.dataProvider.getKocinkaSurfaceHeightService().status;
-      default:
-        return false;
-    }
-  }
+  changeModelStatus(name: string): void {
+    this.dataProvider.selectedModel = name;
+    // @ts-ignore - close modal
+    document.getElementById('dismissButton').click();
+    // TODO: scroll to data
 
-  changeModelStatus(modelName: string, status: boolean): void {
-    switch (modelName) {
-      case 'IMGW':
-        this.dataProvider.getPrecipitationService().status = status;
-        break;
-      case 'river':
-        this.dataProvider.getRiverService().status = status;
-        break;
-      case 'riverPressure':
-        this.dataProvider.getKocinkaSurfaceHeightService().status = status;
-        break;
-    }
+    this.dataProvider.getKocinkaSurfaceHeightService().clear();
+    this.dataProvider.getRiverService().clear();
+    this.dataProvider.getPrecipitationService().clear();
   }
 }

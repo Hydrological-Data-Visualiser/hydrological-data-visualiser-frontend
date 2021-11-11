@@ -1,0 +1,21 @@
+<!-- Button trigger modal -->
+<div class="modal fade " id="geoJsonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Add GeoJson</h1>
+        <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="font-weight-bold">Choose data model</p>
+        <div class="form-group">
+          <label for="file">Choose File</label>
+          <input type="file"
+                 id="file"
+                 (change)="handleFileInput($event.target.files)">
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

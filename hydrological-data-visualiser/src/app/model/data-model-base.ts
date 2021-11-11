@@ -3,10 +3,11 @@ import {HydrologicalDataBase} from './hydrological-data-base';
 
 export class DataModelBase {
   constructor(
-    public modelName: string,
+    public id: string,
+    public name: string,
     public description: string,
     public dataType: DataType,
-    public values: HydrologicalDataBase[]
+    // public values: HydrologicalDataBase[] = []
     /*
     place for other information about data model, TBD in the future
     */

@@ -54,22 +54,21 @@ export class MapComponent implements AfterViewInit {
   constructor(private dataProvider: DataProviderService) {
     this.lat = 0;
     this.long = 0;
-    this.dataProvider.getStationsService().map = this.map;
+    // this.dataProvider.getStationsService().map = this.map;
   }
 
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
     this.dataProvider.getRiverService().map = this.map;
-    this.dataProvider.getRiverService().showKocinkaRiver();
-    this.dataProvider.getStationsService().map = this.map;
+    // this.dataProvider.getStationsService().map = this.map;
     this.dataProvider.getPrecipitationService().map = this.map;
     this.dataProvider.getKocinkaSurfaceHeightService().map = this.map;
-    this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
-      if (this.marker) {
-        this.map.removeLayer(this.marker);
-      }
-    });
+    // this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
+    //   if (this.marker) {
+    //     this.map.removeLayer(this.marker);
+    //   }
+    // });
   }
 
   onResized(event: ResizedEvent): void {

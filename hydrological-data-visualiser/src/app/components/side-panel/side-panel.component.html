@@ -14,45 +14,32 @@
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-form" role="tabpanel" aria-labelledby="nav-form-tab">
           <div class="modal-body">
-            <form #dataForm="ngForm">
-              <!--            <div class="row align-items-center p-2 form-group">-->
-              <!--                <div class="col-2">-->
-              <!--                  <label for="latitude" class="col-form-label">Latitude</label>-->
-              <!--                </div>-->
-              <!--                <div class="col-3">-->
-              <!--                  <input type="number" id="latitude" class="form-control" required-->
-              <!--                  [(ngModel)]="model.latitude" name="latitude" #latitude="ngModel">-->
-              <!--                </div>-->
-              <!--                <div [hidden]="latitude.valid || latitude.pristine"-->
-              <!--                        class="alert alert-danger col-auto validation-msg">-->
-              <!--                    Latitude has to be a number.-->
-              <!--                  </div>-->
-              <!--            </div>-->
 
-              <!--            <div class="row align-items-center p-2">-->
-              <!--                <div class="col-2">-->
-              <!--                  <label for="longitude" class="col-form-label">Longitude</label>-->
-              <!--                </div>-->
-              <!--                <div class="col-3">-->
-              <!--                  <input type="number" id="longitude" class="form-control" required-->
-              <!--                  [(ngModel)]="model.longitude" name="longitude" #longitude="ngModel">-->
-              <!--                </div>-->
-              <!--                <div [hidden]="longitude.valid || longitude.pristine"-->
-              <!--                        class="alert alert-danger col-auto validation-msg">-->
-              <!--                    Longitude has to be a number.-->
-              <!--                  </div>-->
-              <!--            </div>-->
-              <div class="row align-items-center p-2">
-                <ejs-calendar (change)="onValueChange($event)" id=calendar [value]='value'
-                              [firstDayOfWeek]='1'></ejs-calendar>
+
+            <form #dataForm="ngForm">
+              <mat-form-field class="example-full-width" appearance="fill">
+                <mat-label>Choose a date</mat-label>
+                <input matInput [matDatepicker]="picker" placeholder="Input & change events"
+                       (dateInput)="onValueChange($event)">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker [dateClass]="dateClass"></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Choose hour</mat-label>
+                <mat-select *ngIf="blocked" disabled>
+                </mat-select>
+                <mat-select *ngIf="!blocked">
+                  <mat-option *ngFor="let hour of hours" (onSelectionChange)="onHourChange(hour)" [value]="hour">
+                    {{hour}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div>
+                <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show</button>
               </div>
-              <div class="buttons">
-                <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary btn-dark m-1" (click)="onSubmit()"
-                        [disabled]="!dataForm.form.valid" data-bs-dismiss="modal">Show
-                </button>
-              </div>
-              <!-- Animation -->
+              <br>
+
               <label for="days" class="col-form-label">Animation span: </label>
               <div class="col-3">
                 <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
