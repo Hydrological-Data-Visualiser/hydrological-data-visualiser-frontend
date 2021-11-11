@@ -29,7 +29,10 @@ export class GeojsonComponent implements OnInit {
       this.geoJson = L.geoJSON(JSON.parse(a));
       this.geoJson.addTo(this.dataProvider.getRiverService().map);
       this.dataProvider.getRiverService().map.fitBounds(this.geoJson.getBounds());
+      // @ts-ignore
+      document.getElementById('dismissButtonGeoJson').click();
     }));
+
   }
 
   delete(): void {
