@@ -71,42 +71,33 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    if (this.dataProvider.selectedModel === 'river') {
-      this.hours.push('00:00:00');
+    let dataProvider: any;
+    switch (this.dataProvider.selectedModel) {
+      case 'river' :
+        dataProvider = this.dataProvider.getKocinkaRandomService();
+        break;
+      case 'IMGW':
+        dataProvider = this.dataProvider.getPrecipitationService();
+        break;
+      case 'riverPressure':
+        dataProvider = this.dataProvider.getKocinkaSurfaceHeightService();
+        break;
+      default:
+        dataProvider = null;
     }
-    if (this.dataProvider.selectedModel === 'IMGW') {
-      this.dataProvider.getPrecipitationService().getDataInstantFromSpecificDate(formattedDate).subscribe(
-        a => {
-          a.forEach(b => {
-              const date = new Date(b.date);
-              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-
-              const value = (moment(nowUtc)).format('HH:mm:ss');
-
-              if (this.hours.filter(hour => hour === value).length === 0) {
-                this.hours.push(value);
-              }
+    // IT IS IMPORTANT THAT ALL DATAPROVIDERS HAVE THE SAME METHODS!!! IT IS DEALING HERE WITH `ANY` TYPE
+    if (dataProvider) {
+      dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
+        (data: any[]) => {
+          data.forEach(b => {
+            const date = new Date(b.date);
+            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            const value = (moment(nowUtc)).format('HH:mm:ss');
+            if (this.hours.filter(hour => hour === value).length === 0) {
+              this.hours.push(value);
             }
-          );
-        }
-      );
-    }
-
-    if (this.dataProvider.selectedModel === 'riverPressure') {
-      this.dataProvider.getKocinkaSurfaceHeightService().getDataFromSpecificDate(formattedDate).subscribe(
-        a => {
-          a.forEach(b => {
-              const date = new Date(b.date);
-              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-              const value = (moment(nowUtc)).format('HH:mm:ss');
-
-              if (this.hours.filter(hour => hour === value).length === 0) {
-                this.hours.push(value);
-              }
-            }
-          );
+          });
         }
       );
     }
@@ -116,21 +107,20 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     this.value
       .setHours(
+        // tslint:disable:no-non-null-assertion
         Number.parseInt(this.hour!.substr(0, 2), 10),
         Number.parseInt(this.hour!.substr(3, 2), 10),
         Number.parseInt(this.hour!.substr(6, 2), 10)
       );
 
     if (this.dataProvider.selectedModel === 'river') {
-      this.dataProvider.getKocinkaRandomService().showKocinkaRiver(this.value.toDateString());
+      this.dataProvider.getKocinkaRandomService().showKocinkaRiver(this.value);
     }
     if (this.dataProvider.selectedModel === 'IMGW') {
-      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-      this.dataProvider.getPrecipitationService().draw(formattedDate);
+      this.dataProvider.getPrecipitationService().draw(this.value);
     }
     if (this.dataProvider.selectedModel === 'riverPressure') {
-      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-      this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
+      this.dataProvider.getKocinkaSurfaceHeightService().draw(this.value);
     }
   }
 

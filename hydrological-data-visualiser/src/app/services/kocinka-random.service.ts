@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../model/data-model-base';
 import {RiverService} from './river.service';
 import {Observable} from 'rxjs';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +18,8 @@ export class KocinkaRandomService extends RiverService {
     super();
   }
 
-  showKocinkaRiver(date: string): void {
-    this.drawRiver(this.getDataFromDateAsObservable(date));
+  showKocinkaRiver(date: Date): void {
+    this.drawRiver(this.getDataFromDateAsObservableUsingDate(date));
   }
 
   getInfo(): DataModelBase {
@@ -33,7 +34,13 @@ export class KocinkaRandomService extends RiverService {
     return riv;
   }
 
-  getDataFromDateAsObservable(date: string): Observable<RiverPoint[]> {
-    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${date}`);
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
+  }
+
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
   }
 }

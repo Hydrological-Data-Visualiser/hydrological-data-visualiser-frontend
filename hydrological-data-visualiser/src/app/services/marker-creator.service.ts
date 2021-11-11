@@ -45,7 +45,7 @@ export class MarkerCreatorService {
     });
   }
 
-  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, date: string): void {
+  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>): void {
     this.group.clearLayers();
     const usedStations: Station[] = [];
     data.subscribe(d => {

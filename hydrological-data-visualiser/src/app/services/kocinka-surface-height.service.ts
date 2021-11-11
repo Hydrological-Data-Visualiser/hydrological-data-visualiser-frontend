@@ -49,58 +49,28 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
   }
 
-  getDataFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
     return this.http.get<PrecipitationDayDataNew[]>
     (`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataInstantFromSpecificDate(date: string): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>
-    (`${this.url}/data?dateInstant=${date}`);
+  getDataInstantFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
-  mapObservableToArrayData(observable: Observable<PrecipitationDayDataNew[]>): HydrologicalDataBase[] {
-    const precipitationList: HydrologicalDataBase[] = [];
-    let complete = false;
-    observable.subscribe(data => {
-      data.forEach(a => {
-        precipitationList.push(this.toBase(a));
-      });
-      complete = true;
-    });
-    while (!complete) {
-      delay(100);
-    }
-    return precipitationList;
-  }
-
-  toBase(data: PrecipitationDayDataNew): HydrologicalDataBase {
-    return new HydrologicalDataBase(
-      data.id,
-      data.stationId,
-      data.date,
-      data.dailyPrecipitation
-    );
-  }
-
-  draw(date: string): void {
+  draw(date: Date): void {
     this.putMarkers(
       this.getStations(),
-      this.getDataInstantFromSpecificDate(date),
-      date);
+      this.getDataInstantFromSpecificDate(date)
+    );
   }
 
   getInfo(): DataModelBase {
     let res!: DataModelBase;
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
     return res;
-  }
-
-  getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
-    let result: PrecipitationDayDataNew[] = [];
-    this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`).subscribe((res: PrecipitationDayDataNew[]) => result = res);
-    return result;
   }
 
   clear(): void {
