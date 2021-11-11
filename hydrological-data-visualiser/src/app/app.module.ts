@@ -24,6 +24,7 @@ import {MatNativeDateModule} from '@angular/material/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatSelectModule} from '@angular/material/select';
 import {MatRadioModule} from "@angular/material/radio";
+import { GeojsonComponent } from './components/geojson/geojson.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import {MatRadioModule} from "@angular/material/radio";
     DataModelComponent,
     SidePanelComponent,
     StationsComponent,
-    SearchFilterPipe
+    SearchFilterPipe,
+    GeojsonComponent
   ],
   imports: [
     BrowserModule,

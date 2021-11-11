@@ -15,7 +15,7 @@ import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
 export class SidePanelComponent implements OnInit {
   // details attributes
   paused = false;
-  status = true;
+  status = false;
   clicked = false;
   long: number | undefined;
   lat: number | undefined;
