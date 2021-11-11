@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {Station} from '../model/station';
 import * as moment from 'moment';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
@@ -137,17 +137,25 @@ export class PrecipitationService extends MarkerCreatorService {
     );
   }
 
-  getInfo(): void {
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+
+  // getInfo(): void {
+  //   this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+
+  getInfo():  Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
+  }
+
+  clear(): void {
+    this.group.clearLayers();
   }
 
   onSet(){
     this.getMinValue().subscribe( minValue =>
-      this.getMaxValue().subscribe( maxValue => {
-        console.log(minValue)
-        console.log(maxValue)
-        this.colorService.setColorMap(minValue, maxValue, "#FFF000", "000FFF")
-      })
+      this.getMaxValue().subscribe( maxValue =>
+        this.getInfo().subscribe( info =>
+          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel)
+        )
+      )
     )
   }
 }
