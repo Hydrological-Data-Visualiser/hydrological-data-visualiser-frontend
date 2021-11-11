@@ -130,6 +130,9 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.hour!.substr(3, 2), 10),
           Number.parseInt(this.hour!.substr(6, 2), 10)
         );
+      if (this.dataProvider.selectedModel === 'IMGW') {
+        this.dataProvider.getPrecipitationService().onSet()
+      }
       this.dataProvider.getActualService().draw(this.value);
     }
   }
