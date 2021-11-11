@@ -30,8 +30,10 @@
                 <mat-select *ngIf="blocked" disabled>
                 </mat-select>
                 <mat-select *ngIf="!blocked">
-                  <mat-option *ngFor="let hour of hours" (onSelectionChange)="onHourChange(hour)" [value]="hour">
-                    {{hour}}
+                  <mat-option *ngFor="let hour of hours.sort()" (onSelectionChange)="onHourChange(hour)"
+                              [value]="hour">
+                    {{hour | date :'HH:mm:ss'}}
+
                   </mat-option>
                 </mat-select>
               </mat-form-field>

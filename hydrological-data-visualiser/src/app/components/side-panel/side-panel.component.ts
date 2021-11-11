@@ -26,7 +26,7 @@ export class SidePanelComponent implements OnInit {
   public hour: string | undefined;
   blocked = true;
   // hour
-  hours: string[] = [];
+  hours: Date[] = [];
   // animation
   animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
@@ -81,10 +81,13 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(b.date);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            const value = (moment(nowUtc)).format('HH:mm:SS');
-            if (this.hours.filter(hour => hour === value).length === 0) {
-              this.hours.push(value);
-            }
+            // const value = (moment(nowUtc)).format('HH:mm:SS');
+            this.hours.push(nowUtc);
+            // distinct and sort
+            // tslint:disable-next-line:no-shadowed-variable
+            this.hours = [...new Set(this.hours)].sort((a, b) => {
+              return (new Date(b) as any) - (new Date(a) as any);
+            });
           });
         }
       );
@@ -103,8 +106,8 @@ export class SidePanelComponent implements OnInit {
     this.dataProvider.getActualService().draw(this.value);
   }
 
-  onHourChange(hour: string): void {
-    this.hour = hour;
+  onHourChange(hour: Date): void {
+    this.hour = moment(hour).format('HH:mm:SS');
   }
 
   onValueChange(event: any): void {
