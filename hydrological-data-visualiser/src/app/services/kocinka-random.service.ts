@@ -19,18 +19,12 @@ export class KocinkaRandomService extends RiverService {
     this.getInfo();
   }
 
-  showKocinkaRiver(date: Date): void {
+  draw(date: Date): void {
     this.drawRiver(this.getDataFromDateAsObservableUsingDate(date));
   }
 
-  getInfo(): void  {
+  getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).toPromise().then(info => this.info = info);
-  }
-
-  getDataRecordsArrayFromGetRequest(): RiverPoint[] {
-    let riv: RiverPoint[] = [];
-    this.http.get<RiverPoint[]>(`${this.url}/data`).subscribe((res: RiverPoint[]) => riv = res);
-    return riv;
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {
@@ -40,6 +34,6 @@ export class KocinkaRandomService extends RiverService {
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
+    return this.http.get<RiverPoint[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 }

@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import * as L from 'leaflet';
-import {RiverPoint} from '../model/river-point';
 import {LatLng} from 'leaflet';
+import {RiverPoint} from '../model/river-point';
 import {Observable} from 'rxjs';
 
 @Injectable({

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {Observable} from 'rxjs';
 import {Station} from '../model/station';
@@ -88,7 +88,7 @@ export class PrecipitationService extends MarkerCreatorService {
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?instant=${formattedDate}`);
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?date=${formattedDate}`);
   }
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {

@@ -71,20 +71,8 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    let dataProvider: any;
-    switch (this.dataProvider.selectedModel) {
-      case this.dataProvider.getKocinkaRandomService().info.id :
-        dataProvider = this.dataProvider.getKocinkaRandomService();
-        break;
-      case this.dataProvider.getPrecipitationService().info.id:
-        dataProvider = this.dataProvider.getPrecipitationService();
-        break;
-      case this.dataProvider.getKocinkaSurfaceHeightService().info.id:
-        dataProvider = this.dataProvider.getKocinkaSurfaceHeightService();
-        break;
-      default:
-        dataProvider = null;
-    }
+    const dataProvider = this.dataProvider.getActualService();
+
     // IT IS IMPORTANT THAT ALL DATAPROVIDERS HAVE THE SAME METHODS!!! IT IS DEALING HERE WITH `ANY` TYPE
     if (dataProvider) {
       dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
@@ -93,7 +81,7 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(b.date);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            const value = (moment(nowUtc)).format('HH:mm:ss');
+            const value = (moment(nowUtc)).format('HH:mm:SS');
             if (this.hours.filter(hour => hour === value).length === 0) {
               this.hours.push(value);
             }
@@ -112,16 +100,7 @@ export class SidePanelComponent implements OnInit {
         Number.parseInt(this.hour!.substr(3, 2), 10),
         Number.parseInt(this.hour!.substr(6, 2), 10)
       );
-
-    if (this.dataProvider.selectedModel === 'river') {
-      this.dataProvider.getKocinkaRandomService().showKocinkaRiver(this.value);
-    }
-    if (this.dataProvider.selectedModel === 'IMGW') {
-      this.dataProvider.getPrecipitationService().draw(this.value);
-    }
-    if (this.dataProvider.selectedModel === 'riverPressure') {
-      this.dataProvider.getKocinkaSurfaceHeightService().draw(this.value);
-    }
+    this.dataProvider.getActualService().draw(this.value);
   }
 
   onHourChange(hour: string): void {
@@ -148,10 +127,11 @@ export class SidePanelComponent implements OnInit {
     this.animationService.play();
   }
 
-  // called by animationService
+// called by animationService
   setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
     console.log(animationNow);
-    if (this.animationLength !== undefined) {
+    if (this.animationLength !== undefined
+    ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
     this.animationNow = animationNow;

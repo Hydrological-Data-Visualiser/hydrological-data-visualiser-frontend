@@ -4,9 +4,6 @@ import {Observable} from 'rxjs';
 import {Station} from '../model/station';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {MarkerCreatorService} from './marker-creator.service';
-import {PrecipitationService} from './precipitation.service';
-import {HydrologicalDataBase} from '../model/hydrological-data-base';
-import {delay} from 'rxjs/operators';
 import * as moment from 'moment';
 import {DataModelBase} from '../model/data-model-base';
 
@@ -56,7 +53,7 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
     (`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataInstantFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
@@ -64,7 +61,7 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
   draw(date: Date): void {
     this.putMarkers(
       this.getStations(),
-      this.getDataInstantFromSpecificDate(date)
+      this.getDataFromDateAsObservableUsingInstant(date)
     );
   }
 

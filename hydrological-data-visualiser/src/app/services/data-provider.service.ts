@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {DataModelBase} from '../model/data-model-base';
 import {PrecipitationService} from './precipitation.service';
 import {StationsService} from './stations.service';
-import {RiverService} from './river.service';
 import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
 import {HttpClient} from '@angular/common/http';
 import {KocinkaRandomService} from './kocinka-random.service';
@@ -63,5 +62,33 @@ export class DataProviderService {
         this.dataModels.push(info);
       });
     });
+  }
+
+  getActualService(): any {
+    switch (this.selectedModel) {
+      case this.getKocinkaRandomService().info.id :
+        return this.getKocinkaRandomService();
+
+      case this.getPrecipitationService().info.id:
+        return this.getPrecipitationService();
+
+      case this.getKocinkaSurfaceHeightService().info.id:
+        return this.getKocinkaSurfaceHeightService();
+
+      case this.getKocinkaTemperatureService().info.id:
+        return this.getKocinkaTemperatureService();
+
+      default:
+        return null;
+    }
+  }
+
+  getAllServices(): any[] {
+    return [
+      this.getKocinkaTemperatureService(),
+      this.getKocinkaRandomService(),
+      this.getPrecipitationService(),
+      this.getKocinkaSurfaceHeightService()
+    ];
   }
 }
