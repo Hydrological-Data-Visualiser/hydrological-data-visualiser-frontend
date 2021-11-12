@@ -82,8 +82,12 @@ export class SidePanelComponent implements OnInit {
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
             // const value = (moment(nowUtc)).format('HH:mm:SS');
-            if (this.hours.filter((value, index, self) => self.indexOf(value) === index).length === 0) {
-              this.hours.push(nowUtc);
+            if (this.hours.filter(val => val.getTime() === nowUtc.getTime()).length === 0) {
+              if (this.hours.filter(
+                val => val.getTime() - (1000 * 60 * 15) < nowUtc.getTime() &&
+                  val.getTime() + (1000 * 60 * 15) > nowUtc.getTime()).length === 0) {
+                this.hours.push(nowUtc);
+              }
             }
             // distinct and sort
             // tslint:disable-next-line:no-shadowed-variable
