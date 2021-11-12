@@ -4,17 +4,20 @@
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title" id="exampleModalLabel">Add GeoJson</h1>
-        <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" id="dismissButtonGeoJson" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <p class="font-weight-bold">Choose data model</p>
         <div class="form-group">
-          <label for="file">Choose File</label>
           <input type="file"
                  id="file"
                  (change)="handleFileInput($event.target.files)">
+          <div class="m-2">
+            <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show</button>
+            <button *ngIf="geoJson" type="button" class="btn btn-dark m-1" (click)="delete()">Remove GeoJson
+            </button>
+          </div>
         </div>
-
       </div>
     </div>
   </div>

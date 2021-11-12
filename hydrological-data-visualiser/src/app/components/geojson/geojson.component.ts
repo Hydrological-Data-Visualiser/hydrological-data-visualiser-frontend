@@ -9,6 +9,7 @@ import * as L from 'leaflet';
 })
 export class GeojsonComponent implements OnInit {
   fileToUpload: File | null = null;
+  geoJson: L.GeoJSON | null = null;
 
   constructor(private dataProvider: DataProviderService) {
   }
@@ -18,7 +19,25 @@ export class GeojsonComponent implements OnInit {
 
   handleFileInput(files: FileList): void {
     this.fileToUpload = files.item(0);
-    (this.fileToUpload?.text().then(a => L.geoJSON(JSON.parse(a)).addTo(this.dataProvider.getRiverService().map)
-    ));
+  }
+
+  onSubmit(): void {
+    (this.fileToUpload?.text().then(a => {
+      if (this.geoJson) {
+        this.delete();
+      }
+      this.geoJson = L.geoJSON(JSON.parse(a));
+      this.geoJson.addTo(this.dataProvider.getRiverService().map);
+      this.dataProvider.getRiverService().map.fitBounds(this.geoJson.getBounds());
+      // @ts-ignore
+      document.getElementById('dismissButtonGeoJson').click();
+    }));
+
+  }
+
+  delete(): void {
+    // @ts-ignore
+    this.geoJson.removeFrom(this.dataProvider.getRiverService().map);
+    this.geoJson = null;
   }
 }
