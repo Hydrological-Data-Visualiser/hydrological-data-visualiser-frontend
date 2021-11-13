@@ -97,12 +97,12 @@ export class PrecipitationService extends MarkerCreatorService {
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
-  getMinValue(): Observable<number> {
-    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/min`);
+  getMinValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/min?instantFrom=${begin}&length=${length}`);
   }
 
-  getMaxValue(): Observable<number> {
-    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/max`);
+  getMaxValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/max?instantFrom=${begin}&length=${length}`);
   }
 
   capitalize(s: string): string {
@@ -149,12 +149,13 @@ export class PrecipitationService extends MarkerCreatorService {
     this.group.clearLayers();
   }
 
-  onSet(){
-    this.getMinValue().subscribe( minValue =>
-      this.getMaxValue().subscribe( maxValue =>
-        this.getInfo().subscribe( info =>
+  setScaleAndColour(begin: string, length: number, callback: Function) {
+    this.getMinValue(begin, length).subscribe( minValue =>
+      this.getMaxValue(begin, length).subscribe( maxValue =>
+        this.getInfo().subscribe( info => {
           this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel)
-        )
+          callback()
+        })
       )
     )
   }

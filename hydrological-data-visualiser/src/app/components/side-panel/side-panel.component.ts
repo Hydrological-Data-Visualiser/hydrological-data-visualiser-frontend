@@ -133,7 +133,12 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.hour!.substr(6, 2), 10)
         );
       if (this.dataProvider.selectedModel === 'IMGW') {
-        this.dataProvider.getPrecipitationService().onSet()
+        const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+        this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
+          () => {
+            if(this.value)
+              this.dataProvider.getPrecipitationService().draw(this.value);
+          })
       }
       this.dataProvider.getActualService().draw(this.value);
     }
@@ -154,15 +159,19 @@ export class SidePanelComponent implements OnInit {
 
   // animation methods
   playAnimation(): void {
-    if (this.value) {
-      this.paused = false;
-      const date = this.value;
-      this.animationStart = (moment(date)).format('YYYY-MM-DD');
-      this.animationLength = this.animationModel.steps;
+    this.paused = false;
+    const date = this.value;
+    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationLength = this.animationModel.steps;
+    this.animationService.stop()
 
-      this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
-      this.animationService.play();
-    }
+    const formattedStart = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
+      () => {
+        if(date)
+          this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+        this.animationService.play();
+      })
   }
 
 // called by animationService
