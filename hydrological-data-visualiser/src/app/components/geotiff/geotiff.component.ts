@@ -4,6 +4,10 @@ import parse_georaster from 'georaster';
 import {DataProviderService} from '../../services/data-provider.service';
 import {HttpClient} from '@angular/common/http';
 import GeoRasterLayer from 'georaster-layer-for-leaflet';
+// @ts-ignore
+import proj4 from 'proj4';
+
+window.proj4 = proj4;
 
 
 @Component({
@@ -26,6 +30,10 @@ export class GeotiffComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.geoTiff) {
+      this.geoTiff.removeFrom(this.dataProvider.getKocinkaRandomService().map);
+      this.geoTiff = null;
+    }
     const reader = new FileReader();
 
     reader.readAsArrayBuffer(this.fileToUpload);
@@ -49,7 +57,6 @@ export class GeotiffComponent implements OnInit {
   }
 
   delete(): void {
-    // @ts-ignore
     this.geoTiff.removeFrom(this.dataProvider.getKocinkaRandomService().map);
     this.geoTiff = null;
   }

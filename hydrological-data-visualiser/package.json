@@ -43,6 +43,7 @@
     "moment": "^2.29.1",
     "ngx-csv-parser": "0.0.7",
     "primeng": "^11.4.2",
+    "proj4": "^2.7.5",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.3"
@@ -55,6 +56,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/leaflet": "^1.7.1",
     "@types/node": "^12.11.1",
+    "@types/proj4": "^2.5.2",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.7.1",
     "jasmine-spec-reporter": "~5.0.0",
