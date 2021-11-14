@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataProviderService} from '../../services/data-provider.service';
 
@@ -26,8 +26,6 @@ export class DataModelComponent implements OnInit {
     document.getElementById('dismissButton').click();
     // TODO: scroll to data
 
-    this.dataProvider.getKocinkaSurfaceHeightService().clear();
-    this.dataProvider.getRiverService().clear();
-    this.dataProvider.getPrecipitationService().clear();
+    this.dataProvider.getAllServices().forEach(service => service.clear());
   }
 }

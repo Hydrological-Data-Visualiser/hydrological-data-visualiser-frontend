@@ -1,10 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Station} from '../model/station';
+import {HttpClient} from '@angular/common/http';
 import * as L from 'leaflet';
-import {Observable, Subject} from 'rxjs';
 import 'leaflet.markercluster';
-import {PrecipitationService} from './precipitation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,10 +19,6 @@ export class StationsService {
   // public stationList: Station[] = [];
   // private markers: { [key: number]: L.Marker } = {};
 
-  constructor(private http: HttpClient) {
-    // this.getAndParseStationsDataFromGetRequest();
-  }
-
   redIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -34,6 +27,10 @@ export class StationsService {
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
   });
+
+  constructor(private http: HttpClient) {
+    // this.getAndParseStationsDataFromGetRequest();
+  }
 
   getColoredIcon(color: string): L.DivIcon {
     const markerHtmlStyles = `

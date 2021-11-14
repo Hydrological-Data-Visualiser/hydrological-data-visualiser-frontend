@@ -2,7 +2,6 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import * as moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
-import {FormInputData} from '../../model/form-input-data';
 import {DataProviderService} from '../../services/data-provider.service';
 import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
 
@@ -27,7 +26,7 @@ export class SidePanelComponent implements OnInit {
   public hour: string | undefined;
   blocked = true;
   // hour
-  hours: string[] = [];
+  hours: Date[] = [];
   // animation
   animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
@@ -72,42 +71,30 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    if (this.dataProvider.selectedModel === 'river') {
-      this.hours.push('00:00:00');
-    }
-    if (this.dataProvider.selectedModel === 'IMGW') {
-      this.dataProvider.getPrecipitationService().getDataInstantFromSpecificDate(formattedDate).subscribe(
-        a => {
-          a.forEach(b => {
-              const date = new Date(b.date);
-              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    const dataProvider = this.dataProvider.getActualService();
 
-              const value = (moment(nowUtc)).format('HH:mm:ss');
-
-              if (this.hours.filter(hour => hour === value).length === 0) {
-                this.hours.push(value);
+    // IT IS IMPORTANT THAT ALL DATAPROVIDERS HAVE THE SAME METHODS!!! IT IS DEALING HERE WITH `ANY` TYPE
+    if (dataProvider) {
+      dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
+        (data: any[]) => {
+          data.forEach(b => {
+            const date = new Date(b.date);
+            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            // const value = (moment(nowUtc)).format('HH:mm:SS');
+            if (this.hours.filter(val => val.getTime() === nowUtc.getTime()).length === 0) {
+              if (this.hours.filter(
+                val => val.getTime() - (1000 * 60 * 15) < nowUtc.getTime() &&
+                  val.getTime() + (1000 * 60 * 15) > nowUtc.getTime()).length === 0) {
+                this.hours.push(nowUtc);
               }
             }
-          );
-        }
-      );
-    }
-
-    if (this.dataProvider.selectedModel === 'riverPressure') {
-      this.dataProvider.getKocinkaSurfaceHeightService().getDataFromSpecificDate(formattedDate).subscribe(
-        a => {
-          a.forEach(b => {
-              const date = new Date(b.date);
-              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-              const value = (moment(nowUtc)).format('HH:mm:ss');
-
-              if (this.hours.filter(hour => hour === value).length === 0) {
-                this.hours.push(value);
-              }
-            }
-          );
+            // distinct and sort
+            // tslint:disable-next-line:no-shadowed-variable
+            this.hours = [...new Set(this.hours)].sort((a, b) => {
+              return (new Date(b) as any) - (new Date(a) as any);
+            });
+          });
         }
       );
     }
@@ -117,26 +104,16 @@ export class SidePanelComponent implements OnInit {
     console.log(this.value);
     this.value
       .setHours(
+        // tslint:disable:no-non-null-assertion
         Number.parseInt(this.hour!.substr(0, 2), 10),
         Number.parseInt(this.hour!.substr(3, 2), 10),
         Number.parseInt(this.hour!.substr(6, 2), 10)
       );
-
-    if (this.dataProvider.selectedModel === 'river') {
-      this.dataProvider.getRiverService().showKocinkaRiver();
-    }
-    if (this.dataProvider.selectedModel === 'IMGW') {
-      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-      this.dataProvider.getPrecipitationService().draw(formattedDate);
-    }
-    if (this.dataProvider.selectedModel === 'riverPressure') {
-      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-      this.dataProvider.getKocinkaSurfaceHeightService().draw(formattedDate);
-    }
+    this.dataProvider.getActualService().draw(this.value);
   }
 
-  onHourChange(hour: string): void {
-    this.hour = hour;
+  onHourChange(hour: Date): void {
+    this.hour = moment(hour).format('HH:mm:SS');
   }
 
   onValueChange(event: any): void {
@@ -159,10 +136,11 @@ export class SidePanelComponent implements OnInit {
     this.animationService.play();
   }
 
-  // called by animationService
+// called by animationService
   setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
     console.log(animationNow);
-    if (this.animationLength !== undefined) {
+    if (this.animationLength !== undefined
+    ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
     this.animationNow = animationNow;

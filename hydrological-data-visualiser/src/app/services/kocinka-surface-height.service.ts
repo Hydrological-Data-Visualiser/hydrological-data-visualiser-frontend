@@ -4,9 +4,6 @@ import {Observable} from 'rxjs';
 import {Station} from '../model/station';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {MarkerCreatorService} from './marker-creator.service';
-import {PrecipitationService} from './precipitation.service';
-import {HydrologicalDataBase} from '../model/hydrological-data-base';
-import {delay} from 'rxjs/operators';
 import * as moment from 'moment';
 import {DataModelBase} from '../model/data-model-base';
 
@@ -16,10 +13,11 @@ import {DataModelBase} from '../model/data-model-base';
 export class KocinkaSurfaceHeightService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/kocinkaPressure';
   public status = false;
-  public info: DataModelBase = this.getInfo();
+  public info!: DataModelBase;
 
   constructor(private http: HttpClient) {
     super();
+    this.getInfo();
   }
 
   getStationsObservable(): Observable<Station[]> {
@@ -49,58 +47,26 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService {
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
   }
 
-  getDataFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
     return this.http.get<PrecipitationDayDataNew[]>
     (`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataInstantFromSpecificDate(date: string): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>
-    (`${this.url}/data?dateInstant=${date}`);
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
-  mapObservableToArrayData(observable: Observable<PrecipitationDayDataNew[]>): HydrologicalDataBase[] {
-    const precipitationList: HydrologicalDataBase[] = [];
-    let complete = false;
-    observable.subscribe(data => {
-      data.forEach(a => {
-        precipitationList.push(this.toBase(a));
-      });
-      complete = true;
-    });
-    while (!complete) {
-      delay(100);
-    }
-    return precipitationList;
-  }
-
-  toBase(data: PrecipitationDayDataNew): HydrologicalDataBase {
-    return new HydrologicalDataBase(
-      data.id,
-      data.stationId,
-      data.date,
-      data.dailyPrecipitation
+  draw(date: Date): void {
+    this.putMarkers(
+      this.getStations(),
+      this.getDataFromDateAsObservableUsingInstant(date)
     );
   }
 
-  draw(date: string): void {
-    this.putMarkers(
-      this.getStations(),
-      this.getDataInstantFromSpecificDate(date),
-      date);
-  }
-
-  getInfo(): DataModelBase {
-    let res!: DataModelBase;
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
-    return res;
-  }
-
-  getDataRecordsArrayFromGetRequest(): PrecipitationDayDataNew[] {
-    let result: PrecipitationDayDataNew[] = [];
-    this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`).subscribe((res: PrecipitationDayDataNew[]) => result = res);
-    return result;
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
   clear(): void {

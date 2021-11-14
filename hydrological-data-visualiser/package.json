@@ -1,4 +1,9 @@
 {
+  "browser": {
+    "fs": false,
+    "http": false,
+    "https": false
+  },
   "name": "hydrological-data-visualiser",
   "version": "0.0.0",
   "scripts": {
@@ -28,7 +33,12 @@
     "angular-resize-event": "^2.1.0",
     "bootstrap": "^5.0.0-beta3",
     "dateformat": "^5.0.1",
+    "georaster": "^1.5.4",
+    "georaster-layer-for-leaflet": "^1.0.2",
+    "geotiff": "^1.0.4",
     "leaflet": "^1.7.1",
+    "leaflet-geotiff": "^0.2.0",
+    "leaflet-geotiff-2": "^0.5.1",
     "leaflet.markercluster": "^1.5.0",
     "moment": "^2.29.1",
     "ngx-csv-parser": "0.0.7",

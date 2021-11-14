@@ -60,15 +60,8 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initMap();
     this.onClick();
-    this.dataProvider.getRiverService().map = this.map;
-    // this.dataProvider.getStationsService().map = this.map;
-    this.dataProvider.getPrecipitationService().map = this.map;
-    this.dataProvider.getKocinkaSurfaceHeightService().map = this.map;
-    // this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
-    //   if (this.marker) {
-    //     this.map.removeLayer(this.marker);
-    //   }
-    // });
+
+    this.dataProvider.getAllServices().forEach(service => service.map = this.map);
   }
 
   onResized(event: ResizedEvent): void {

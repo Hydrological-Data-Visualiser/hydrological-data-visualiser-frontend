@@ -1,8 +1,8 @@
-export class RiverPoint {
+
+export class PolygonModel {
   constructor(
     public id: number,
-    public latitude: number,
-    public longitude: number,
+    public points: number[][],
     public value: number,
     public date: Date
   ) {

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {Observable} from 'rxjs';
 import {Station} from '../model/station';
@@ -15,18 +15,19 @@ export class PrecipitationService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/imgw';
   public precipitationDict: { [key: string]: number } = {};
   public status = false;
-  public info: DataModelBase = this.getInfo();
+  public info!: DataModelBase;
 
   constructor(private http: HttpClient) {
     super();
+    this.getInfo();
   }
 
-  draw(date: string): void {
+  draw(date: Date): void {
     this.getStationsObservable().subscribe(stations => {
       this.putMarkers(
         this.getDistinctLatLongStations(stations),
-        this.getPrecipitationDataForSpecificStringDate(date),
-        date);
+        this.getDataFromDateAsObservableUsingInstant(date)
+      );
     });
   }
 
@@ -85,23 +86,14 @@ export class PrecipitationService extends MarkerCreatorService {
     return precipitationList;
   }
 
-  getDataRecordsArrayFromGetRequest(): HydrologicalDataBase[] {
-    return this.mapObservableToArrayData(this.getData());
-  }
-
-  getPrecipitationDataForSpecificDateAndStation(date: string, station: Station): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>
-    (`${this.url}/data?date=${date}&stationId=${station.id.toString()}`);
-  }
-
-  getDataInstantFromSpecificDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<PrecipitationDayDataNew[]>
-    (`${this.url}/data?instant=${formattedDate}`);
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?date=${formattedDate}`);
   }
 
-  getPrecipitationDataForSpecificStringDate(date: string): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${date}`);
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   capitalize(s: string): string {
@@ -136,10 +128,8 @@ export class PrecipitationService extends MarkerCreatorService {
     );
   }
 
-  getInfo(): DataModelBase {
-    let res!: DataModelBase;
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => res = info);
-    return res;
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
   clear(): void {

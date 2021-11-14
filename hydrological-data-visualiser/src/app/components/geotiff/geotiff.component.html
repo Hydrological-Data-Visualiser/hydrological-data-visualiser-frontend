@@ -1,0 +1,24 @@
+<!-- Button trigger modal -->
+<div class="modal fade " id="geoTiffModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Add GeoTiff</h1>
+        <button type="button" id="dismissButtonGeoTiff" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="font-weight-bold">Choose your own geoTiff file</p>
+        <div class="form-group">
+          <input type="file"
+                 id="file"
+                 (change)="handleFileInput($event)">
+          <div class="m-2">
+            <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show</button>
+            <button type="button" class="btn btn-dark m-1" (click)="delete()">Remove GeoTiff
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

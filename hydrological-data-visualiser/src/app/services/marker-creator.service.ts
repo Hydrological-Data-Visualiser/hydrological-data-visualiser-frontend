@@ -10,8 +10,6 @@ import {HydrologicalDataBase} from '../model/hydrological-data-base';
 })
 export class MarkerCreatorService {
   public map: any;
-  private clickedMarker = new Subject<Station>();
-  public clickedMarker$ = this.clickedMarker.asObservable();
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
     maxClusterRadius: zoom => 130 - zoom * 10
@@ -19,6 +17,8 @@ export class MarkerCreatorService {
   public stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();
   public stationList: Station[] = [];
+  private clickedMarker = new Subject<Station>();
+  public clickedMarker$ = this.clickedMarker.asObservable();
   private markers: { [key: number]: L.Marker } = {};
 
   constructor() {
@@ -45,22 +45,24 @@ export class MarkerCreatorService {
     });
   }
 
-  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, date: string): void {
+  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>): void {
     this.group.clearLayers();
+
     const usedStations: Station[] = [];
     data.subscribe(d => {
       d.forEach(rainData => {
-          const rainValue = rainData.value;
-          const colorValue = rainValue * 50;
-          const filteredStations = stations.filter(station => station.id === rainData.stationId);
-          if (filteredStations.length > 0) {
-            const station = filteredStations[0];
-            usedStations.push(station);
-            this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
-          }
-        });
+        const rainValue = rainData.value;
+        const colorValue = rainValue * 50;
+        const filteredStations = stations.filter(station => station.id === rainData.stationId);
+        if (filteredStations.length > 0) {
+          const station = filteredStations[0];
+          usedStations.push(station);
+          this.createMarker(station, this.rgbToHex(Math.max(255 - colorValue, 0), Math.max(255 - colorValue, 0), 255), rainValue);
+        }
+      });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
       unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN));
+      this.map.fitBounds(this.group.getBounds());
     });
   }
 

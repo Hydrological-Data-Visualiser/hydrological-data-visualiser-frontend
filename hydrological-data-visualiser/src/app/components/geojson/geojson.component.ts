@@ -27,8 +27,8 @@ export class GeojsonComponent implements OnInit {
         this.delete();
       }
       this.geoJson = L.geoJSON(JSON.parse(a));
-      this.geoJson.addTo(this.dataProvider.getRiverService().map);
-      this.dataProvider.getRiverService().map.fitBounds(this.geoJson.getBounds());
+      this.geoJson.addTo(this.dataProvider.getKocinkaRandomService().map);
+      this.dataProvider.getKocinkaRandomService().map.fitBounds(this.geoJson.getBounds());
       // @ts-ignore
       document.getElementById('dismissButtonGeoJson').click();
     }));
