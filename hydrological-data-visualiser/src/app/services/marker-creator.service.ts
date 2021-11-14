@@ -47,6 +47,7 @@ export class MarkerCreatorService {
 
   putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>): void {
     this.group.clearLayers();
+
     const usedStations: Station[] = [];
     data.subscribe(d => {
       d.forEach(rainData => {
@@ -61,6 +62,7 @@ export class MarkerCreatorService {
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
       unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN));
+      this.map.fitBounds(this.group.getBounds());
     });
   }
 

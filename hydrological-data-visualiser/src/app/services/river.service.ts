@@ -11,7 +11,7 @@ export class RiverService {
   public status = false;
   public map: any;
   private river: LatLng[] = [];
-  private riverLayer = L.layerGroup();
+  private riverLayer = new L.FeatureGroup();
 
   constructor() {
   }
@@ -26,6 +26,7 @@ export class RiverService {
         const color = this.getColor((Number(points[i].value) + Number(points[i + 1].value)) / 2);
         this.riverLayer.addLayer(L.polyline(this.river, {color}));
         this.riverLayer.addTo(this.map);
+        this.map.fitBounds(this.riverLayer.getBounds());
       }
     });
   }
