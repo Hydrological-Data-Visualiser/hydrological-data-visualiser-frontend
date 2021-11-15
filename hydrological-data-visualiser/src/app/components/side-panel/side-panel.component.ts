@@ -22,7 +22,7 @@ export class SidePanelComponent implements OnInit {
   // form attributes
   public minDate: Date = new Date('05/07/2017');
   public maxDate: Date = new Date('08/27/2017');
-  public value: Date = new Date();
+  public value: Date | undefined;
   public hour: string | undefined;
   blocked = true;
   // hour
@@ -56,6 +56,10 @@ export class SidePanelComponent implements OnInit {
       this.dateFilter = (date: Date): boolean => {
         return !!tab.includes(moment(date).format('YYYY-MM-DD'));
       };
+      this.hours = [];
+      this.hour = undefined;
+      this.value = undefined;
+      this.blocked = true;
     });
   }
 
@@ -112,14 +116,16 @@ export class SidePanelComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.value
-      .setHours(
-        // tslint:disable:no-non-null-assertion
-        Number.parseInt(this.hour!.substr(0, 2), 10),
-        Number.parseInt(this.hour!.substr(3, 2), 10),
-        Number.parseInt(this.hour!.substr(6, 2), 10)
-      );
-    this.dataProvider.getActualService().draw(this.value);
+    if (this.value) {
+      this.value
+        .setHours(
+          // tslint:disable:no-non-null-assertion
+          Number.parseInt(this.hour!.substr(0, 2), 10),
+          Number.parseInt(this.hour!.substr(3, 2), 10),
+          Number.parseInt(this.hour!.substr(6, 2), 10)
+        );
+      this.dataProvider.getActualService().draw(this.value);
+    }
   }
 
   onHourChange(hour: Date): void {
@@ -137,13 +143,15 @@ export class SidePanelComponent implements OnInit {
 
   // animation methods
   playAnimation(): void {
-    this.paused = false;
-    const date = this.value;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD');
-    this.animationLength = this.animationModel.steps;
+    if (this.value) {
+      this.paused = false;
+      const date = this.value;
+      this.animationStart = (moment(date)).format('YYYY-MM-DD');
+      this.animationLength = this.animationModel.steps;
 
-    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
-    this.animationService.play();
+      this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+      this.animationService.play();
+    }
   }
 
 // called by animationService
