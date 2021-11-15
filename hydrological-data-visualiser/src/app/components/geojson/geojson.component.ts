@@ -36,8 +36,9 @@ export class GeojsonComponent implements OnInit {
   }
 
   delete(): void {
-    // @ts-ignore
-    this.geoJson.removeFrom(this.dataProvider.getRiverService().map);
-    this.geoJson = null;
+    if (this.geoJson) {
+      this.geoJson.removeFrom(this.dataProvider.getKocinkaRandomService().map);
+      this.geoJson = null;
+    }
   }
 }
