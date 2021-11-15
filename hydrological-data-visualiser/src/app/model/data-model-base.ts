@@ -7,6 +7,7 @@ export class DataModelBase {
     public name: string,
     public description: string,
     public dataType: DataType,
+    public availableDates: Date[]
     // public values: HydrologicalDataBase[] = []
     /*
     place for other information about data model, TBD in the future

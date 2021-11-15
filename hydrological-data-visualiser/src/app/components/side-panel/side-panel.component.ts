@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
-import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
+import {SidePanelService} from './side-panel-service';
 
 @Component({
   selector: 'app-side-panel',
@@ -34,7 +34,9 @@ export class SidePanelComponent implements OnInit {
   animationNow: string | undefined;
   animationPercentage: number | undefined;
 
-  constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
+  constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
+              private sidePanelService: SidePanelService
+  ) {
   }
 
   ngOnInit(): void {
@@ -46,6 +48,15 @@ export class SidePanelComponent implements OnInit {
     //     this.clicked = true;
     //   }
     // });
+
+    this.sidePanelService.modelEmitter.subscribe(name => {
+      const tab = this.dataProvider.getActualService().info.availableDates;
+      this.minDate = tab[0];
+      this.maxDate = tab[tab.length - 1];
+      this.dateFilter = (date: Date): boolean => {
+        return !!tab.includes(moment(date).format('YYYY-MM-DD'));
+      };
+    });
   }
 
   setLong(newItem: number): void {
@@ -101,7 +112,6 @@ export class SidePanelComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.value);
     this.value
       .setHours(
         // tslint:disable:no-non-null-assertion
@@ -151,14 +161,7 @@ export class SidePanelComponent implements OnInit {
     this.animationService.pause();
   }
 
-  dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
-    // Only highligh dates inside the month view.
-    if (view === 'month') {
-      const date = cellDate.getDate();
-
-      // Highlight the 1st and 20th day of each month.
-      return date === 1 ? 'example-custom-date-class' : '';
-    }
-    return '';
+  dateFilter = (date: Date) => {
+    return true;
   }
 }
