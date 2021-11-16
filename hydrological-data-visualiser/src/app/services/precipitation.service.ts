@@ -131,8 +131,4 @@ export class PrecipitationService extends MarkerCreatorService {
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
-
-  clear(): void {
-    this.group.clearLayers();
-  }
 }

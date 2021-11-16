@@ -26,7 +26,6 @@ export class PolygonsService {
         this.map.fitBounds(this.polygonLayer.getBounds());
       });
     });
-    // console.log(this.polygonLayer.getBounds())
   }
 
   clear(): void {

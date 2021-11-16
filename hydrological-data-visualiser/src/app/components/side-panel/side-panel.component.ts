@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
-import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
+import {SidePanelService} from './side-panel-service';
 
 @Component({
   selector: 'app-side-panel',
@@ -20,11 +20,12 @@ export class SidePanelComponent implements OnInit {
   lat: number | undefined;
   name: string | undefined;
   // form attributes
-  public minDate: Date = new Date('05/07/2017');
-  public maxDate: Date = new Date('08/27/2017');
-  public value: Date = new Date();
+  public minDate: Date = new Date();
+  public maxDate: Date = new Date();
+  public value: Date | undefined;
   public hour: string | undefined;
-  blocked = true;
+  blockedHourDropdown = true;
+  isDateAndHourSelected = false;
   // hour
   hours: Date[] = [];
   // animation
@@ -34,7 +35,9 @@ export class SidePanelComponent implements OnInit {
   animationNow: string | undefined;
   animationPercentage: number | undefined;
 
-  constructor(private dataProvider: DataProviderService, private animationService: AnimationService) {
+  constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
+              private sidePanelService: SidePanelService
+  ) {
   }
 
   ngOnInit(): void {
@@ -46,6 +49,24 @@ export class SidePanelComponent implements OnInit {
     //     this.clicked = true;
     //   }
     // });
+
+    this.sidePanelService.modelEmitter.subscribe(name => {
+      const tab = this.dataProvider.getActualService().info.availableDates.sort();
+      this.minDate = tab[0];
+      this.maxDate = tab[tab.length - 1];
+      this.dateFilter = (date: Date): boolean => {
+        return !!tab.includes(moment(date).format('YYYY-MM-DD'));
+      };
+      this.clear();
+    });
+  }
+
+  clear(): void {
+    this.hours = [];
+    this.hour = undefined;
+    this.value = undefined;
+    this.blockedHourDropdown = true;
+    this.isDateAndHourSelected = false;
   }
 
   setLong(newItem: number): void {
@@ -101,39 +122,42 @@ export class SidePanelComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log(this.value);
-    this.value
-      .setHours(
-        // tslint:disable:no-non-null-assertion
-        Number.parseInt(this.hour!.substr(0, 2), 10),
-        Number.parseInt(this.hour!.substr(3, 2), 10),
-        Number.parseInt(this.hour!.substr(6, 2), 10)
-      );
-    this.dataProvider.getActualService().draw(this.value);
+    if (this.value) {
+      this.value
+        .setHours(
+          // tslint:disable:no-non-null-assertion
+          Number.parseInt(this.hour!.substr(0, 2), 10),
+          Number.parseInt(this.hour!.substr(3, 2), 10),
+          Number.parseInt(this.hour!.substr(6, 2), 10)
+        );
+      this.dataProvider.getActualService().draw(this.value);
+    }
   }
 
   onHourChange(hour: Date): void {
     this.hour = moment(hour).format('HH:mm:SS');
+    this.isDateAndHourSelected = true;
   }
 
   onValueChange(event: any): void {
-    this.hour = undefined;
-    this.hours = [];
+    this.clear();
+    this.blockedHourDropdown = false;
     this.value = event.value;
-    this.blocked = false;
     this.updateHourList(new Date(event.value));
     this.animationService.stop();
   }
 
   // animation methods
   playAnimation(): void {
-    this.paused = false;
-    const date = this.value;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD');
-    this.animationLength = this.animationModel.steps;
+    if (this.value) {
+      this.paused = false;
+      const date = this.value;
+      this.animationStart = (moment(date)).format('YYYY-MM-DD');
+      this.animationLength = this.animationModel.steps;
 
-    this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
-    this.animationService.play();
+      this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+      this.animationService.play();
+    }
   }
 
 // called by animationService
@@ -151,14 +175,7 @@ export class SidePanelComponent implements OnInit {
     this.animationService.pause();
   }
 
-  dateClass: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
-    // Only highligh dates inside the month view.
-    if (view === 'month') {
-      const date = cellDate.getDate();
-
-      // Highlight the 1st and 20th day of each month.
-      return date === 1 ? 'example-custom-date-class' : '';
-    }
-    return '';
+  dateFilter = (date: Date) => {
+    return false;
   }
 }

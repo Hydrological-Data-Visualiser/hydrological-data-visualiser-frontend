@@ -20,7 +20,6 @@ export class StationsComponent implements AfterViewInit, OnInit {
       .subscribe(stations => stations.forEach(station => this.allStations.push(station)));
     this.dataProvider.getKocinkaSurfaceHeightService().getStationsObservable()
       .subscribe(stations => stations.forEach(station => this.allStations.push(station)));
-    console.log(this.allStations);
   }
 
   ngAfterViewInit(): void {

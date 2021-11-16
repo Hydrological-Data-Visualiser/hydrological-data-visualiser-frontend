@@ -64,7 +64,6 @@ export class DataProviderService {
 
   getModels(): void {
     this.apis.forEach(api => {
-      console.log(`${api}/info`);
       this.http.get<DataModelBase>(`${api}/info`).subscribe(info => {
         this.dataModels.push(info);
       });

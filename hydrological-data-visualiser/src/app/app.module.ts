@@ -26,6 +26,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatRadioModule} from '@angular/material/radio';
 import { GeojsonComponent } from './components/geojson/geojson.component';
 import { GeotiffComponent } from './components/geotiff/geotiff.component';
+import {MatButtonModule} from '@angular/material/button';
+import {SidePanelService} from "./components/side-panel/side-panel-service";
 
 @NgModule({
   declarations: [
@@ -37,27 +39,28 @@ import { GeotiffComponent } from './components/geotiff/geotiff.component';
     StationsComponent,
     SearchFilterPipe,
     GeojsonComponent,
-    GeotiffComponent
+    GeotiffComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    AngularResizedEventModule,
-    FormsModule,
-    ScrollingModule,
-    CalendarModule,
-    BrowserAnimationsModule,
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatNativeDateModule,
-    MatCardModule,
-    MatInputModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-    MatRadioModule
-  ],
-  providers: [SidePanelComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        AngularResizedEventModule,
+        FormsModule,
+        ScrollingModule,
+        CalendarModule,
+        BrowserAnimationsModule,
+        MatDatepickerModule,
+        MatFormFieldModule,
+        MatNativeDateModule,
+        MatCardModule,
+        MatInputModule,
+        ReactiveFormsModule,
+        MatSelectModule,
+        MatRadioModule,
+        MatButtonModule,
+    ],
+  providers: [SidePanelComponent, SidePanelService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
