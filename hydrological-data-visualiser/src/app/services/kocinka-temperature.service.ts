@@ -18,10 +18,6 @@ export class KocinkaTemperatureService extends RiverService {
     this.getInfo();
   }
 
-  clear(): void {
-    // this.group.clearLayers();
-  }
-
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }

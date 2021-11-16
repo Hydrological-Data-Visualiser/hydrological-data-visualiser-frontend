@@ -12,7 +12,7 @@ export class MarkerCreatorService {
   public map: any;
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: zoom => 130 - zoom * 10
+    maxClusterRadius: zoom => 100 - zoom * 10
   });
   public stations = new Subject<Station>();
   public stations$ = this.stations.asObservable();

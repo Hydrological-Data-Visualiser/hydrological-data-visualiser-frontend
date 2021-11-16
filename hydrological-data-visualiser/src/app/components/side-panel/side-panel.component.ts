@@ -20,11 +20,11 @@ export class SidePanelComponent implements OnInit {
   lat: number | undefined;
   name: string | undefined;
   // form attributes
-  public minDate: Date = new Date('05/07/2017');
-  public maxDate: Date = new Date('08/27/2017');
+  public minDate: Date = new Date();
+  public maxDate: Date = new Date();
   public value: Date | undefined;
   public hour: string | undefined;
-  blocked = true;
+  blockedHourDropdown = true;
   // hour
   hours: Date[] = [];
   // animation
@@ -50,17 +50,21 @@ export class SidePanelComponent implements OnInit {
     // });
 
     this.sidePanelService.modelEmitter.subscribe(name => {
-      const tab = this.dataProvider.getActualService().info.availableDates;
+      const tab = this.dataProvider.getActualService().info.availableDates.sort();
       this.minDate = tab[0];
       this.maxDate = tab[tab.length - 1];
       this.dateFilter = (date: Date): boolean => {
         return !!tab.includes(moment(date).format('YYYY-MM-DD'));
       };
-      this.hours = [];
-      this.hour = undefined;
-      this.value = undefined;
-      this.blocked = true;
+      this.clear();
     });
+  }
+
+  clear(): void {
+    this.hours = [];
+    this.hour = undefined;
+    this.value = undefined;
+    this.blockedHourDropdown = true;
   }
 
   setLong(newItem: number): void {
@@ -136,7 +140,7 @@ export class SidePanelComponent implements OnInit {
     this.hour = undefined;
     this.hours = [];
     this.value = event.value;
-    this.blocked = false;
+    this.blockedHourDropdown = false;
     this.updateHourList(new Date(event.value));
     this.animationService.stop();
   }
