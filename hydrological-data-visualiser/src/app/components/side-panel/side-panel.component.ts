@@ -25,6 +25,7 @@ export class SidePanelComponent implements OnInit {
   public value: Date | undefined;
   public hour: string | undefined;
   blockedHourDropdown = true;
+  isDateAndHourSelected = false;
   // hour
   hours: Date[] = [];
   // animation
@@ -65,6 +66,7 @@ export class SidePanelComponent implements OnInit {
     this.hour = undefined;
     this.value = undefined;
     this.blockedHourDropdown = true;
+    this.isDateAndHourSelected = false;
   }
 
   setLong(newItem: number): void {
@@ -134,13 +136,13 @@ export class SidePanelComponent implements OnInit {
 
   onHourChange(hour: Date): void {
     this.hour = moment(hour).format('HH:mm:SS');
+    this.isDateAndHourSelected = true;
   }
 
   onValueChange(event: any): void {
-    this.hour = undefined;
-    this.hours = [];
-    this.value = event.value;
+    this.clear();
     this.blockedHourDropdown = false;
+    this.value = event.value;
     this.updateHourList(new Date(event.value));
     this.animationService.stop();
   }
@@ -174,6 +176,6 @@ export class SidePanelComponent implements OnInit {
   }
 
   dateFilter = (date: Date) => {
-    return true;
+    return false;
   }
 }

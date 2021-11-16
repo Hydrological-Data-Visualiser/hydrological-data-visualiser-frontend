@@ -20,7 +20,8 @@
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
                 <input matInput [matDatepicker]="picker" placeholder="Input & change events"
-                       (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"  [min]="minDate"
+                       (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"
+                       [min]="minDate"
                        [max]="maxDate">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker>
@@ -44,7 +45,11 @@
                 </mat-select>
               </mat-form-field>
               <div>
-                <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show</button>
+                <button *ngIf="isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show
+                </button>
+                <button *ngIf="!isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()"
+                        disabled>Show
+                </button>
               </div>
               <br>
 
