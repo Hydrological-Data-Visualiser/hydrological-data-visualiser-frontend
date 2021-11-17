@@ -5,11 +5,12 @@ import {Observable} from 'rxjs';
 import {RiverPoint} from '../model/river-point';
 import * as moment from 'moment';
 import {RiverService} from './river.service';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaTemperatureService extends RiverService {
+export class KocinkaTemperatureService extends RiverService implements DataServiceInterface<RiverPoint>{
   public url = 'https://imgw-mock.herokuapp.com/kocinkaTemperature';
   public info!: DataModelBase;
 

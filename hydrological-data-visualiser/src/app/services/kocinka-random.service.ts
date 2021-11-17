@@ -5,11 +5,12 @@ import {DataModelBase} from '../model/data-model-base';
 import {RiverService} from './river.service';
 import {Observable} from 'rxjs';
 import * as moment from 'moment';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaRandomService extends RiverService {
+export class KocinkaRandomService extends RiverService implements DataServiceInterface<RiverPoint> {
   public url = 'https://imgw-mock.herokuapp.com/kocinka';
   public status = false;
   public info!: DataModelBase;

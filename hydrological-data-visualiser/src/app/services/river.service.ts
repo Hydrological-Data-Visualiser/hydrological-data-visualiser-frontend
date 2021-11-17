@@ -10,7 +10,6 @@ import {Observable} from 'rxjs';
 export class RiverService {
   public status = false;
   public map: any;
-  private river: LatLng[] = [];
   private riverLayer = new L.FeatureGroup();
 
   constructor() {
@@ -20,15 +19,16 @@ export class RiverService {
     this.riverLayer.clearLayers();
     data.subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
-        this.river = [];
-        this.river.push(new LatLng(points[i].latitude, points[i].longitude));
-        this.river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
+        const river = [];
+        river.push(new LatLng(points[i].latitude, points[i].longitude));
+        river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
         const color = this.getColor((Number(points[i].value) + Number(points[i + 1].value)) / 2);
-        this.riverLayer.addLayer(L.polyline(this.river, {color}));
-        this.riverLayer.addTo(this.map);
-        this.map.fitBounds(this.riverLayer.getBounds());
+        this.riverLayer.addLayer(L.polyline(river, {color}));
       }
+      this.riverLayer.addTo(this.map);
+      this.map.fitBounds(this.riverLayer.getBounds());
     });
+
   }
 
   getColor(d: number): string {

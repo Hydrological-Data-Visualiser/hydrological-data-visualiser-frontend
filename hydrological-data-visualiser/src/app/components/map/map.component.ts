@@ -11,7 +11,6 @@ import {DataProviderService} from '../../services/data-provider.service';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
-
   map: any;
   lat: number;
   long: number;
@@ -20,6 +19,16 @@ export class MapComponent implements AfterViewInit {
   @Output() longEmitter = new EventEmitter<number>();
   @Output() latEmitter = new EventEmitter<number>();
   @Output() clickedEmitter = new EventEmitter<boolean>();
+
+  redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -72,7 +81,7 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latlng, {icon: this.dataProvider.getStationsService().redIcon}).addTo(this.map).on('click', a => {
+    this.marker = L.marker(latlng, {icon: this.redIcon}).addTo(this.map).on('click', a => {
       this.map.removeLayer(this.marker);
       this.marker = undefined;
       this.longEmitter.emit(undefined);

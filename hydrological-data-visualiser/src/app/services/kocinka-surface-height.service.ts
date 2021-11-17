@@ -6,11 +6,12 @@ import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
 import {MarkerCreatorService} from './marker-creator.service';
 import * as moment from 'moment';
 import {DataModelBase} from '../model/data-model-base';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaSurfaceHeightService extends MarkerCreatorService {
+export class KocinkaSurfaceHeightService extends MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew>{
   public url = 'https://imgw-mock.herokuapp.com/kocinkaPressure';
   public status = false;
   public info!: DataModelBase;

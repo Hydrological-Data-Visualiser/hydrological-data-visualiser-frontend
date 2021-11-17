@@ -4,6 +4,7 @@ import {Station} from '../model/station';
 import * as L from 'leaflet';
 import * as moment from 'moment';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
+import 'leaflet.markercluster';
 
 @Injectable({
   providedIn: 'root'

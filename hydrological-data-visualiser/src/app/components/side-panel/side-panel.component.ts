@@ -55,7 +55,7 @@ export class SidePanelComponent implements OnInit {
       this.minDate = tab[0];
       this.maxDate = tab[tab.length - 1];
       this.dateFilter = (date: Date): boolean => {
-        return !!tab.includes(moment(date).format('YYYY-MM-DD'));
+        return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
       this.clear();
     });

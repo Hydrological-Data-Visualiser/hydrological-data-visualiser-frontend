@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import * as moment from 'moment';
 import {SidePanelComponent} from '../components/side-panel/side-panel.component';
 import {PrecipitationService} from './precipitation.service';
-import {StationsService} from './stations.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +9,14 @@ import {StationsService} from './stations.service';
 export class AnimationService {
   private currentPlayData: PlayData | null = null;
 
-  constructor(private stationsService: StationsService, private precipitationService: PrecipitationService) {
+  constructor(private precipitationService: PrecipitationService) {
   }
 
   public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent): void {
     if (this.currentPlayData != null) {
       this.currentPlayData.stopPlaying();
     }
-    const playData = new PlayData(startStep, steps, timestepMs, this.stationsService, this.precipitationService, sidepanel);
+    const playData = new PlayData(startStep, steps, timestepMs, this.precipitationService, sidepanel);
     this.currentPlayData = playData;
   }
 
@@ -54,7 +53,6 @@ class PlayData {
   constructor(private startStep: Date,
               private steps: number,
               private timestepMs: number,
-              private stationsService: StationsService,
               private precipitationService: PrecipitationService,
               private sidepanel: SidePanelComponent) {
   }

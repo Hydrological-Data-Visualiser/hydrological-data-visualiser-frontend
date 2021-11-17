@@ -7,11 +7,12 @@ import * as moment from 'moment';
 import {HydrologicalDataBase} from '../model/hydrological-data-base';
 import {MarkerCreatorService} from './marker-creator.service';
 import {DataModelBase} from '../model/data-model-base';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PrecipitationService extends MarkerCreatorService {
+export class PrecipitationService extends MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew> {
   public url = 'https://imgw-mock.herokuapp.com/imgw';
   public precipitationDict: { [key: string]: number } = {};
   public status = false;

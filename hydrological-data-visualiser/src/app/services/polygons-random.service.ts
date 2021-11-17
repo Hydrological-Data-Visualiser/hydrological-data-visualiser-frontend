@@ -5,11 +5,12 @@ import {DataModelBase} from '../model/data-model-base';
 import {Observable} from 'rxjs';
 import * as moment from 'moment';
 import {PolygonModel} from '../model/polygon';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PolygonsRandomService extends PolygonsService {
+export class PolygonsRandomService extends PolygonsService implements DataServiceInterface<PolygonModel>{
   public url = 'https://imgw-mock.herokuapp.com/polygons';
   public info!: DataModelBase;
 

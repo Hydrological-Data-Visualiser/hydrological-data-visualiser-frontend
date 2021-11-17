@@ -20,7 +20,7 @@ export class PolygonsService {
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.getColor(Number(polygon.value));
-        const pol = new L.Polygon(latLngs, {color: color, opacity: 1, fillOpacity: 0.7});
+        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7});
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
         this.map.fitBounds(this.polygonLayer.getBounds());
