@@ -24,7 +24,7 @@ export class KocinkaTemperatureService extends RiverService implements DataServi
   }
 
   draw(date: Date): void {
-    this.drawRiver(this.getDataFromDateAsObservableUsingInstant(date));
+    this.drawRiver(this.getDataFromDateAsObservableUsingInstant(date), this.info.metricLabel);
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {

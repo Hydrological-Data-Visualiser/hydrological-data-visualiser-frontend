@@ -14,13 +14,14 @@ export class PolygonsService {
   constructor() {
   }
 
-  drawPolygons(data: Observable<PolygonModel[]>): void {
+  drawPolygons(data: Observable<PolygonModel[]>, metricLabel: string): void {
     this.clear();
     data.subscribe(polygons => {
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.getColor(Number(polygon.value));
-        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7});
+        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+          .bindPopup(`${polygon.value} ${metricLabel}`);
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
         this.map.fitBounds(this.polygonLayer.getBounds());

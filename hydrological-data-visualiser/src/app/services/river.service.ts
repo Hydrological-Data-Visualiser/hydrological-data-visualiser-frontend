@@ -15,15 +15,17 @@ export class RiverService {
   constructor() {
   }
 
-  drawRiver(data: Observable<RiverPoint[]>): void {
+  drawRiver(data: Observable<RiverPoint[]>, metricLabel: string): void {
     this.riverLayer.clearLayers();
     data.subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
         const river = [];
         river.push(new LatLng(points[i].latitude, points[i].longitude));
         river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
-        const color = this.getColor((Number(points[i].value) + Number(points[i + 1].value)) / 2);
-        this.riverLayer.addLayer(L.polyline(river, {color}));
+        const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
+        const color = this.getColor(value);
+        const polyLine = L.polyline(river, {color}).bindPopup(`${value.toFixed(2)} ${metricLabel}`);
+        this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map);
       this.map.fitBounds(this.riverLayer.getBounds());

@@ -27,7 +27,8 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
     this.getStationsObservable().subscribe(stations => {
       this.putMarkers(
         this.getDistinctLatLongStations(stations),
-        this.getDataFromDateAsObservableUsingInstant(date)
+        this.getDataFromDateAsObservableUsingInstant(date),
+        this.info.metricLabel
       );
     });
   }

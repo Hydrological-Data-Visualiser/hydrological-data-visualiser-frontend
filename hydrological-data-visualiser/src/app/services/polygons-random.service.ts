@@ -20,7 +20,7 @@ export class PolygonsRandomService extends PolygonsService implements DataServic
   }
 
   draw(date: Date): void {
-    this.drawPolygons(this.getDataFromDateAsObservableUsingInstant(date));
+    this.drawPolygons(this.getDataFromDateAsObservableUsingInstant(date), this.info.metricLabel);
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonModel[]> {

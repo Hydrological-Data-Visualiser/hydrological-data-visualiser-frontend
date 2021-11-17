@@ -21,7 +21,7 @@ export class KocinkaRandomService extends RiverService implements DataServiceInt
   }
 
   draw(date: Date): void {
-    this.drawRiver(this.getDataFromDateAsObservableUsingDate(date));
+    this.drawRiver(this.getDataFromDateAsObservableUsingDate(date), this.info.metricLabel);
   }
 
   getInfo(): void {
