@@ -58,10 +58,11 @@ import { LegendComponent } from './components/legend/legend.component';
     MatCardModule,
     MatInputModule,
     ReactiveFormsModule,
+    MatButtonModule,
     MatSelectModule,
     MatRadioModule
   ],
-  providers: [],
+  providers: [SidePanelComponent, SidePanelService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

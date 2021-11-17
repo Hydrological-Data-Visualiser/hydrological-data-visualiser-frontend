@@ -138,10 +138,11 @@ export class PrecipitationService extends MarkerCreatorService {
   }
 
 
-  // getInfo(): void {
-  //   this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
 
-  getInfo():  Observable<DataModelBase> {
+  getInfoSubscription():  Observable<DataModelBase> {
     return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
@@ -152,7 +153,7 @@ export class PrecipitationService extends MarkerCreatorService {
   setScaleAndColour(begin: string, length: number, callback: Function) {
     this.getMinValue(begin, length).subscribe( minValue =>
       this.getMaxValue(begin, length).subscribe( maxValue =>
-        this.getInfo().subscribe( info => {
+        this.getInfoSubscription().subscribe( info => {
           this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel)
           callback()
         })
