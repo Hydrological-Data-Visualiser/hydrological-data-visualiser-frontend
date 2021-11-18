@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import * as moment from 'moment';
 import {PolygonModel} from '../../model/polygon';
 import {DataServiceInterface} from '../data.service.interface';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class PolygonsRandomService extends PolygonsService implements DataServic
   public url = 'https://imgw-mock.herokuapp.com/polygons';
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, public sidePanelService: SidePanelService) {
+    super(sidePanelService);
     this.getInfo();
   }
 

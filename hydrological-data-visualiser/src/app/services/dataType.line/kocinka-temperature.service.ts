@@ -6,6 +6,7 @@ import {RiverPoint} from '../../model/river-point';
 import * as moment from 'moment';
 import {RiverService} from './river.service';
 import {DataServiceInterface} from '../data.service.interface';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class KocinkaTemperatureService extends RiverService implements DataServi
   public url = 'https://imgw-mock.herokuapp.com/kocinkaTemperature';
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, public sidePanelService: SidePanelService) {
+    super(sidePanelService);
     this.getInfo();
   }
 

@@ -19,7 +19,7 @@ export class ColorService {
   setLegend(legend: LegendComponent): void {
     this.legend = legend
   }
-  
+
   setColorMap(minValue: number, maxValue: number, startColor: string, endColor: string, metricLabel: string): void {
     this.minValue = minValue
     this.maxValue = maxValue

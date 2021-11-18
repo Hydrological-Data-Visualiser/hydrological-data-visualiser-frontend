@@ -59,6 +59,10 @@ export class SidePanelComponent implements OnInit {
       };
       this.clear();
     });
+
+    this.sidePanelService.dataEmitter.subscribe(data => {
+      console.log(data);
+    });
   }
 
   clear(): void {

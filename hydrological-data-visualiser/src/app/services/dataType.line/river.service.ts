@@ -3,6 +3,8 @@ import * as L from 'leaflet';
 import {LatLng} from 'leaflet';
 import {RiverPoint} from '../../model/river-point';
 import {Observable} from 'rxjs';
+import {EmitData} from '../../model/emit-data';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +14,7 @@ export class RiverService {
   public map: any;
   private riverLayer = new L.FeatureGroup();
 
-  constructor() {
+  constructor(public sidePanelService: SidePanelService) {
   }
 
   drawRiver(data: Observable<RiverPoint[]>, metricLabel: string): void {
@@ -24,13 +26,22 @@ export class RiverService {
         river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
         const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
         const color = this.getColor(value, points);
-        const polyLine = L.polyline(river, {color}).bindPopup(`${value.toFixed(2)} ${metricLabel}`);
+        const polyLine = L.polyline(river, {color})
+          .bindPopup(`${value.toFixed(2)} ${metricLabel}`)
+          .on('click', () => {
+            this.emitData(
+              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, metricLabel)
+            );
+          });
         this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map);
       this.map.fitBounds(this.riverLayer.getBounds());
     });
+  }
 
+  emitData(data: EmitData): void {
+    this.sidePanelService.emitData(data);
   }
 
   getColor(d: number, points: RiverPoint[]): string {

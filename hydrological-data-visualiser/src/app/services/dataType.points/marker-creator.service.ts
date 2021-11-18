@@ -6,6 +6,8 @@ import * as moment from 'moment';
 import {HydrologicalDataBase} from '../../model/hydrological-data-base';
 import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
+import {EmitData} from '../../model/emit-data';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +25,7 @@ export class MarkerCreatorService {
   public clickedMarker$ = this.clickedMarker.asObservable();
   private markers: { [key: number]: L.Marker } = {};
 
-  constructor(protected colorService: ColorService) {
+  constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService) {
   }
 
   getColoredIcon(color: string): L.DivIcon {
@@ -73,7 +75,11 @@ export class MarkerCreatorService {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
+        this.emitData(
+          new EmitData(station.name, station.latitude, station.longitude, undefined, rainValue, metricLabel)
+        );
       });
+
       if (!isNaN(rainValue)) {
         marker.bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`);
       } else {
@@ -117,7 +123,7 @@ export class MarkerCreatorService {
   rgbStringToHex(rgbString: string): string {
     // tslint:disable-next-line:no-bitwise
     const newStr = rgbString.substring(4, rgbString.length - 1);
-    console.log(newStr);
+    // console.log(newStr);
     const split = newStr.split(',');
     const r = +split[0];
     const g = +split[1];
@@ -129,6 +135,10 @@ export class MarkerCreatorService {
   rgbToHex(r: number, g: number, b: number): string {
     // tslint:disable-next-line:no-bitwise
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  emitData(data: EmitData): void {
+    this.sidePanelService.emitData(data);
   }
 
 }
