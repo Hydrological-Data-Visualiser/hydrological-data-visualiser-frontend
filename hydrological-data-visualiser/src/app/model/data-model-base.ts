@@ -8,7 +8,9 @@ export class DataModelBase {
     public description: string,
     public dataType: DataType,
     public availableDates: Date[],
-    public metricLabel: string
+    public metricLabel: string,
+    public minColour: string,
+    public maxColour: string
     // public values: HydrologicalDataBase[] = []
     /*
     place for other information about data model, TBD in the future

@@ -8,6 +8,7 @@ import {HydrologicalDataBase} from '../model/hydrological-data-base';
 import {MarkerCreatorService} from './marker-creator.service';
 import {DataModelBase} from '../model/data-model-base';
 import {DataServiceInterface} from './data.service.interface';
+import {ColorService} from './color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +19,8 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
   public status = false;
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, colorService: ColorService) {
+    super(colorService);
     this.getInfo();
   }
 
@@ -98,6 +99,14 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
     return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
+  getMinValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/min?instantFrom=${begin}&length=${length}`);
+  }
+
+  getMaxValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/max?instantFrom=${begin}&length=${length}`);
+  }
+
   capitalize(s: string): string {
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }
@@ -130,7 +139,28 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
     );
   }
 
+
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
+  }
+
+  clear(): void {
+    this.group.clearLayers();
+  }
+
+  // tslint:disable-next-line:ban-types
+  setScaleAndColour(begin: string, length: number, callback: Function): void {
+    this.getMinValue(begin, length).subscribe(minValue =>
+      this.getMaxValue(begin, length).subscribe(maxValue =>
+        this.getInfoSubscription().subscribe(info => {
+          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
+          callback();
+        })
+      )
+    );
   }
 }

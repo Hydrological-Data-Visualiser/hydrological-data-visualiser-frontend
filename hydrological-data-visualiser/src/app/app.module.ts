@@ -28,6 +28,7 @@ import { GeojsonComponent } from './components/geojson/geojson.component';
 import { GeotiffComponent } from './components/geotiff/geotiff.component';
 import {MatButtonModule} from '@angular/material/button';
 import {SidePanelService} from "./components/side-panel/side-panel-service";
+import { LegendComponent } from './components/legend/legend.component';
 
 @NgModule({
   declarations: [
@@ -40,26 +41,27 @@ import {SidePanelService} from "./components/side-panel/side-panel-service";
     SearchFilterPipe,
     GeojsonComponent,
     GeotiffComponent,
+    LegendComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        HttpClientModule,
-        AngularResizedEventModule,
-        FormsModule,
-        ScrollingModule,
-        CalendarModule,
-        BrowserAnimationsModule,
-        MatDatepickerModule,
-        MatFormFieldModule,
-        MatNativeDateModule,
-        MatCardModule,
-        MatInputModule,
-        ReactiveFormsModule,
-        MatSelectModule,
-        MatRadioModule,
-        MatButtonModule,
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    AngularResizedEventModule,
+    FormsModule,
+    ScrollingModule,
+    CalendarModule,
+    BrowserAnimationsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatNativeDateModule,
+    MatCardModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatRadioModule
+  ],
   providers: [SidePanelComponent, SidePanelService],
   bootstrap: [AppComponent]
 })

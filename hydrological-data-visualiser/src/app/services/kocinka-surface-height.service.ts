@@ -7,6 +7,7 @@ import {MarkerCreatorService} from './marker-creator.service';
 import * as moment from 'moment';
 import {DataModelBase} from '../model/data-model-base';
 import {DataServiceInterface} from './data.service.interface';
+import {ColorService} from './color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService implements
   public status = false;
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, colorService: ColorService) {
+    super(colorService);
     this.getInfo();
   }
 

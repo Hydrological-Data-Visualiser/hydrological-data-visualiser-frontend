@@ -6,6 +6,8 @@
   right: 0;
   bottom: 0;
   margin: 15px;
+  margin-right: -15px;
+  /* padding-right: 5px; */
   /*padding-left: 20vw;*/
 }
 
