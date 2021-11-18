@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {RiverPoint} from '../model/river-point';
+import {RiverPoint} from '../../model/river-point';
 import {HttpClient} from '@angular/common/http';
-import {DataModelBase} from '../model/data-model-base';
+import {DataModelBase} from '../../model/data-model-base';
 import {RiverService} from './river.service';
 import {Observable} from 'rxjs';
 import * as moment from 'moment';
-import {DataServiceInterface} from './data.service.interface';
+import {DataServiceInterface} from '../data.service.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +26,10 @@ export class KocinkaRandomService extends RiverService implements DataServiceInt
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {

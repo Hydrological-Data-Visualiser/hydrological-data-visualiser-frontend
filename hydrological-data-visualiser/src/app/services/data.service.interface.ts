@@ -1,5 +1,6 @@
 import {DataModelBase} from '../model/data-model-base';
 import {Observable} from 'rxjs';
+import {Station} from '../model/station';
 
 export interface DataServiceInterface<Type> {
   readonly url: string;
@@ -12,4 +13,11 @@ export interface DataServiceInterface<Type> {
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<Type[]>;
 
   getInfo(): void;
+
+  getInfoSubscription(): Observable<DataModelBase>;
+
+  // only in points services
+  getStationsObservable?(): Observable<Station[]>;
+
+  getStations?(): Station[];
 }

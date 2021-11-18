@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {DataModelBase} from '../model/data-model-base';
+import {DataModelBase} from '../../model/data-model-base';
 import {Observable} from 'rxjs';
-import {RiverPoint} from '../model/river-point';
+import {RiverPoint} from '../../model/river-point';
 import * as moment from 'moment';
 import {RiverService} from './river.service';
-import {DataServiceInterface} from './data.service.interface';
+import {DataServiceInterface} from '../data.service.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +21,10 @@ export class KocinkaTemperatureService extends RiverService implements DataServi
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
   draw(date: Date): void {

@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {PolygonsService} from './polygons.service';
 import {HttpClient} from '@angular/common/http';
-import {DataModelBase} from '../model/data-model-base';
+import {DataModelBase} from '../../model/data-model-base';
 import {Observable} from 'rxjs';
 import * as moment from 'moment';
-import {PolygonModel} from '../model/polygon';
-import {DataServiceInterface} from './data.service.interface';
+import {PolygonModel} from '../../model/polygon';
+import {DataServiceInterface} from '../data.service.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -35,5 +35,9 @@ export class PolygonsRandomService extends PolygonsService implements DataServic
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 }

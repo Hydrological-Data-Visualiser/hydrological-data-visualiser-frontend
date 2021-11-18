@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as moment from 'moment';
 import {SidePanelComponent} from '../components/side-panel/side-panel.component';
-import {PrecipitationService} from './precipitation.service';
+import {PrecipitationService} from './dataType.points/precipitation.service';
 
 @Injectable({
   providedIn: 'root'

@@ -4,8 +4,6 @@ import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
-import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
-import { LegendComponent } from '../legend/legend.component';
 
 @Component({
   selector: 'app-side-panel',
@@ -136,9 +134,10 @@ export class SidePanelComponent implements OnInit {
         const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
         this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
           () => {
-            if(this.value)
+            if (this.value) {
               this.dataProvider.getPrecipitationService().draw(this.value);
-          })
+            }
+          });
       }
       this.dataProvider.getActualService().draw(this.value);
     }
@@ -163,15 +162,16 @@ export class SidePanelComponent implements OnInit {
     const date = this.value;
     this.animationStart = (moment(date)).format('YYYY-MM-DD');
     this.animationLength = this.animationModel.steps;
-    this.animationService.stop()
+    this.animationService.stop();
 
     const formattedStart = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
       () => {
-        if(date)
+        if (date) {
           this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+        }
         this.animationService.play();
-      })
+      });
   }
 
 // called by animationService

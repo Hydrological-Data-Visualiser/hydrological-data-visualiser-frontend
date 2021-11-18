@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {DataModelBase} from '../model/data-model-base';
-import {PrecipitationService} from './precipitation.service';
-import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
+import {PrecipitationService} from './dataType.points/precipitation.service';
+import {KocinkaSurfaceHeightService} from './dataType.points/kocinka-surface-height.service';
 import {HttpClient} from '@angular/common/http';
-import {PolygonsRandomService} from './polygons-random.service';
-import {KocinkaRandomService} from './kocinka-random.service';
-import {KocinkaTemperatureService} from './kocinka-temperature.service';
+import {PolygonsRandomService} from './dataType.polygon/polygons-random.service';
+import {KocinkaRandomService} from './dataType.line/kocinka-random.service';
+import {KocinkaTemperatureService} from './dataType.line/kocinka-temperature.service';
 import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({

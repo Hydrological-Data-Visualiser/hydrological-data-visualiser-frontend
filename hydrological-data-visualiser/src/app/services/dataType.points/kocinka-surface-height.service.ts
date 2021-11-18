@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Station} from '../model/station';
-import {PrecipitationDayDataNew} from '../model/precipitation-day-data-new';
+import {Station} from '../../model/station';
+import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {MarkerCreatorService} from './marker-creator.service';
 import * as moment from 'moment';
-import {DataModelBase} from '../model/data-model-base';
-import {DataServiceInterface} from './data.service.interface';
-import {ColorService} from './color.service';
+import {DataModelBase} from '../../model/data-model-base';
+import {DataServiceInterface} from '../data.service.interface';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -70,6 +70,10 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService implements
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
   clear(): void {

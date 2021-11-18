@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {Station} from '../model/station';
+import {Station} from '../../model/station';
 import * as L from 'leaflet';
 import * as moment from 'moment';
-import {HydrologicalDataBase} from '../model/hydrological-data-base';
+import {HydrologicalDataBase} from '../../model/hydrological-data-base';
 import 'leaflet.markercluster';
-import {ColorService} from './color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'

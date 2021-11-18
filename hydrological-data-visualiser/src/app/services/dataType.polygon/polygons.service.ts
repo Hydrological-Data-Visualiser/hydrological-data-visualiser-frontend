@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import * as L from 'leaflet';
 import {Observable} from 'rxjs';
-import {PolygonModel} from '../model/polygon';
+import {PolygonModel} from '../../model/polygon';
 
 @Injectable({
   providedIn: 'root'

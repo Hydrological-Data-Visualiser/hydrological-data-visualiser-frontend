@@ -1,5 +1,5 @@
 export enum DataType {
-  LINE= 'Line',
-  POINTS = 'Points',
-  POLYGON = 'Polygon',
+  LINE = 'LINE',
+  POINTS = 'POINTS',
+  POLYGON = 'POLYGON',
 }
