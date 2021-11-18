@@ -11,15 +11,23 @@ import {DataProviderService} from '../../services/data-provider.service';
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
-
   map: any;
   lat: number;
   long: number;
   clicked = false;
   marker: L.Marker<any> | undefined;
-  @Output() longEmitter = new EventEmitter<number>();
-  @Output() latEmitter = new EventEmitter<number>();
+  @Output() latLngEventEmitter = new EventEmitter<L.LatLng>();
   @Output() clickedEmitter = new EventEmitter<boolean>();
+
+  redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -43,8 +51,7 @@ export class MapComponent implements AfterViewInit {
       const coord = e.latlng;
       this.lat = coord.lat;
       this.long = coord.lng;
-      this.longEmitter.emit(this.long);
-      this.latEmitter.emit(this.lat);
+      this.latLngEventEmitter.emit(new L.LatLng(this.lat, this.long));
       this.clickedEmitter.emit(true);
       this.addMarker(coord);
       // @Output() latitude = new EventEmitter<string>();
@@ -72,11 +79,10 @@ export class MapComponent implements AfterViewInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    this.marker = L.marker(latlng, {icon: this.dataProvider.getStationsService().redIcon}).addTo(this.map).on('click', a => {
+    this.marker = L.marker(latlng, {icon: this.redIcon}).addTo(this.map).on('click', a => {
       this.map.removeLayer(this.marker);
       this.marker = undefined;
-      this.longEmitter.emit(undefined);
-      this.latEmitter.emit(undefined);
+      this.latLngEventEmitter.emit(undefined);
       this.clickedEmitter.emit(false);
     });
     // .bindPopup('Ionic 4 <br> Leaflet.')

@@ -4,8 +4,8 @@ import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
-import {MatCalendarCellClassFunction} from '@angular/material/datepicker';
-import { LegendComponent } from '../legend/legend.component';
+import {EmitData} from '../../model/emit-data';
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-side-panel',
@@ -36,6 +36,7 @@ export class SidePanelComponent implements OnInit {
   animationLength: number | undefined;
   animationNow: string | undefined;
   animationPercentage: number | undefined;
+  data: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService
@@ -43,23 +44,31 @@ export class SidePanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.dataProvider.getStationsService().clickedMarker$.subscribe(a => {
-    //   this.lat = a?.latitude;
-    //   this.long = a?.longitude;
-    //   this.name = a?.name;
-    //   if (a?.latitude && a.name && a.longitude) {
-    //     this.clicked = true;
-    //   }
-    // });
-
     this.sidePanelService.modelEmitter.subscribe(name => {
       const tab = this.dataProvider.getActualService().info.availableDates.sort();
       this.minDate = tab[0];
       this.maxDate = tab[tab.length - 1];
       this.dateFilter = (date: Date): boolean => {
-        return !!tab.includes(moment(date).format('YYYY-MM-DD'));
+        return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
       this.clear();
+      this.clearData();
+      this.clicked = false;
+    });
+
+    this.sidePanelService.dataEmitter.subscribe(data => {
+      if (data.latitude === this.data.latitude && data.longitude === this.data.longitude) {
+        this.clicked = false;
+        this.clearData();
+      } else {
+        this.clicked = true;
+        this.data.date = data.date;
+        this.data.value = data.value;
+        this.data.longitude = data.longitude;
+        this.data.latitude = data.latitude;
+        this.data.stationName = data.stationName;
+        this.data.metricLabel = data.metricLabel;
+      }
     });
   }
 
@@ -71,15 +80,11 @@ export class SidePanelComponent implements OnInit {
     this.isDateAndHourSelected = false;
   }
 
-  setLong(newItem: number): void {
+  setLatLng(newItem: L.LatLng): void {
     if (newItem) {
-      this.long = Number(newItem.toFixed(6));
-    }
-  }
-
-  setLat(newItem: number): void {
-    if (newItem) {
-      this.lat = Number(newItem.toFixed(6));
+      this.clearData();
+      this.data.latitude = newItem.lat;
+      this.data.longitude = newItem.lng;
     }
   }
 
@@ -136,9 +141,10 @@ export class SidePanelComponent implements OnInit {
         const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
         this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
           () => {
-            if(this.value)
+            if (this.value) {
               this.dataProvider.getPrecipitationService().draw(this.value);
-          })
+            }
+          });
       }
       this.dataProvider.getActualService().draw(this.value);
     }
@@ -163,15 +169,16 @@ export class SidePanelComponent implements OnInit {
     const date = this.value;
     this.animationStart = (moment(date)).format('YYYY-MM-DD');
     this.animationLength = this.animationModel.steps;
-    this.animationService.stop()
+    this.animationService.stop();
 
     const formattedStart = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
       () => {
-        if(date)
+        if (date) {
           this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+        }
         this.animationService.play();
-      })
+      });
   }
 
 // called by animationService
@@ -191,5 +198,14 @@ export class SidePanelComponent implements OnInit {
 
   dateFilter = (date: Date) => {
     return false;
+  }
+
+  clearData(): void {
+    this.data.date = undefined;
+    this.data.value = undefined;
+    this.data.longitude = undefined;
+    this.data.latitude = undefined;
+    this.data.stationName = undefined;
+    this.data.metricLabel = undefined;
   }
 }

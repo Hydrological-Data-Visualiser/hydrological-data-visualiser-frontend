@@ -1,10 +1,13 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
-import {Station} from '../model/station';
+import {Station} from '../../model/station';
 import * as L from 'leaflet';
 import * as moment from 'moment';
-import {HydrologicalDataBase} from '../model/hydrological-data-base';
-import { ColorService } from './color.service';
+import {HydrologicalDataBase} from '../../model/hydrological-data-base';
+import 'leaflet.markercluster';
+import {ColorService} from '../color.service';
+import {EmitData} from '../../model/emit-data';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +25,8 @@ export class MarkerCreatorService {
   public clickedMarker$ = this.clickedMarker.asObservable();
   private markers: { [key: number]: L.Marker } = {};
 
-  constructor(protected colorService: ColorService) { }
+  constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService) {
+  }
 
   getColoredIcon(color: string): L.DivIcon {
     const markerHtmlStyles = `
@@ -45,7 +49,7 @@ export class MarkerCreatorService {
     });
   }
 
-  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>): void {
+  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
     this.group.clearLayers();
 
     const usedStations: Station[] = [];
@@ -56,26 +60,30 @@ export class MarkerCreatorService {
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
           usedStations.push(station);
-          const color = this.colorService.getColor(rainValue)
-          this.createMarker(station, this.rgbStringToHex(color), rainValue);
+          const color = this.colorService.getColor(rainValue);
+          this.createMarker(station, this.rgbStringToHex(color), rainValue, metricLabel, date);
         }
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
-      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN));
+      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
       this.map.fitBounds(this.group.getBounds());
     });
   }
 
-  createMarker(station: Station, colorHex: string, rainValue: number): void {
+  createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
+        this.emitData(
+          new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
+        );
       });
+
       if (!isNaN(rainValue)) {
-        marker.bindPopup(station.name + ' ' + rainValue.toString() + 'mm');
+        marker.bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`);
       } else {
-        marker.bindPopup(station.name + ' no rain data');
+        marker.bindPopup(station.name + ' no data');
       }
       this.markers[station.id] = marker;
       this.group.addLayer(marker);
@@ -88,17 +96,15 @@ export class MarkerCreatorService {
       .toPromise().then(d => {
         d.filter(item => (moment(item.date)).format('YYYY-MM-DD') === date)
           .forEach(rainData => {
-          const rainValue = rainData.value;
-          const colorValue = rainValue * 50;
-          const filteredStations = stations.filter(station => station.id === rainData.stationId);
-          if (filteredStations.length > 0) {
-            const station = filteredStations[0];
-            // result[0] = filteredStations[0]
-            // usedStations.push(station);
-            const color = this.colorService.getColor(rainValue)
-            this.updateMarker(station, this.rgbStringToHex(color), rainValue);
-          }
-        });
+            const rainValue = rainData.value;
+            const colorValue = rainValue * 50;
+            const filteredStations = stations.filter(station => station.id === rainData.stationId);
+            if (filteredStations.length > 0) {
+              const station = filteredStations[0];
+              const color = this.colorService.getColor(rainValue);
+              this.updateMarker(station, this.rgbStringToHex(color), rainValue);
+            }
+          });
       });
   }
 
@@ -116,18 +122,23 @@ export class MarkerCreatorService {
 
   rgbStringToHex(rgbString: string): string {
     // tslint:disable-next-line:no-bitwise
-    const newStr = rgbString.substring(4, rgbString.length-1)
-    console.log(newStr)
-    const split = newStr.split(',')
-    const r = +split[0]
-    const g = +split[1]
-    const b = +split[2]
+    const newStr = rgbString.substring(4, rgbString.length - 1);
+    // console.log(newStr);
+    const split = newStr.split(',');
+    const r = +split[0];
+    const g = +split[1];
+    const b = +split[2];
+    // tslint:disable-next-line:no-bitwise
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
 
   rgbToHex(r: number, g: number, b: number): string {
     // tslint:disable-next-line:no-bitwise
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  emitData(data: EmitData): void {
+    this.sidePanelService.emitData(data);
   }
 
 }

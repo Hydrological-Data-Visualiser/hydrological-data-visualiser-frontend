@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {DataModelBase} from '../model/data-model-base';
-import {PrecipitationService} from './precipitation.service';
-import {StationsService} from './stations.service';
-import {KocinkaSurfaceHeightService} from './kocinka-surface-height.service';
+import {PrecipitationService} from './dataType.points/precipitation.service';
+import {KocinkaSurfaceHeightService} from './dataType.points/kocinka-surface-height.service';
 import {HttpClient} from '@angular/common/http';
-import {PolygonsRandomService} from './polygons-random.service';
-import {KocinkaRandomService} from './kocinka-random.service';
-import {KocinkaTemperatureService} from './kocinka-temperature.service';
+import {PolygonsRandomService} from './dataType.polygon/polygons-random.service';
+import {KocinkaRandomService} from './dataType.line/kocinka-random.service';
+import {KocinkaTemperatureService} from './dataType.line/kocinka-temperature.service';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,6 @@ export class DataProviderService {
     private http: HttpClient,
     // new dataSource - add constructor to the service here
     private precipitationService: PrecipitationService,
-    private stationsService: StationsService,
     private kocinkaRandomService: KocinkaRandomService,
     private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService,
     private kocinkaTemperatureService: KocinkaTemperatureService,
@@ -35,10 +34,6 @@ export class DataProviderService {
   ) {
     // precipitationService.getDataRecordsArrayFromGetRequest();
     this.getModels();
-  }
-
-  getStationsService(): StationsService {
-    return this.stationsService;
   }
 
   getPrecipitationService(): PrecipitationService {
@@ -70,7 +65,7 @@ export class DataProviderService {
     });
   }
 
-  getActualService(): any {
+  getActualService(): DataServiceInterface<any> {
     switch (this.selectedModel) {
       case this.getKocinkaRandomService().info.id :
         return this.getKocinkaRandomService();
@@ -88,7 +83,7 @@ export class DataProviderService {
         return this.getPolygonsRandomService();
 
       default:
-        return null;
+        throw new Error();
     }
   }
 

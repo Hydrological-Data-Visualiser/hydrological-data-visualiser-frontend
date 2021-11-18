@@ -1,30 +1,35 @@
 import {Injectable} from '@angular/core';
-import {RiverPoint} from '../model/river-point';
 import {HttpClient} from '@angular/common/http';
-import {DataModelBase} from '../model/data-model-base';
-import {RiverService} from './river.service';
+import {DataModelBase} from '../../model/data-model-base';
 import {Observable} from 'rxjs';
+import {RiverPoint} from '../../model/river-point';
 import * as moment from 'moment';
+import {RiverService} from './river.service';
+import {DataServiceInterface} from '../data.service.interface';
+import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaRandomService extends RiverService {
-  public url = 'https://imgw-mock.herokuapp.com/kocinka';
-  public status = false;
+export class KocinkaTemperatureService extends RiverService implements DataServiceInterface<RiverPoint>{
+  public url = 'https://imgw-mock.herokuapp.com/kocinkaTemperature';
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(private http: HttpClient, public sidePanelService: SidePanelService) {
+    super(sidePanelService);
     this.getInfo();
-  }
-
-  draw(date: Date): void {
-    this.drawRiver(this.getDataFromDateAsObservableUsingDate(date));
   }
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
+  }
+
+  draw(date: Date): void {
+    this.drawRiver(this.getDataFromDateAsObservableUsingInstant(date), this.info.metricLabel);
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {

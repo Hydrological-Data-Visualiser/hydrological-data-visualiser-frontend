@@ -3,14 +3,17 @@
   <div class="modal-dialog modal-lg  modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Stations</h5>
+        <h1 class="modal-title" id="exampleModalLabel">Stations</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 
         <div class="row align-items-center p-2 form-group">
           <div class="form-group">
-            <input type="text" class="form-control mb-4" placeholder="Search" [(ngModel)]="query" id="listSearch">
+            <input *ngIf="allStations.length > 0" type="text" class="form-control mb-4" placeholder="Search"
+                   [(ngModel)]="query">
+            <input *ngIf="allStations.length === 0" type="text" class="form-control mb-4"
+                   placeholder="There are no stations in this model" [(ngModel)]="query" disabled>
           </div>
           <div class="row">
             <div *ngFor="let station of allStations | searchFilter: query" class="col-4">
@@ -22,7 +25,8 @@
               <p class="text-center">No matches</p>
             </div>
             <ng-template #other>
-              <p class="text-center" *ngIf="query.length == 0"> Enter Character to start search</p>
+              <p class="text-center" *ngIf="query.length == 0 && allStations.length > 0"> Enter Character to start
+                search</p>
             </ng-template>
           </div>
         </div>
