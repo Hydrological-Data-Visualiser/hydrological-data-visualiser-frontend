@@ -16,8 +16,7 @@ export class MapComponent implements AfterViewInit {
   long: number;
   clicked = false;
   marker: L.Marker<any> | undefined;
-  @Output() longEmitter = new EventEmitter<number>();
-  @Output() latEmitter = new EventEmitter<number>();
+  @Output() latLngEventEmitter = new EventEmitter<L.LatLng>();
   @Output() clickedEmitter = new EventEmitter<boolean>();
 
   redIcon = new L.Icon({
@@ -52,8 +51,7 @@ export class MapComponent implements AfterViewInit {
       const coord = e.latlng;
       this.lat = coord.lat;
       this.long = coord.lng;
-      this.longEmitter.emit(this.long);
-      this.latEmitter.emit(this.lat);
+      this.latLngEventEmitter.emit(new L.LatLng(this.lat, this.long));
       this.clickedEmitter.emit(true);
       this.addMarker(coord);
       // @Output() latitude = new EventEmitter<string>();
@@ -84,8 +82,7 @@ export class MapComponent implements AfterViewInit {
     this.marker = L.marker(latlng, {icon: this.redIcon}).addTo(this.map).on('click', a => {
       this.map.removeLayer(this.marker);
       this.marker = undefined;
-      this.longEmitter.emit(undefined);
-      this.latEmitter.emit(undefined);
+      this.latLngEventEmitter.emit(undefined);
       this.clickedEmitter.emit(false);
     });
     // .bindPopup('Ionic 4 <br> Leaflet.')

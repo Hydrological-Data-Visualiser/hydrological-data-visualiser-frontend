@@ -65,7 +65,8 @@ export class KocinkaSurfaceHeightService extends MarkerCreatorService implements
     this.putMarkers(
       this.getStations(),
       this.getDataFromDateAsObservableUsingInstant(date),
-      this.info.metricLabel
+      this.info.metricLabel,
+      date
     );
   }
 

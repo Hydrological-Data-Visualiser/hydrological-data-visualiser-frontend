@@ -49,7 +49,7 @@ export class MarkerCreatorService {
     });
   }
 
-  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string): void {
+  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
     this.group.clearLayers();
 
     const usedStations: Station[] = [];
@@ -61,22 +61,22 @@ export class MarkerCreatorService {
           const station = filteredStations[0];
           usedStations.push(station);
           const color = this.colorService.getColor(rainValue);
-          this.createMarker(station, this.rgbStringToHex(color), rainValue, metricLabel);
+          this.createMarker(station, this.rgbStringToHex(color), rainValue, metricLabel, date);
         }
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
-      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel));
+      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
       this.map.fitBounds(this.group.getBounds());
     });
   }
 
-  createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string): void {
+  createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
         this.clickedMarker.next(station);
         this.emitData(
-          new EmitData(station.name, station.latitude, station.longitude, undefined, rainValue, metricLabel)
+          new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
       });
 
