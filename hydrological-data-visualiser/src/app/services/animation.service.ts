@@ -9,15 +9,15 @@ import {PrecipitationService} from './dataType.points/precipitation.service';
 export class AnimationService {
   private currentPlayData: PlayData | null = null;
 
-  constructor(private precipitationService: PrecipitationService) {
+  constructor() {
   }
 
   public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent): void {
     if (this.currentPlayData != null) {
       this.currentPlayData.stopPlaying();
     }
-    const playData = new PlayData(startStep, steps, timestepMs, this.precipitationService, sidepanel);
-    this.currentPlayData = playData;
+    // const playData = new PlayData(startStep, steps, timestepMs, this.precipitationService, sidepanel);
+    // this.currentPlayData = playData;
   }
 
   play(): void {

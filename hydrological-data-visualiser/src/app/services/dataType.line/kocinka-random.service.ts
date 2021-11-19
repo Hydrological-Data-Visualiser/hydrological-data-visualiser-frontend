@@ -11,35 +11,11 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
 @Injectable({
   providedIn: 'root'
 })
-export class KocinkaRandomService extends RiverService implements DataServiceInterface<RiverPoint> {
+export class KocinkaRandomService extends RiverService {
   public url = 'https://imgw-mock.herokuapp.com/kocinka';
-  public status = false;
-  public info!: DataModelBase;
 
-  constructor(private http: HttpClient, public sidePanelService: SidePanelService) {
-    super(sidePanelService);
+  constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
+    super(sidePanelService, http);
     this.getInfo();
-  }
-
-  draw(date: Date): void {
-    this.drawRiver(this.getDataFromDateAsObservableUsingDate(date), this.info.metricLabel);
-  }
-
-  getInfo(): void {
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoSubscription(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
-  }
-
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<RiverPoint[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 }

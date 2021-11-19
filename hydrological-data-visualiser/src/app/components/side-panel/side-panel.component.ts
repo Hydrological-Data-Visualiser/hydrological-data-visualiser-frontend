@@ -39,8 +39,7 @@ export class SidePanelComponent implements OnInit {
   data: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
-              private sidePanelService: SidePanelService
-  ) {
+              private sidePanelService: SidePanelService) {
   }
 
   ngOnInit(): void {
@@ -146,7 +145,7 @@ export class SidePanelComponent implements OnInit {
             }
           });
       }
-      this.dataProvider.getActualService().draw(this.value);
+      this.dataProvider.getActualService().draw(this.value, this.dataProvider.getActualService().url);
     }
   }
 

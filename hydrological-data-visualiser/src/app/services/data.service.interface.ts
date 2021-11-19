@@ -1,12 +1,13 @@
 import {DataModelBase} from '../model/data-model-base';
 import {Observable} from 'rxjs';
 import {Station} from '../model/station';
+import * as L from 'leaflet';
 
 export interface DataServiceInterface<Type> {
   readonly url: string;
   info: DataModelBase;
-
-  draw(date: Date): void;
+  map: L.Map;
+  draw(date: Date, url: string): void;
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<Type[]>;
 
@@ -20,4 +21,6 @@ export interface DataServiceInterface<Type> {
   getStationsObservable?(): Observable<Station[]>;
 
   getStations?(): Station[];
+
+  clear(): void;
 }

@@ -3,23 +3,21 @@ import {HttpClient} from '@angular/common/http';
 import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
-import * as moment from 'moment';
 import {MarkerCreatorService} from './marker-creator.service';
 import {DataModelBase} from '../../model/data-model-base';
-import {DataServiceInterface} from '../data.service.interface';
 import {ColorService} from '../color.service';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PrecipitationService extends MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew> {
+export class PrecipitationService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/imgw';
   public status = false;
   public info!: DataModelBase;
 
-  constructor(private http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
-    super(colorService, sidePanelService);
+  constructor(http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
+    super(colorService, sidePanelService, http);
     this.getInfo();
   }
 
@@ -32,10 +30,6 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
         date
       );
     });
-  }
-
-  getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>(`${this.url}/stations`);
   }
 
   getData(): Observable<PrecipitationDayDataNew[]> {
@@ -76,34 +70,12 @@ export class PrecipitationService extends MarkerCreatorService implements DataSe
     return retVal;
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
-  }
-
   getMinValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/min?instantFrom=${begin}&length=${length}`);
   }
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`https://imgw-mock.herokuapp.com/imgw/max?instantFrom=${begin}&length=${length}`);
-  }
-
-  getInfo(): void {
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoSubscription(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
-  }
-
-  clear(): void {
-    this.group.clearLayers();
   }
 
   // tslint:disable-next-line:ban-types
