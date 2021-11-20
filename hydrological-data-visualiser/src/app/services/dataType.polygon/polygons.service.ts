@@ -81,4 +81,12 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   getInfoSubscription(): Observable<DataModelBase> {
     return this.http.get<DataModelBase>(`${this.url}/info`);
   }
+
+  getMinValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
+  }
+
+  getMaxValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
 }

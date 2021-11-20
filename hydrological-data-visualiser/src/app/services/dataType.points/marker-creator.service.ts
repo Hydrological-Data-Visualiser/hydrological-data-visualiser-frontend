@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
 import * as L from 'leaflet';
 import * as moment from 'moment';
@@ -19,16 +19,12 @@ import {DataModelBase} from '../../model/data-model-base';
 export abstract class MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew> {
   public url!: string;
   public info!: DataModelBase;
-  public map: any;
+  public map!: L.Map;
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: zoom => 100 - zoom * 10
+    maxClusterRadius: zoom => 120 - zoom * 10
   });
-  public stations = new Subject<Station>();
-  public stations$ = this.stations.asObservable();
   public stationList: Station[] = [];
-  private clickedMarker = new Subject<Station>();
-  public clickedMarker$ = this.clickedMarker.asObservable();
   private markers: { [key: number]: L.Marker } = {};
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
@@ -80,7 +76,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
-        this.clickedMarker.next(station);
         this.emitData(
           new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
@@ -147,23 +142,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
     return this.http.get<Station[]>(`${this.url}/stations`);
   }
 
-  getStations(): Station[] {
-    const stat: Station[] = [];
+  getStations(): void {
     this.getStationsObservable().subscribe(data => {
-      this.stations$.subscribe(value => {
-        stat.push(value);
-      });
-      data.forEach(value => {
-        this.stations.next(new Station(
-          value.id,
-          value.name.charAt(0).toUpperCase() + value.name.slice(1).toLowerCase(),
-          value.geoId,
-          value.latitude,
-          value.longitude
-        ));
-      });
+      this.stationList = data;
     });
-    return stat;
   }
 
   getData(): Observable<PrecipitationDayDataNew[]> {
@@ -183,7 +165,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
 
   draw(date: Date): void {
     this.putMarkers(
-      this.getStations(),
+     this.getDistinctLatLongStations(this.stationList),
       this.getDataFromDateAsObservableUsingInstant(date),
       this.info.metricLabel,
       date
@@ -201,4 +183,40 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
   clear(): void {
     this.group.clearLayers();
   }
+
+  getDistinctLatLongStations(stations: Station[]): Station[] {
+    const tab: number[] = [];
+    const retVal: Station[] = [];
+    stations.forEach(a => {
+      const latitude = a.latitude;
+      if (latitude) {
+        if (!tab.includes(latitude)) {
+          tab.push(latitude);
+          retVal.push(a);
+        }
+      }
+    });
+    return retVal;
+  }
+
+  getMinValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
+  }
+
+  getMaxValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  // tslint:disable-next-line:ban-types
+  setScaleAndColour(begin: string, length: number, callback: Function): void {
+    this.getMinValue(begin, length).subscribe(minValue =>
+      this.getMaxValue(begin, length).subscribe(maxValue =>
+        this.getInfoSubscription().subscribe(info => {
+          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
+          callback();
+        })
+      )
+    );
+  }
+
 }
