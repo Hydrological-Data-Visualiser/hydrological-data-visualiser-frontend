@@ -2,6 +2,7 @@ import {DataModelBase} from '../model/data-model-base';
 import {Observable} from 'rxjs';
 import {Station} from '../model/station';
 import * as L from 'leaflet';
+import {EmitData} from '../model/emit-data';
 
 export interface DataServiceInterface<Type> {
   readonly url: string;
@@ -23,4 +24,6 @@ export interface DataServiceInterface<Type> {
   getStations?(): Station[];
 
   clear(): void;
+
+  emitData(data: EmitData): void;
 }

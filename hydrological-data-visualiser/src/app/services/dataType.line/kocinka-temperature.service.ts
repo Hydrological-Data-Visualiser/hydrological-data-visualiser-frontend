@@ -9,7 +9,6 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
 })
 export class KocinkaTemperatureService extends RiverService {
   public url = 'https://imgw-mock.herokuapp.com/kocinkaTemperature';
-  // public info!: DataModelBase;
 
   constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
     super(sidePanelService, http);

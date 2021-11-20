@@ -13,8 +13,6 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
 })
 export class PrecipitationService extends MarkerCreatorService {
   public url = 'https://imgw-mock.herokuapp.com/imgw';
-  public status = false;
-  public info!: DataModelBase;
 
   constructor(http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
     super(colorService, sidePanelService, http);
