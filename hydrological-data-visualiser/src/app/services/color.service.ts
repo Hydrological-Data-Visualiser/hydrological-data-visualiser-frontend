@@ -10,7 +10,6 @@ const interpolate = require('color-interpolate');
 })
 export class ColorService {
 
-  constructor() { }
   private colormap: any = interpolate(["#FFFFFF", "#0000FF"])
   private minValue: number = 0
   private maxValue: number = 50 // mock values

@@ -145,7 +145,7 @@ export class SidePanelComponent implements OnInit {
             }
           });
       }
-      this.dataProvider.getActualService().draw(this.value, this.dataProvider.getActualService().url);
+      this.dataProvider.getActualService().draw(this.value);
     }
   }
 

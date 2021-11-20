@@ -14,13 +14,7 @@ export class StationsComponent implements OnInit {
   allStations: Station[] = [];
   query = '';
 
-  // items = Array.from({length: 200000}).map((_, i) => `Item ${i}`);
-
   constructor(private dataProvider: DataProviderService, private http: HttpClient, private sidePanelService: SidePanelService) {
-    // this.dataProvider.getPrecipitationService().getStationsObservable()
-    //   .subscribe(stations => stations.forEach(station => this.allStations.push(station)));
-    // this.dataProvider.getKocinkaSurfaceHeightService().getStationsObservable()
-    //   .subscribe(stations => stations.forEach(station => this.allStations.push(station)));
   }
 
   ngOnInit(): void {
@@ -36,12 +30,11 @@ export class StationsComponent implements OnInit {
 
   zoomTo(id: number): void {
     const station = this.allStations.filter(a => a.id === id)[0];
-    const map = this.dataProvider.getPrecipitationService().map;
+    const map = this.dataProvider.getActualService().map;
     if (station.latitude && station.longitude) {
       this.query = '';
       map.setView([station.latitude, station.longitude], 13, {
         animate: true,
-        animation: true,
         duration: 2
       });
     }

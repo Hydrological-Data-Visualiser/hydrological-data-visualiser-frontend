@@ -53,11 +53,11 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
-  getInfoSubscription(): Observable<DataModelBase> {
+  getInfoObservable(): Observable<DataModelBase> {
     return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
-  draw(date: Date, url: string): void {
+  draw(date: Date): void {
     this.riverLayer.clearLayers();
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
@@ -88,5 +88,13 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<RiverPoint[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+  }
+
+  getMinValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
+  }
+
+  getMaxValue(begin: string, length: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
   }
 }

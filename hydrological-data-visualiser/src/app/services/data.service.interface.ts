@@ -8,7 +8,8 @@ export interface DataServiceInterface<Type> {
   readonly url: string;
   info: DataModelBase;
   map: L.Map;
-  draw(date: Date, url: string): void;
+
+  draw(date: Date): void;
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<Type[]>;
 
@@ -16,14 +17,18 @@ export interface DataServiceInterface<Type> {
 
   getInfo(): void;
 
-  getInfoSubscription(): Observable<DataModelBase>;
+  getInfoObservable(): Observable<DataModelBase>;
 
   // only in points services
   getStationsObservable?(): Observable<Station[]>;
 
-  getStations?(): Station[];
+  getStations?(): void;
 
   clear(): void;
 
   emitData(data: EmitData): void;
+
+  getMaxValue(begin: string, length: number): Observable<number>;
+
+  getMinValue(begin: string, length: number): Observable<number>;
 }
