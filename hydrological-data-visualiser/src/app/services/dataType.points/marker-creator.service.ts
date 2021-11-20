@@ -8,11 +8,17 @@ import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
 import {EmitData} from '../../model/emit-data';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
+import {DataServiceInterface} from '../data.service.interface';
+import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
+import {HttpClient} from '@angular/common/http';
+import {DataModelBase} from '../../model/data-model-base';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MarkerCreatorService {
+export abstract class MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew> {
+  public url!: string;
+  public info!: DataModelBase;
   public map: any;
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
@@ -25,7 +31,7 @@ export class MarkerCreatorService {
   public clickedMarker$ = this.clickedMarker.asObservable();
   private markers: { [key: number]: L.Marker } = {};
 
-  constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService) {
+  protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
   }
 
   getColoredIcon(color: string): L.DivIcon {
@@ -116,10 +122,6 @@ export class MarkerCreatorService {
     }
   }
 
-  clear(): void {
-    this.group.clearLayers();
-  }
-
   rgbStringToHex(rgbString: string): string {
     // tslint:disable-next-line:no-bitwise
     const newStr = rgbString.substring(4, rgbString.length - 1);
@@ -141,4 +143,62 @@ export class MarkerCreatorService {
     this.sidePanelService.emitData(data);
   }
 
+  getStationsObservable(): Observable<Station[]> {
+    return this.http.get<Station[]>(`${this.url}/stations`);
+  }
+
+  getStations(): Station[] {
+    const stat: Station[] = [];
+    this.getStationsObservable().subscribe(data => {
+      this.stations$.subscribe(value => {
+        stat.push(value);
+      });
+      data.forEach(value => {
+        this.stations.next(new Station(
+          value.id,
+          value.name.charAt(0).toUpperCase() + value.name.slice(1).toLowerCase(),
+          value.geoId,
+          value.latitude,
+          value.longitude
+        ));
+      });
+    });
+    return stat;
+  }
+
+  getData(): Observable<PrecipitationDayDataNew[]> {
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
+  }
+
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD');
+    return this.http.get<PrecipitationDayDataNew[]>
+    (`${this.url}/data?date=${formattedDate}`);
+  }
+
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+  }
+
+  draw(date: Date): void {
+    this.putMarkers(
+      this.getStations(),
+      this.getDataFromDateAsObservableUsingInstant(date),
+      this.info.metricLabel,
+      date
+    );
+  }
+
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
+  }
+
+  clear(): void {
+    this.group.clearLayers();
+  }
 }

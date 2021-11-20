@@ -5,39 +5,23 @@ import {RiverPoint} from '../../model/river-point';
 import {Observable} from 'rxjs';
 import {EmitData} from '../../model/emit-data';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
+import {HttpClient} from '@angular/common/http';
+import {DataServiceInterface} from '../data.service.interface';
+import {DataModelBase} from '../../model/data-model-base';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class RiverService {
+export abstract class RiverService implements DataServiceInterface<RiverPoint> {
+  public map!: L.Map;
+  public info!: DataModelBase;
+  public url!: string;
+
   public status = false;
-  public map: any;
   private riverLayer = new L.FeatureGroup();
 
-  constructor(public sidePanelService: SidePanelService) {
-  }
-
-  drawRiver(data: Observable<RiverPoint[]>, metricLabel: string): void {
-    this.riverLayer.clearLayers();
-    data.subscribe(points => {
-      for (let i = 0; i < points.length - 1; i++) {
-        const river = [];
-        river.push(new LatLng(points[i].latitude, points[i].longitude));
-        river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
-        const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
-        const color = this.getColor(value, points);
-        const polyLine = L.polyline(river, {color})
-          .bindPopup(`${value.toFixed(2)} ${metricLabel}`)
-          .on('click', () => {
-            this.emitData(
-              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, metricLabel)
-            );
-          });
-        this.riverLayer.addLayer(polyLine);
-      }
-      this.riverLayer.addTo(this.map);
-      this.map.fitBounds(this.riverLayer.getBounds());
-    });
+  protected constructor(public sidePanelService: SidePanelService, public http: HttpClient) {
   }
 
   emitData(data: EmitData): void {
@@ -63,5 +47,46 @@ export class RiverService {
 
   clear(): void {
     this.riverLayer.clearLayers();
+  }
+
+  getInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
+  }
+
+  getInfoSubscription(): Observable<DataModelBase> {
+    return this.http.get<DataModelBase>(`${this.url}/info`);
+  }
+
+  draw(date: Date, url: string): void {
+    this.riverLayer.clearLayers();
+    this.getDataFromDateAsObservableUsingInstant(date).subscribe(points => {
+      for (let i = 0; i < points.length - 1; i++) {
+        const river = [];
+        river.push(new LatLng(points[i].latitude, points[i].longitude));
+        river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
+        const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
+        const color = this.getColor(value, points);
+        const polyLine = L.polyline(river, {color})
+          .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
+          .on('click', () => {
+            this.emitData(
+              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
+            );
+          });
+        this.riverLayer.addLayer(polyLine);
+      }
+      this.riverLayer.addTo(this.map);
+      this.map.fitBounds(this.riverLayer.getBounds());
+    });
+  }
+
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
+  }
+
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<RiverPoint[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 }

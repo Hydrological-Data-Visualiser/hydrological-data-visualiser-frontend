@@ -1,44 +1,16 @@
 import {Injectable} from '@angular/core';
 import {PolygonsService} from './polygons.service';
 import {HttpClient} from '@angular/common/http';
-import {DataModelBase} from '../../model/data-model-base';
-import {Observable} from 'rxjs';
-import * as moment from 'moment';
-import {PolygonModel} from '../../model/polygon';
-import {DataServiceInterface} from '../data.service.interface';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PolygonsRandomService extends PolygonsService implements DataServiceInterface<PolygonModel>{
+export class PolygonsRandomService extends PolygonsService {
   public url = 'https://imgw-mock.herokuapp.com/polygons';
-  public info!: DataModelBase;
 
-  constructor(private http: HttpClient, public sidePanelService: SidePanelService) {
-    super(sidePanelService);
+  constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
+    super(sidePanelService, http);
     this.getInfo();
-  }
-
-  draw(date: Date): void {
-    this.drawPolygons(this.getDataFromDateAsObservableUsingInstant(date), this.info.metricLabel);
-  }
-
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonModel[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<PolygonModel[]>(`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolygonModel[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<PolygonModel[]>(`${this.url}/data?dateInstant=${formattedDate}`);
-  }
-
-  getInfo(): void {
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoSubscription(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 }

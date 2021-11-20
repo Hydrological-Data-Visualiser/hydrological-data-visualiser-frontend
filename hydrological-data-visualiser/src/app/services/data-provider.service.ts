@@ -32,7 +32,6 @@ export class DataProviderService {
     private kocinkaTemperatureService: KocinkaTemperatureService,
     private polygonsRandomService: PolygonsRandomService
   ) {
-    // precipitationService.getDataRecordsArrayFromGetRequest();
     this.getModels();
   }
 
@@ -66,28 +65,10 @@ export class DataProviderService {
   }
 
   getActualService(): DataServiceInterface<any> {
-    switch (this.selectedModel) {
-      case this.getKocinkaRandomService().info.id :
-        return this.getKocinkaRandomService();
-
-      case this.getPrecipitationService().info.id:
-        return this.getPrecipitationService();
-
-      case this.getKocinkaSurfaceHeightService().info.id:
-        return this.getKocinkaSurfaceHeightService();
-
-      case this.getKocinkaTemperatureService().info.id:
-        return this.getKocinkaTemperatureService();
-
-      case this.getPolygonsRandomService().info.id:
-        return this.getPolygonsRandomService();
-
-      default:
-        throw new Error();
-    }
+    return this.getAllServices().filter(service => service.info.id === this.selectedModel)[0];
   }
 
-  getAllServices(): any[] {
+  getAllServices(): DataServiceInterface<any>[] {
     return [
       this.getKocinkaTemperatureService(),
       this.getKocinkaRandomService(),
