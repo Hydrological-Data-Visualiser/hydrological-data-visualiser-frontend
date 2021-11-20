@@ -53,7 +53,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
-  getInfoSubscription(): Observable<DataModelBase> {
+  getInfoObservable(): Observable<DataModelBase> {
     return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 

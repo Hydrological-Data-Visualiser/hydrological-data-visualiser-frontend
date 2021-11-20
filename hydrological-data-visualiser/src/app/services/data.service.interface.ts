@@ -17,7 +17,7 @@ export interface DataServiceInterface<Type> {
 
   getInfo(): void;
 
-  getInfoSubscription(): Observable<DataModelBase>;
+  getInfoObservable(): Observable<DataModelBase>;
 
   // only in points services
   getStationsObservable?(): Observable<Station[]>;

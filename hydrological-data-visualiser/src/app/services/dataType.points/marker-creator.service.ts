@@ -176,7 +176,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }
 
-  getInfoSubscription(): Observable<DataModelBase> {
+  getInfoObservable(): Observable<DataModelBase> {
     return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
@@ -211,7 +211,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
       this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoSubscription().subscribe(info => {
+        this.getInfoObservable().subscribe(info => {
           this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
           callback();
         })
