@@ -8,6 +8,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
+import { ColorService } from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,22 +21,11 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public polygonLayer = new L.FeatureGroup();
   public info!: DataModelBase;
 
-  protected constructor(public sidePanelService: SidePanelService, public http: HttpClient) {
+  protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
   }
 
   clear(): void {
     this.polygonLayer.clearLayers();
-  }
-
-  getColor(d: number): string {
-    return d < 1 ? '#9c136a' :
-      d < 1.5 ? '#440404' :
-        d < 2 ? '#000000' :
-          d < 2.5 ? '#dca221' :
-            d < 3 ? '#fc650d' :
-              d < 3.5 ? '#021349' :
-                d < 4 ? '#0A2F51' :
-                  '#CCEDFF';
   }
 
   emitData(data: EmitData): void {
@@ -47,7 +37,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(polygons => {
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
-        const color = this.getColor(Number(polygon.value));
+        const color = this.colorService.getColor(polygon.value);
         const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
@@ -69,7 +59,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       this.clear();
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
-        const color = this.getColor(Number(polygon.value));
+        const color = this.colorService.getColor(polygon.value);
         const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
@@ -83,6 +73,18 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
         this.polygonLayer.addTo(this.map);
       });
     });
+  }
+
+  // tslint:disable-next-line:ban-types
+  setScaleAndColour(begin: string, length: number, callback: Function): void {
+    this.getMinValue(begin, length).subscribe(minValue =>
+      this.getMaxValue(begin, length).subscribe(maxValue =>
+        this.getInfoObservable().subscribe(info => {
+          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
+          callback();
+        })
+      )
+    );
   }
 
   getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonModel[]> {
