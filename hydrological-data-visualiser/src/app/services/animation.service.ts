@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import * as moment from 'moment';
 import {SidePanelComponent} from '../components/side-panel/side-panel.component';
+import { DataProviderService } from './data-provider.service';
+import { DataServiceInterface } from './data.service.interface';
 import {PrecipitationService} from './dataType.points/precipitation.service';
 
 @Injectable({
@@ -12,12 +14,17 @@ export class AnimationService {
   constructor() {
   }
 
-  public setAnimation(startStep: Date, steps: number, timestepMs: number, sidepanel: SidePanelComponent): void {
+  public setAnimation(startStep: Date,
+                      steps: number,
+                      timestepMs: number,
+                      sidepanel: SidePanelComponent,
+                      dataService: DataServiceInterface<any>): void {
+
     if (this.currentPlayData != null) {
       this.currentPlayData.stopPlaying();
     }
-    // const playData = new PlayData(startStep, steps, timestepMs, this.precipitationService, sidepanel);
-    // this.currentPlayData = playData;
+    const playData = new PlayData(startStep, steps, timestepMs, dataService, sidepanel);
+    this.currentPlayData = playData;
   }
 
   play(): void {
@@ -53,7 +60,7 @@ class PlayData {
   constructor(private startStep: Date,
               private steps: number,
               private timestepMs: number,
-              private precipitationService: PrecipitationService,
+              private dataService: DataServiceInterface<any>,
               private sidepanel: SidePanelComponent) {
   }
 
@@ -68,11 +75,15 @@ class PlayData {
       }
 
       this.currentStep = (this.currentStep + 1) % this.steps;
-      const frameDate = new Date(this.startStep.valueOf());
-      frameDate.setDate(frameDate.getDate() + this.currentStep);
-      this.sidepanel.setAnimationPlaybackData((moment(frameDate)).format('YYYY-MM-DD'), this.currentStep);
-      this.setFrame(frameDate).then(() => {
-        this.playState();
+      this.dataService.getTimePointAfterAsObservable(this.startStep, this.currentStep).subscribe( frameDate => {
+        const date = new Date(frameDate);
+        const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+        console.log(this.startStep.toString() + utcDate);
+        this.sidepanel.setAnimationPlaybackData(utcDate, this.currentStep);
+        this.setFrame(utcDate).then(() => {
+          this.playState();
+        });
       });
     }, this.timestepMs);
   }
@@ -92,9 +103,7 @@ class PlayData {
   }
 
   private setFrame(date: Date): Promise<void> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.precipitationService
-      .updateMarkers(formattedDate, this.precipitationService.stationList, this.precipitationService.getData());
+    return this.dataService.update(date);
   }
 
   stopPlaying(): void {

@@ -11,9 +11,13 @@ export interface DataServiceInterface<Type> {
 
   draw(date: Date): void;
 
+  update(date: Date): Promise<void>;
+
   getDataFromDateAsObservableUsingDate(date: Date): Observable<Type[]>;
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<Type[]>;
+
+  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date>;
 
   getInfo(): void;
 

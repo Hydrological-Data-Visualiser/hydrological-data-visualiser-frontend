@@ -64,6 +64,27 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
     });
   }
 
+  update(date: Date): Promise<void> {
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(polygons => {
+      this.clear();
+      polygons.forEach(polygon => {
+        const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
+        const color = this.getColor(Number(polygon.value));
+        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+          .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
+          .on('click', event => {
+            // @ts-ignore
+            const coords: L.LatLng = event.latlng;
+            this.emitData(
+              new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
+            );
+          });
+        this.polygonLayer.addLayer(pol);
+        this.polygonLayer.addTo(this.map);
+      });
+    });
+  }
+
   getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonModel[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
     return this.http.get<PolygonModel[]>(`${this.url}/data?date=${formattedDate}`);
@@ -72,6 +93,11 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolygonModel[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<PolygonModel[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+  }
+
+  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
   getInfo(): void {
