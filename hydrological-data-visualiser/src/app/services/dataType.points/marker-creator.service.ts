@@ -92,11 +92,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   update(date: Date): Promise<void> {
-    const stations = this.getStations();
     return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then( d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
-        const filteredStations = stations.filter(station => station.id === rainData.stationId); // stationsList ok?
+        const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
           const color = this.colorService.getColor(rainValue);

@@ -23,12 +23,16 @@ export class ColorService {
     this.minValue = minValue
     this.maxValue = maxValue
     console.log(startColor)
-    this.colormap = interpolate([startColor, endColor])
-    if(this.legend)
+    this.colormap = interpolate([startColor, endColor]);
+    if(this.legend) {
       this.legend.setScale(minValue, maxValue, startColor, endColor, metricLabel)
+    }
   }
 
   getColor(value: number): string {
-    return this.colormap((value - this.minValue)/(this.maxValue - this.minValue))
+    if(this.minValue === this.maxValue) {
+      return this.colormap(0);
+    }
+    return this.colormap((value - this.minValue) / (this.maxValue - this.minValue));
   }
 }

@@ -7,6 +7,7 @@ import {Observable} from 'rxjs';
 import * as moment from 'moment';
 import {DataServiceInterface} from '../data.service.interface';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
+import { ColorService } from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
 export class KocinkaRandomService extends RiverService {
   public url = 'https://imgw-mock.herokuapp.com/kocinka';
 
-  constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
-    super(sidePanelService, http);
+  constructor(public http: HttpClient, public sidePanelService: SidePanelService, colorService: ColorService) {
+    super(sidePanelService, http, colorService);
     this.getInfo();
   }
 }

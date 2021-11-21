@@ -16,7 +16,7 @@ export class LegendComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  setScale(startValue: number, endValue: number, startColour: string, endColour: string, metric: string) {
+  setScale(startValue: number, endValue: number, startColour: string, endColour: string, metric: string): void {
     this.scaleData = new ScaleData(startValue, endValue, startColour, endColour, metric);
   }
 }

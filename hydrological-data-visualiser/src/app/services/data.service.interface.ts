@@ -19,9 +19,16 @@ export interface DataServiceInterface<Type> {
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date>;
 
+  getMinValue(begin: string, length: number): Observable<number>;
+
+  getMaxValue(begin: string, length: number): Observable<number>;
+
   getInfo(): void;
 
   getInfoObservable(): Observable<DataModelBase>;
+
+  // tslint:disable-next-line:ban-types
+  setScaleAndColour(begin: string, length: number, callback: Function): void;
 
   // only in points services
   getStationsObservable?(): Observable<Station[]>;

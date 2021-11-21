@@ -137,14 +137,13 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.hour!.substr(6, 2), 10)
         );
       const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-      //   this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
-      //     () => {
-      //       if (this.value) {
-      //         this.dataProvider.getPrecipitationService().draw(this.value);
-      //       }
-      //     });
-      // this.animationService.stop();
-      this.dataProvider.getActualService().draw(this.value);
+      this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
+        () => {
+          if (this.value) {
+            this.dataProvider.getActualService().draw(this.value);
+          }
+        });
+      this.animationService.stop();
     }
   }
 
@@ -170,7 +169,7 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
 
     const formattedStart = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
+    this.dataProvider.getActualService().setScaleAndColour(formattedStart, this.animationLength,
       () => {
         if (date) {
           this.animationService.setAnimation(
@@ -179,14 +178,9 @@ export class SidePanelComponent implements OnInit {
         }
         this.animationService.play();
       });
-    // if(date)
-    //   this.animationService.setAnimation(
-    //     date, this.animationModel.steps, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
-    //   );
-    // this.animationService.play();
   }
 
-// called by animationService
+  // called by animationService
   setAnimationPlaybackData(animationNow: Date, currentFrame: number): void {
     console.log(animationNow);
     if (this.animationLength !== undefined
