@@ -7,6 +7,7 @@ import {PolygonsRandomService} from './dataType.polygon/polygons-random.service'
 import {KocinkaRandomService} from './dataType.line/kocinka-random.service';
 import {KocinkaTemperatureService} from './dataType.line/kocinka-temperature.service';
 import {DataServiceInterface} from './data.service.interface';
+import {UniversalMarkerCreatorServiceService} from './dataType.points/universal-marker-creator-service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,11 +15,19 @@ import {DataServiceInterface} from './data.service.interface';
 export class DataProviderService {
   selectedModel!: string;
   dataModels: DataModelBase[] = [];
+  dataModelServices: DataServiceInterface<any>[] = [
+    this.getKocinkaTemperatureService(),
+    this.getKocinkaRandomService(),
+    this.getPrecipitationService(),
+    // this.getKocinkaSurfaceHeightService(),
+    this.getPolygonsRandomService(),
+    this.getUniversalMarkerCreatorService()
+  ];
 
   apis: string[] = [
     this.precipitationService.url,
     this.kocinkaRandomService.url,
-    this.kocinkaSurfaceHeightService.url,
+    // this.kocinkaSurfaceHeightService.url,
     this.kocinkaTemperatureService.url,
     this.polygonsRandomService.url
   ];
@@ -28,9 +37,10 @@ export class DataProviderService {
     // new dataSource - add constructor to the service here
     private precipitationService: PrecipitationService,
     private kocinkaRandomService: KocinkaRandomService,
-    private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService,
+    // private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService,
     private kocinkaTemperatureService: KocinkaTemperatureService,
-    private polygonsRandomService: PolygonsRandomService
+    private polygonsRandomService: PolygonsRandomService,
+    private universalMarkerCreatorService: UniversalMarkerCreatorServiceService
   ) {
     this.getModels();
   }
@@ -43,9 +53,9 @@ export class DataProviderService {
     return this.kocinkaRandomService;
   }
 
-  getKocinkaSurfaceHeightService(): KocinkaSurfaceHeightService {
-    return this.kocinkaSurfaceHeightService;
-  }
+  // getKocinkaSurfaceHeightService(): KocinkaSurfaceHeightService {
+  //   return this.kocinkaSurfaceHeightService;
+  // }
 
   getKocinkaTemperatureService(): KocinkaTemperatureService {
     return this.kocinkaTemperatureService;
@@ -55,26 +65,27 @@ export class DataProviderService {
     return this.polygonsRandomService;
   }
 
+  getUniversalMarkerCreatorService(): UniversalMarkerCreatorServiceService {
+    return this.universalMarkerCreatorService;
+  }
 
   getModels(): void {
+    this.dataModels = [];
     this.apis.forEach(api => {
       this.http.get<DataModelBase>(`${api}/info`).subscribe(info => {
-        this.dataModels.push(info);
+        if (info !== undefined) {
+          this.dataModels.push(info);
+        }
       });
     });
   }
 
   getActualService(): DataServiceInterface<any> {
+    console.log(this.getAllServices());
     return this.getAllServices().filter(service => service.info.id === this.selectedModel)[0];
   }
 
   getAllServices(): DataServiceInterface<any>[] {
-    return [
-      this.getKocinkaTemperatureService(),
-      this.getKocinkaRandomService(),
-      this.getPrecipitationService(),
-      this.getKocinkaSurfaceHeightService(),
-      this.getPolygonsRandomService()
-    ];
+    return this.dataModelServices;
   }
 }

@@ -53,14 +53,16 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
 
   putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
     this.group.clearLayers();
-
+    console.log(stations);
     const usedStations: Station[] = [];
     data.subscribe(d => {
       d.forEach(rainData => {
+        console.log(rainData);
         const rainValue = rainData.value;
         const filteredStations = stations.filter(station => station.id === rainData.stationId);
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
+          console.log(station);
           usedStations.push(station);
           const color = this.colorService.getColor(rainValue);
           this.createMarker(station, this.rgbStringToHex(color), rainValue, metricLabel, date);
