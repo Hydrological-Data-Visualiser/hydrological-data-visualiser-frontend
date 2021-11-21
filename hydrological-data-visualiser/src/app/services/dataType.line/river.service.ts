@@ -80,13 +80,34 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     });
   }
 
+  update(date: Date): Promise<void> {
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(points => {
+      for (let i = 0; i < points.length - 1; i++) {
+        const river = [];
+        river.push(new LatLng(points[i].latitude, points[i].longitude));
+        river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
+        const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
+        const color = this.getColor(value, points);
+        const polyLine = L.polyline(river, {color})
+          .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
+          .on('click', () => { // TODO
+            this.emitData(
+              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
+            );
+          });
+        this.riverLayer.addLayer(polyLine);
+      }
+      this.riverLayer.addTo(this.map); // no fit bounds
+    });
+  }
+
   getDataFromDateAsObservableUsingDate(date: Date): Observable<RiverPoint[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
     return this.http.get<RiverPoint[]>(`${this.url}/data?date=${formattedDate}`);
   }
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<RiverPoint[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<RiverPoint[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
@@ -96,5 +117,10 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 }

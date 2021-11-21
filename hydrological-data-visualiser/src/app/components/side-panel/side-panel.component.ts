@@ -136,15 +136,14 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.hour!.substr(3, 2), 10),
           Number.parseInt(this.hour!.substr(6, 2), 10)
         );
-      if (this.dataProvider.selectedModel === 'IMGW') {
-        const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-        this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
-          () => {
-            if (this.value) {
-              this.dataProvider.getPrecipitationService().draw(this.value);
-            }
-          });
-      }
+      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      //   this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
+      //     () => {
+      //       if (this.value) {
+      //         this.dataProvider.getPrecipitationService().draw(this.value);
+      //       }
+      //     });
+      // this.animationService.stop();
       this.dataProvider.getActualService().draw(this.value);
     }
   }
@@ -174,20 +173,28 @@ export class SidePanelComponent implements OnInit {
     this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
       () => {
         if (date) {
-          this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+          this.animationService.setAnimation(
+            date, this.animationModel.steps, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
+          );
         }
         this.animationService.play();
       });
+    // if(date)
+    //   this.animationService.setAnimation(
+    //     date, this.animationModel.steps, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
+    //   );
+    // this.animationService.play();
   }
 
 // called by animationService
-  setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
+  setAnimationPlaybackData(animationNow: Date, currentFrame: number): void {
     console.log(animationNow);
     if (this.animationLength !== undefined
     ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
-    this.animationNow = animationNow;
+    const formattedDate = (moment(animationNow)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    this.animationNow = formattedDate;
   }
 
   pauseAnimation(): void {
