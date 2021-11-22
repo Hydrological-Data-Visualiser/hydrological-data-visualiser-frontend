@@ -86,6 +86,7 @@
                 <p *ngIf="data.latitude"> Latitude:</p>
                 <p *ngIf="data.longitude"> Longitude:</p>
                 <p *ngIf="data.value"> Value:</p>
+                <p *ngIf="!data.value"> Value:</p>
                 <p *ngIf="data.date"> Date:</p>
               </div>
               <div class="col">
@@ -93,6 +94,7 @@
                 <p *ngIf="data.latitude">{{data.latitude.toFixed(4)}}</p>
                 <p *ngIf="data.longitude">{{data.longitude.toFixed(4)}}</p>
                 <p *ngIf="data.value">{{data.value.toFixed(2)}} {{data.metricLabel}}</p>
+                <p *ngIf="!data.value">No Data</p>
                 <p *ngIf="data.date">{{data.date | date:'medium'}}</p>
               </div>
             </div>
