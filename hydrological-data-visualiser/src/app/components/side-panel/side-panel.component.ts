@@ -101,11 +101,9 @@ export class SidePanelComponent implements OnInit {
 
   updateHourList(formattedDate: Date): void {
     this.hours = [];
-    const dataProvider = this.dataProvider.getActualService();
-
-    // IT IS IMPORTANT THAT ALL DATAPROVIDERS HAVE THE SAME METHODS!!! IT IS DEALING HERE WITH `ANY` TYPE
-    if (dataProvider) {
-      dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
+    const actualService = this.dataProvider.getActualService();
+    if (actualService) {
+      actualService.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
         (data: any[]) => {
           data.forEach(b => {
             const date = new Date(b.date);
