@@ -49,7 +49,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.getColor(Number(polygon.value));
         const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
-          // .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
+          .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
             const coords: L.LatLng = event.latlng;

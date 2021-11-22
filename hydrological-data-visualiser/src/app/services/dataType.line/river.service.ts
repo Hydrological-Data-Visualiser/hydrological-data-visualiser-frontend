@@ -67,7 +67,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
         const color = this.getColor(value, points);
         const polyLine = L.polyline(river, {color})
-          // .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
+          .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', () => {
             this.emitData(
               new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)

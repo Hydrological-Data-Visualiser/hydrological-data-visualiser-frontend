@@ -81,11 +81,11 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
         );
       });
 
-      // if (!isNaN(rainValue)) {
-      //   marker.bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`);
-      // } else {
-      //   marker.bindPopup(station.name + ' no data');
-      // }
+      if (!isNaN(rainValue)) {
+        marker.bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`);
+      } else {
+        marker.bindPopup(station.name + ' no data');
+      }
       this.markers[station.id] = marker;
       this.group.addLayer(marker);
       this.map.addLayer(this.group);
