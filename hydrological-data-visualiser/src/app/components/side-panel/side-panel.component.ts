@@ -67,6 +67,9 @@ export class SidePanelComponent implements OnInit {
         this.data.latitude = data.latitude;
         this.data.stationName = data.stationName;
         this.data.metricLabel = data.metricLabel;
+        this.status = false;
+        // @ts-ignore - open details tab
+        document.getElementById('nav-details-tab').click();
       }
     });
   }
