@@ -9,6 +9,20 @@
       <div class="modal-body">
         <form #dataForm="ngForm">
           <div class="form-group">
+            <div class="btn-group" data-toggle="buttons">
+              <label class="btn btn-primary active">
+                <input type="radio" name="options" id="option1" value="LINE"
+                       [(ngModel)]="dataType"> Line
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="options" id="option2" value="POINTS"
+                       [(ngModel)]="dataType"> Points
+              </label>
+              <label class="btn btn-primary">
+                <input type="radio" name="options" id="option3" value="POLYGON"
+                       [(ngModel)]="dataType"> Polygon
+              </label>
+            </div>
             <label for="urlAddress">address</label>
             <input type="email" class="form-control" id="urlAddress" placeholder="Enter url address" [(ngModel)]="url"
             #urlAddress="ngModel" name="url">

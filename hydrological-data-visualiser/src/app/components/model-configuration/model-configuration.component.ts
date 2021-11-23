@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {DataProviderService} from '../../services/data-provider.service';
-import {UniversalMarkerCreatorServiceService} from '../../services/dataType.points/universal-marker-creator-service.service';
+import {DataType} from '../../model/data-type';
 
 @Component({
   selector: 'app-model-configuration',
@@ -10,6 +10,7 @@ import {UniversalMarkerCreatorServiceService} from '../../services/dataType.poin
 export class ModelConfigurationComponent implements OnInit {
 
   url = '';
+  dataType: DataType | undefined;
   constructor(private dataProvider: DataProviderService) { }
 
   ngOnInit(): void {
@@ -18,6 +19,20 @@ export class ModelConfigurationComponent implements OnInit {
   onSubmit(): void {
     this.dataProvider.apis.push(this.url);
     this.dataProvider.getModels();
-    this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
+    switch (this.dataType) {
+      case DataType.LINE: {
+        break;
+      }
+      case DataType.POINTS: {
+        this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
+        break;
+      }
+      case DataType.POLYGON: {
+        this.dataProvider.getUniversalPolygonsService().setUrl(this.url);
+        break;
+      }
+    }
+    // @ts-ignore -
+    document.getElementById('dismissButtonModalLabel').click();
   }
 }
