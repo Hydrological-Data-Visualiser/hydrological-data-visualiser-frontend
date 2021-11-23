@@ -21,6 +21,7 @@ export class ModelConfigurationComponent implements OnInit {
     this.dataProvider.getModels();
     switch (this.dataType) {
       case DataType.LINE: {
+        this.dataProvider.getUniversalLineService().setUrl(this.url);
         break;
       }
       case DataType.POINTS: {

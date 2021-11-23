@@ -9,6 +9,7 @@ import {KocinkaTemperatureService} from './dataType.line/kocinka-temperature.ser
 import {DataServiceInterface} from './data.service.interface';
 import {UniversalMarkerCreatorServiceService} from './dataType.points/universal-marker-creator-service.service';
 import {UniversalPolygonsService} from './dataType.polygon/universal-polygons.service';
+import {UniversalLineService} from './dataType.line/universal-line.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,8 @@ export class DataProviderService {
     private kocinkaTemperatureService: KocinkaTemperatureService,
     private polygonsRandomService: PolygonsRandomService,
     private universalMarkerCreatorService: UniversalMarkerCreatorServiceService,
-    private universalPolygonsService: UniversalPolygonsService
+    private universalPolygonsService: UniversalPolygonsService,
+    private universalLineService: UniversalLineService
   ) {
     this.getModels();
   }
@@ -74,6 +76,10 @@ export class DataProviderService {
 
   getUniversalPolygonsService(): UniversalPolygonsService {
     return this.universalPolygonsService;
+  }
+
+  getUniversalLineService(): UniversalLineService {
+    return this.universalLineService;
   }
 
   getModels(): void {
