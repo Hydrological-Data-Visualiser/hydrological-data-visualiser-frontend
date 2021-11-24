@@ -45,9 +45,11 @@
                 </mat-select>
               </mat-form-field>
               <div>
-                <button *ngIf="isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show
+                <button mat-raised-button color="primary" *ngIf="isDateAndHourSelected" type="button" class="m-1"
+                        (click)="onSubmit()">Show
                 </button>
-                <button *ngIf="!isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()"
+                <button mat-raised-button color="primary" *ngIf="!isDateAndHourSelected" type="button" class="m-1"
+                        (click)="onSubmit()"
                         disabled>Show
                 </button>
               </div>
@@ -64,11 +66,18 @@
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </div>
               <div class="buttons">
-                <button *ngIf="!paused" type="button" class="btn btn-secondary  m-1" (click)="pauseAnimation()">Pause
+
+                <button mat-mini-fab color="primary" *ngIf="!paused" class="m-2" (click)="pauseAnimation()">
+                  <mat-icon>pause</mat-icon>
                 </button>
-                <button *ngIf="paused" type="button" class="btn btn-secondary m-1 " (click)="pauseAnimation()">Unpause
+
+                <button mat-mini-fab color="primary" *ngIf="paused" class="m-2" (click)="pauseAnimation()">
+                  <mat-icon>play_arrow</mat-icon>
                 </button>
-                <button type="submit" class="btn btn-primary m-1 btn-dark" (click)="playAnimation()">Play</button>
+
+                <button mat-mini-fab color="primary" class="m-2" (click)="playAnimation()">
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
               </div>
             </form>
           </div>
@@ -107,7 +116,7 @@
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <div class="col">
-          <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+          <button mat-raised-button color="primary" (click)="clickEvent()">See Details</button>
         </div>
         <div class="col">
           <p>Start At: {{animationStart}}</p>

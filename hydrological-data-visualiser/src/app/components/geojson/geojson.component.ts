@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {DataProviderService} from '../../services/data-provider.service';
 import * as L from 'leaflet';
 
@@ -10,6 +10,7 @@ import * as L from 'leaflet';
 export class GeojsonComponent implements OnInit {
   fileToUpload: File | null = null;
   geoJson: L.GeoJSON | null = null;
+  @ViewChild('fileInput') fileInput: any;
 
   constructor(private dataProvider: DataProviderService) {
   }
@@ -40,5 +41,15 @@ export class GeojsonComponent implements OnInit {
       this.geoJson.removeFrom(this.dataProvider.getKocinkaRandomService().map);
       this.geoJson = null;
     }
+  }
+
+
+  onClickFileInputButton(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onChangeFileInput(): void {
+    const files: { [key: string]: File } = this.fileInput.nativeElement.files;
+    this.fileToUpload = files[0];
   }
 }
