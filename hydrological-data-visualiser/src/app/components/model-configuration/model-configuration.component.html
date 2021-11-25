@@ -8,22 +8,30 @@
       </div>
       <div class="modal-body">
         <form #dataForm="ngForm">
+          <label>Choose data type</label>
           <div class="form-group">
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-primary active">
-                <input type="radio" name="options" id="option1" value="LINE"
-                       [(ngModel)]="dataType"> Line
-              </label>
-              <label class="btn btn-primary">
-                <input type="radio" name="options" id="option2" value="POINTS"
-                       [(ngModel)]="dataType"> Points
-              </label>
-              <label class="btn btn-primary">
-                <input type="radio" name="options" id="option3" value="POLYGON"
-                       [(ngModel)]="dataType"> Polygon
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="dataTypeFlex" id="option1" value="LINE"
+                     [(ngModel)]="dataType">
+              <label class="form-check-label" for="option1">
+                Line
               </label>
             </div>
-            <label for="urlAddress">address</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="dataTypeFlex" id="option2" value="POINTS"
+                     [(ngModel)]="dataType" checked>
+              <label class="form-check-label" for="option2">
+                Points
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="dataTypeFlex" id="option3" value="POLYGON"
+                     [(ngModel)]="dataType">
+              <label class="form-check-label" for="option3">
+                Polygon
+              </label>
+            </div>
+            <label for="urlAddress">Enter address</label>
             <input type="email" class="form-control" id="urlAddress" placeholder="Enter url address" [(ngModel)]="url"
             #urlAddress="ngModel" name="url">
           </div>
