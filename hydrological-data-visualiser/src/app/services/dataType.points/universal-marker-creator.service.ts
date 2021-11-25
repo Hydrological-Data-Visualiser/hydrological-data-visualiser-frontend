@@ -11,7 +11,7 @@ import {DataType} from '../../model/data-type';
 @Injectable({
   providedIn: 'root'
 })
-export class UniversalMarkerCreatorServiceService extends MarkerCreatorService{
+export class UniversalMarkerCreatorService extends MarkerCreatorService{
   constructor(http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
     super(colorService, sidePanelService, http);
     this.info = new DataModelBase('creator-service-model-base', '', '', DataType.POINTS, [], '', '', '');

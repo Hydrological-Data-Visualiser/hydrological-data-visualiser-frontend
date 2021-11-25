@@ -7,9 +7,9 @@ import {PolygonsRandomService} from './dataType.polygon/polygons-random.service'
 import {KocinkaRandomService} from './dataType.line/kocinka-random.service';
 import {KocinkaTemperatureService} from './dataType.line/kocinka-temperature.service';
 import {DataServiceInterface} from './data.service.interface';
-import {UniversalMarkerCreatorServiceService} from './dataType.points/universal-marker-creator-service.service';
 import {UniversalPolygonsService} from './dataType.polygon/universal-polygons.service';
 import {UniversalLineService} from './dataType.line/universal-line.service';
+import {UniversalMarkerCreatorService} from './dataType.points/universal-marker-creator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +43,7 @@ export class DataProviderService {
     private kocinkaSurfaceHeightService: KocinkaSurfaceHeightService,
     private kocinkaTemperatureService: KocinkaTemperatureService,
     private polygonsRandomService: PolygonsRandomService,
-    private universalMarkerCreatorService: UniversalMarkerCreatorServiceService,
+    private universalMarkerCreatorService: UniversalMarkerCreatorService,
     private universalPolygonsService: UniversalPolygonsService,
     private universalLineService: UniversalLineService
   ) {
@@ -70,7 +70,7 @@ export class DataProviderService {
     return this.polygonsRandomService;
   }
 
-  getUniversalMarkerCreatorService(): UniversalMarkerCreatorServiceService {
+  getUniversalMarkerCreatorService(): UniversalMarkerCreatorService {
     return this.universalMarkerCreatorService;
   }
 
