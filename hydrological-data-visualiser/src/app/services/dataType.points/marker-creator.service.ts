@@ -163,6 +163,11 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
+  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    return this.http.get<Date[]>(`${this.url}/dayTimePoints?instantFrom=${formattedDate}`);
+  }
+
   draw(date: Date): void {
     this.putMarkers(
      this.getDistinctLatLongStations(this.stationList),
