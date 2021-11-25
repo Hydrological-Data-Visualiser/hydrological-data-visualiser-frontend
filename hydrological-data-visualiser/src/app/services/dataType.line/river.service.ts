@@ -108,7 +108,6 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
       this.getMaxValue(begin, length).subscribe(maxValue =>
         this.getInfoObservable().subscribe(info => {
           this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
-          console.log("callback");
           callback();
         })
       )
@@ -128,6 +127,11 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
+  }
+
+  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    return this.http.get<Date[]>(`${this.url}/dayTimePoints?instantFrom=${formattedDate}`);
   }
 
   getMinValue(begin: string, length: number): Observable<number> {
