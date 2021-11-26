@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {DataProviderService} from '../../services/data-provider.service';
 import {DataType} from '../../model/data-type';
+import {DataModelBase} from '../../model/data-model-base';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-model-configuration',
@@ -10,8 +12,8 @@ import {DataType} from '../../model/data-type';
 export class ModelConfigurationComponent implements OnInit {
 
   url = '';
-  dataType: DataType | undefined;
-  constructor(private dataProvider: DataProviderService) { }
+  public dataModelBase!: DataModelBase;
+  constructor(private dataProvider: DataProviderService, public http: HttpClient) { }
 
   ngOnInit(): void {
   }
@@ -19,7 +21,8 @@ export class ModelConfigurationComponent implements OnInit {
   onSubmit(): void {
     this.dataProvider.apis.push(this.url);
     this.dataProvider.getModels();
-    switch (this.dataType) {
+    this.readDataTypeFromModelInfo();
+    switch (this.dataModelBase.dataType) {
       case DataType.LINE: {
         this.dataProvider.getUniversalLineService().setUrl(this.url);
         break;
@@ -35,5 +38,9 @@ export class ModelConfigurationComponent implements OnInit {
     }
     // @ts-ignore -
     document.getElementById('dismissButtonModalLabel').click();
+  }
+
+  readDataTypeFromModelInfo(): void {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.dataModelBase = info);
   }
 }
