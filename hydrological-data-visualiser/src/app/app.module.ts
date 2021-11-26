@@ -28,6 +28,7 @@ import {SidePanelService} from './components/side-panel/side-panel-service';
 import {LegendComponent} from './components/legend/legend.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDialogModule} from '@angular/material/dialog';
+import {MatSliderModule} from "@angular/material/slider";
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import {MatDialogModule} from '@angular/material/dialog';
     MatSelectModule,
     MatRadioModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSliderModule
   ],
   providers: [SidePanelComponent, SidePanelService],
   bootstrap: [AppComponent]

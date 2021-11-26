@@ -39,7 +39,5 @@ export interface DataServiceInterface<Type> {
 
   emitData(data: EmitData): void;
 
-  getMaxValue(begin: string, length: number): Observable<number>;
-
-  getMinValue(begin: string, length: number): Observable<number>;
+  changeOpacity(opacity: number): void;
 }

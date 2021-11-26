@@ -92,7 +92,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then( d => {
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
         const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
@@ -165,7 +165,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   draw(date: Date): void {
     this.putMarkers(
-     this.getDistinctLatLongStations(this.stationList),
+      this.getDistinctLatLongStations(this.stationList),
       this.getDataFromDateAsObservableUsingInstant(date),
       this.info.metricLabel,
       date
@@ -219,4 +219,12 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     );
   }
 
+  changeOpacity(newOpacity: number): void {
+    this.group.setStyle({opacity: newOpacity, fillOpacity: newOpacity});
+    for (const key in this.markers) {
+      if (this.markers.hasOwnProperty(key)) {
+        this.markers[key].setOpacity(newOpacity);
+      }
+    }
+  }
 }

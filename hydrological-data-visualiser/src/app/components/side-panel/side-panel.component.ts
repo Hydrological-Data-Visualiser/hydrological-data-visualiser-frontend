@@ -37,6 +37,7 @@ export class SidePanelComponent implements OnInit {
   animationNow: string | undefined;
   animationPercentage: number | undefined;
   data: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
+  opacity = 50;
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -54,6 +55,7 @@ export class SidePanelComponent implements OnInit {
       this.clearData();
       this.clicked = false;
       this.status = false;
+      this.opacity = 100;
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
     });
@@ -204,6 +206,10 @@ export class SidePanelComponent implements OnInit {
 
   dateFilter = (date: Date) => {
     return false;
+  }
+
+  changeOpacity(value: number): void {
+    this.dataProvider.getActualService().changeOpacity(value / 100);
   }
 
   clearData(): void {

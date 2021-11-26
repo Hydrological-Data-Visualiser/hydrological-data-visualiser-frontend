@@ -9,6 +9,9 @@
           <button class="nav-link" id="nav-details-tab" data-bs-toggle="tab" data-bs-target="#nav-details" type="button"
                   role="tab" aria-controls="nav-details" aria-selected="false">Details
           </button>
+          <button class="nav-link" id="nav-conf-tab" data-bs-toggle="tab" data-bs-target="#nav-conf" type="button"
+                  role="tab" aria-controls="nav-conf" aria-selected="false">Configuration
+          </button>
         </div>
       </nav>
       <div class="tab-content" id="nav-tabContent">
@@ -99,7 +102,6 @@
                 <p *ngIf="data.date"> Date:</p>
               </div>
               <div class="col">
-                <p *ngIf="data.stationName">{{data.stationName}}</p>
                 <p *ngIf="data.latitude">{{data.latitude.toFixed(4)}}</p>
                 <p *ngIf="data.longitude">{{data.longitude.toFixed(4)}}</p>
                 <p *ngIf="data.value">{{data.value.toFixed(2)}} {{data.metricLabel}}</p>
@@ -107,6 +109,32 @@
                 <p *ngIf="data.date">{{data.date | date:'medium'}}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="nav-conf" role="tabpanel" aria-labelledby="nav-conf-tab">
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 id="example-name-label" class="example-name-label">Opacity: </h2>
+          </div>
+          <mat-slider
+            class="example-margin"
+            [max]=100
+            [min]=0
+            [step]=5
+            [thumbLabel]=true
+            [(ngModel)]="opacity"
+            (input)="changeOpacity($event.value)"
+            [disabled]="!isDateAndHourSelected"
+            color="primary"
+            aria-labelledby="example-name-label">
+          </mat-slider>
+
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 class="example-name-label">Minimal Color: </h2>
+          </div>
+
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 class="example-name-label">Maximal Color: </h2>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
-import { ColorService } from '../color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -116,5 +116,9 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  changeOpacity(newOpacity: number): void {
+    this.polygonLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
   }
 }

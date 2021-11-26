@@ -137,4 +137,8 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
   }
+
+  changeOpacity(newOpacity: number): void {
+    this.riverLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+  }
 }
