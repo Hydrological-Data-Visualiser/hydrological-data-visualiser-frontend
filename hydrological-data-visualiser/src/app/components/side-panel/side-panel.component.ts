@@ -53,6 +53,9 @@ export class SidePanelComponent implements OnInit {
       this.clear();
       this.clearData();
       this.clicked = false;
+      this.status = false;
+      // @ts-ignore - open details tab
+      document.getElementById('nav-form-tab').click();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -67,6 +70,9 @@ export class SidePanelComponent implements OnInit {
         this.data.latitude = data.latitude;
         this.data.stationName = data.stationName;
         this.data.metricLabel = data.metricLabel;
+        this.status = false;
+        // @ts-ignore - open details tab
+        document.getElementById('nav-details-tab').click();
       }
     });
   }
@@ -136,16 +142,14 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.hour!.substr(3, 2), 10),
           Number.parseInt(this.hour!.substr(6, 2), 10)
         );
-      if (this.dataProvider.selectedModel === 'IMGW') {
-        const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-        this.dataProvider.getPrecipitationService().setScaleAndColour(formattedDate, 1,
-          () => {
-            if (this.value) {
-              this.dataProvider.getPrecipitationService().draw(this.value);
-            }
-          });
-      }
-      this.dataProvider.getActualService().draw(this.value);
+      const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
+        () => {
+          if (this.value) {
+            this.dataProvider.getActualService().draw(this.value);
+          }
+        });
+      this.animationService.stop();
     }
   }
 
@@ -171,23 +175,26 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
 
     const formattedStart = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    this.dataProvider.getPrecipitationService().setScaleAndColour(formattedStart, this.animationLength,
+    this.dataProvider.getActualService().setScaleAndColour(formattedStart, this.animationLength,
       () => {
         if (date) {
-          this.animationService.setAnimation(date, this.animationModel.steps, this.animationModel.timestepMs, this);
+          this.animationService.setAnimation(
+            date, this.animationModel.steps, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
+          );
         }
         this.animationService.play();
       });
   }
 
-// called by animationService
-  setAnimationPlaybackData(animationNow: string, currentFrame: number): void {
+  // called by animationService
+  setAnimationPlaybackData(animationNow: Date, currentFrame: number): void {
     console.log(animationNow);
     if (this.animationLength !== undefined
     ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
-    this.animationNow = animationNow;
+    const formattedDate = (moment(animationNow)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    this.animationNow = formattedDate;
   }
 
   pauseAnimation(): void {

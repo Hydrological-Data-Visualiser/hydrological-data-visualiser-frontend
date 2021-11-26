@@ -9,14 +9,13 @@ import {ColorService} from '../color.service';
 import {EmitData} from '../../model/emit-data';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
 import {DataServiceInterface} from '../data.service.interface';
-import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../../model/data-model-base';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class MarkerCreatorService implements DataServiceInterface<PrecipitationDayDataNew> {
+export abstract class MarkerCreatorService implements DataServiceInterface<HydrologicalDataBase> {
   public url!: string;
   public info!: DataModelBase;
   public map!: L.Map;
@@ -94,21 +93,18 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
     }
   }
 
-  updateMarkers(date: string, stations: Station[], data: Observable<HydrologicalDataBase[]>): Promise<void> {
-    return data
-      .toPromise().then(d => {
-        d.filter(item => (moment(item.date)).format('YYYY-MM-DD') === date)
-          .forEach(rainData => {
-            const rainValue = rainData.value;
-            const colorValue = rainValue * 50;
-            const filteredStations = stations.filter(station => station.id === rainData.stationId);
-            if (filteredStations.length > 0) {
-              const station = filteredStations[0];
-              const color = this.colorService.getColor(rainValue);
-              this.updateMarker(station, this.rgbStringToHex(color), rainValue);
-            }
-          });
+  update(date: Date): Promise<void> {
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then( d => {
+      d.forEach(rainData => {
+        const rainValue = rainData.value;
+        const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
+        if (filteredStations.length > 0) {
+          const station = filteredStations[0];
+          const color = this.colorService.getColor(rainValue);
+          this.updateMarker(station, this.rgbStringToHex(color), rainValue);
+        }
       });
+    });
   }
 
   updateMarker(station: Station, colorHex: string, rainValue: number): void {
@@ -122,7 +118,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
   rgbStringToHex(rgbString: string): string {
     // tslint:disable-next-line:no-bitwise
     const newStr = rgbString.substring(4, rgbString.length - 1);
-    // console.log(newStr);
     const split = newStr.split(',');
     const r = +split[0];
     const g = +split[1];
@@ -150,19 +145,24 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Preci
     });
   }
 
-  getData(): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
+  getData(): Observable<HydrologicalDataBase[]> {
+    return this.http.get<HydrologicalDataBase[]>(`${this.url}/data`);
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<HydrologicalDataBase[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<PrecipitationDayDataNew[]>
+    return this.http.get<HydrologicalDataBase[]>
     (`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PrecipitationDayDataNew[]> {
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<HydrologicalDataBase[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+    return this.http.get<HydrologicalDataBase[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+  }
+
+  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
   draw(date: Date): void {
