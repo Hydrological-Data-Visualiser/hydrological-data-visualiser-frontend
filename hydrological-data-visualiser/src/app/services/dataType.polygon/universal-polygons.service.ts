@@ -6,14 +6,15 @@ import {Observable} from 'rxjs';
 import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataType} from '../../model/data-type';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UniversalPolygonsService extends PolygonsService{
 
-  constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
-    super(sidePanelService, http);
+  constructor(public http: HttpClient, public sidePanelService: SidePanelService, colorService: ColorService) {
+    super(sidePanelService, http, colorService);
     this.info = new DataModelBase('polygon-service-model-base', '', '', DataType.POLYGON, [], '', '', '');
   }
 

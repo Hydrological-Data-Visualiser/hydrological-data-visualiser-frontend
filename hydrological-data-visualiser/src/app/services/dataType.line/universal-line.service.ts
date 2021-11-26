@@ -6,13 +6,14 @@ import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {RiverService} from './river.service';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataType} from '../../model/data-type';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UniversalLineService extends RiverService{
-  constructor(public http: HttpClient, public sidePanelService: SidePanelService) {
-    super(sidePanelService, http);
+  constructor(public http: HttpClient, public sidePanelService: SidePanelService, colorService: ColorService) {
+    super(sidePanelService, http, colorService);
     this.info = new DataModelBase('line-service-model-base', '', '', DataType.LINE, [], '', '', '');
   }
 
