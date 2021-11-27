@@ -24,7 +24,8 @@ export class DataProviderService {
     this.getKocinkaSurfaceHeightService(),
     this.getPolygonsRandomService(),
     this.getUniversalMarkerCreatorService(),
-    this.getUniversalPolygonsService()
+    this.getUniversalPolygonsService(),
+    this.getUniversalLineService()
   ];
 
   apis: string[] = [

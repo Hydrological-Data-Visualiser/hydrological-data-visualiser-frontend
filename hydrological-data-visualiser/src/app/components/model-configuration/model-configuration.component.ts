@@ -3,6 +3,8 @@ import {DataProviderService} from '../../services/data-provider.service';
 import {DataType} from '../../model/data-type';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
+import {concatMap} from 'rxjs/operators';
+import {of, pipe} from 'rxjs';
 
 @Component({
   selector: 'app-model-configuration',
@@ -21,26 +23,23 @@ export class ModelConfigurationComponent implements OnInit {
   onSubmit(): void {
     this.dataProvider.apis.push(this.url);
     this.dataProvider.getModels();
-    this.readDataTypeFromModelInfo();
-    switch (this.dataModelBase.dataType) {
-      case DataType.LINE: {
-        this.dataProvider.getUniversalLineService().setUrl(this.url);
-        break;
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => {
+      switch (info.dataType) {
+        case DataType.LINE: {
+          this.dataProvider.getUniversalLineService().setUrl(this.url);
+          break;
+        }
+        case DataType.POINTS: {
+          this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
+          break;
+        }
+        case DataType.POLYGON: {
+          this.dataProvider.getUniversalPolygonsService().setUrl(this.url);
+          break;
+        }
       }
-      case DataType.POINTS: {
-        this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
-        break;
-      }
-      case DataType.POLYGON: {
-        this.dataProvider.getUniversalPolygonsService().setUrl(this.url);
-        break;
-      }
-    }
+    });
     // @ts-ignore -
     document.getElementById('dismissButtonModalLabel').click();
-  }
-
-  readDataTypeFromModelInfo(): void {
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.dataModelBase = info);
   }
 }
