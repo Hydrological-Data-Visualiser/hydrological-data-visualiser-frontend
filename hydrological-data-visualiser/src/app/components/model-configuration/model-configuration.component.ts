@@ -22,9 +22,8 @@ export class ModelConfigurationComponent implements OnInit {
 
   onSubmit(): void {
     this.dataProvider.apis.push(this.url);
-    this.dataProvider.getModels();
-    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => {
-      switch (info.dataType) {
+    this.http.get<DataModelBase>(`${this.url}/info`).subscribe(data => {
+      switch (data.dataType) {
         case DataType.LINE: {
           this.dataProvider.getUniversalLineService().setUrl(this.url);
           break;
@@ -38,7 +37,11 @@ export class ModelConfigurationComponent implements OnInit {
           break;
         }
       }
+    }, error => {
+      console.log('cannot get ' + this.url + '/info.');
+      this.dataProvider.apis.pop();
     });
+    this.dataProvider.getModels();
     // @ts-ignore -
     document.getElementById('dismissButtonModalLabel').click();
   }
