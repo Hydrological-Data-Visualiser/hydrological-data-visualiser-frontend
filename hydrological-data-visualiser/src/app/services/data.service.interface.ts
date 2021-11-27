@@ -40,4 +40,6 @@ export interface DataServiceInterface<Type> {
   emitData(data: EmitData): void;
 
   changeOpacity(opacity: number): void;
+
+  updateColor(date: Date): void;
 }

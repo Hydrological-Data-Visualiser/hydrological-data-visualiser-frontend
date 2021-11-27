@@ -27,7 +27,7 @@ export class GeojsonComponent implements OnInit {
       if (this.geoJson) {
         this.delete();
       }
-      this.geoJson = L.geoJSON(JSON.parse(a));
+      this.geoJson = L.geoJSON(JSON.parse(a), {style: {opacity: 0.5, fillOpacity: 0.5}});
       this.geoJson.addTo(this.dataProvider.getKocinkaRandomService().map);
       this.dataProvider.getKocinkaRandomService().map.fitBounds(this.geoJson.getBounds());
       // @ts-ignore

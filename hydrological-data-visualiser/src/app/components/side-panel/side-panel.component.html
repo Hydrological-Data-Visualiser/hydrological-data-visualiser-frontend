@@ -131,11 +131,27 @@
 
           <div class="example-label-container" [class]="'example-label-horizontal'">
             <h2 class="example-name-label">Minimal Color: </h2>
+            <mat-form-field>
+              <input matInput [ngxMatColorPicker]="minColorPicker" [formControl]="minColorCtr"
+                     [disabled]="!isDateAndHourSelected">
+              <ngx-mat-color-toggle matSuffix [for]="minColorPicker"></ngx-mat-color-toggle>
+              <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
+            </mat-form-field>
           </div>
 
           <div class="example-label-container" [class]="'example-label-horizontal'">
             <h2 class="example-name-label">Maximal Color: </h2>
+            <mat-form-field>
+              <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
+                     [disabled]="!isDateAndHourSelected">
+              <ngx-mat-color-toggle matSuffix [for]="maxColorPicker"></ngx-mat-color-toggle>
+              <ngx-mat-color-picker #maxColorPicker></ngx-mat-color-picker>
+            </mat-form-field>
           </div>
+          <button mat-raised-button color="primary" (click)="changeColor(minColorCtr, maxColorCtr)"
+                  [disabled]="!isDateAndHourSelected">Set Colors
+          </button>
+
         </div>
       </div>
     </div>

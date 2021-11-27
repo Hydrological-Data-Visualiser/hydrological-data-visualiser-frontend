@@ -74,7 +74,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
-        {icon: this.getColoredIcon(colorHex)}).on('click', event => {
+        {icon: this.getColoredIcon(colorHex), opacity: 0.5}).on('click', event => {
         this.emitData(
           new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
@@ -210,12 +210,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoObservable().subscribe(info => {
-          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
+      this.getMaxValue(begin, length).subscribe(maxValue => {
+          this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
           callback();
         })
-      )
     );
   }
 
@@ -226,5 +224,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
         this.markers[key].setOpacity(newOpacity);
       }
     }
+  }
+
+  updateColor(date: Date): void {
+    this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
+    // TODO
   }
 }

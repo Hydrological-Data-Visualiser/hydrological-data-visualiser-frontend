@@ -15,7 +15,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import {CalendarModule} from '@syncfusion/ej2-angular-calendars';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatFormFieldModule,} from '@angular/material/form-field';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatNativeDateModule} from '@angular/material/core';
 import {MatCardModule} from '@angular/material/card';
@@ -28,7 +28,12 @@ import {SidePanelService} from './components/side-panel/side-panel-service';
 import {LegendComponent} from './components/legend/legend.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDialogModule} from '@angular/material/dialog';
-import {MatSliderModule} from "@angular/material/slider";
+import {MatSliderModule} from '@angular/material/slider';
+import {
+  MAT_COLOR_FORMATS,
+  NGX_MAT_COLOR_FORMATS,
+  NgxMatColorPickerModule
+} from '@angular-material-components/color-picker';
 
 @NgModule({
   declarations: [
@@ -63,9 +68,10 @@ import {MatSliderModule} from "@angular/material/slider";
     MatRadioModule,
     MatIconModule,
     MatDialogModule,
-    MatSliderModule
+    MatSliderModule,
+    NgxMatColorPickerModule,
   ],
-  providers: [SidePanelComponent, SidePanelService],
+  providers: [SidePanelComponent, SidePanelService, {provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS}],
   bootstrap: [AppComponent]
 })
 export class AppModule {

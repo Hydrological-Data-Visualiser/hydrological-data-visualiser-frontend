@@ -45,7 +45,7 @@ export class GeotiffComponent implements OnInit {
       parse_georaster(arrayBuffer).then((georaster: any) => {
         this.geoTiff = new GeoRasterLayer({
           georaster,
-          opacity: 0.7,
+          opacity: 0.5,
           resolution: 256
         });
         this.geoTiff.addTo(map);
