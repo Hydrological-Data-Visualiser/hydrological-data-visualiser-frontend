@@ -234,12 +234,9 @@ export class SidePanelComponent implements OnInit {
   changeColor(minColorCtr: AbstractControl, maxColorCtr: AbstractControl): void {
     this.dataProvider.getActualService().info.minColour = '#' + minColorCtr.value.hex;
     this.dataProvider.getActualService().info.maxColour = '#' + maxColorCtr.value.hex;
-    console.log('#' + minColorCtr.value.hex);
-    console.log('#' + maxColorCtr.value.hex);
-    const formattedDate = (moment(this.value)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-
-    // @ts-ignore
-    this.dataProvider.getActualService().updateColor(formattedDate);
+    if (this.value) {
+      this.dataProvider.getActualService().updateColor(this.value);
+    }
     this.opacity = 50;
   }
 

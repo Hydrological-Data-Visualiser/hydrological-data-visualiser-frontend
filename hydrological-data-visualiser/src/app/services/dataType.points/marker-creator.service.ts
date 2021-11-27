@@ -228,6 +228,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   updateColor(date: Date): void {
     this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
-    // TODO
+    this.draw(date);
   }
 }
