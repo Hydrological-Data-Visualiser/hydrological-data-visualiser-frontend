@@ -52,7 +52,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
     this.group.clearLayers();
-
     const usedStations: Station[] = [];
     data.subscribe(d => {
       d.forEach(rainData => {

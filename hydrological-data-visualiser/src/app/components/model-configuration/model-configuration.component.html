@@ -1,0 +1,24 @@
+<!-- Button trigger modal -->
+<div class="modal fade " id="modelConfigurationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="exampleModalLabel">Add new data model</h1>
+        <button type="button" id="dismissButtonModalLabel" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #dataForm="ngForm">
+          <label for="urlAddress">Enter address</label>
+          <input type="email" class="form-control" id="urlAddress" placeholder="Enter url address" [(ngModel)]="url"
+                 #urlAddress="ngModel" name="url">
+          <div *ngIf="urlAdded" class="alert alert-warning" role="alert" style="margin: 5px;">
+            This url has already been added.
+          </div>
+          <button type="button" class="btn btn-dark m-1" (click)="onSubmit()">Add</button>
+        </form>
+
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,8 +27,9 @@ import {MatRadioModule} from '@angular/material/radio';
 import { GeojsonComponent } from './components/geojson/geojson.component';
 import { GeotiffComponent } from './components/geotiff/geotiff.component';
 import {MatButtonModule} from '@angular/material/button';
-import {SidePanelService} from "./components/side-panel/side-panel-service";
+import {SidePanelService} from './components/side-panel/side-panel-service';
 import { LegendComponent } from './components/legend/legend.component';
+import { ModelConfigurationComponent } from './components/model-configuration/model-configuration.component';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import { LegendComponent } from './components/legend/legend.component';
     SearchFilterPipe,
     GeojsonComponent,
     GeotiffComponent,
-    LegendComponent
+    LegendComponent,
+    ModelConfigurationComponent
   ],
   imports: [
     BrowserModule,
