@@ -49,7 +49,7 @@ export class GeotiffComponent implements OnInit {
           resolution: 256
         });
         this.geoTiff.addTo(map);
-        map.fitBounds(this.geoTiff.getBounds());
+        map.flyToBounds(this.geoTiff.getBounds());
       });
     };
     // @ts-ignore

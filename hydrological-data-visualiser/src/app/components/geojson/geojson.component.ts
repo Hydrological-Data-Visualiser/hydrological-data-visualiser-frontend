@@ -29,7 +29,7 @@ export class GeojsonComponent implements OnInit {
       }
       this.geoJson = L.geoJSON(JSON.parse(a), {style: {opacity: 0.5, fillOpacity: 0.5}});
       this.geoJson.addTo(this.dataProvider.getKocinkaRandomService().map);
-      this.dataProvider.getKocinkaRandomService().map.fitBounds(this.geoJson.getBounds());
+      this.dataProvider.getKocinkaRandomService().map.flyToBounds(this.geoJson.getBounds());
       // @ts-ignore
       document.getElementById('dismissButtonGeoJson').click();
     }));
