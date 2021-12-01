@@ -1,9 +1,6 @@
 import {Injectable} from '@angular/core';
-import * as moment from 'moment';
 import {SidePanelComponent} from '../components/side-panel/side-panel.component';
-import { DataProviderService } from './data-provider.service';
-import { DataServiceInterface } from './data.service.interface';
-import {PrecipitationService} from './dataType.points/precipitation.service';
+import {DataServiceInterface} from './data.service.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -75,35 +72,18 @@ class PlayData {
       }
 
       this.currentStep = (this.currentStep + 1) % this.steps;
-      this.dataService.getTimePointAfterAsObservable(this.startStep, this.currentStep).subscribe( frameDate => {
+      this.dataService.getTimePointAfterAsObservable(this.startStep, this.currentStep).subscribe(frameDate => {
         const date = new Date(frameDate);
         const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+          date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
         console.log(this.startStep.toString() + utcDate);
+        // propagate that the frame changed
         this.sidepanel.setAnimationPlaybackData(utcDate, this.currentStep);
         this.setFrame(utcDate).then(() => {
           this.playState();
         });
       });
     }, this.timestepMs);
-  }
-
-  private pauseState(): void {
-    setTimeout(() => {
-      if (!this.playing) {
-        return;
-      }
-      if (this.paused) {
-        this.pauseState();
-      } else {
-        this.playState();
-        return;
-      }
-    }, 100);
-  }
-
-  private setFrame(date: Date): Promise<void> {
-    return this.dataService.update(date);
   }
 
   stopPlaying(): void {
@@ -124,6 +104,24 @@ class PlayData {
 
   isPaused(): boolean {
     return this.paused;
+  }
+
+  private pauseState(): void {
+    setTimeout(() => {
+      if (!this.playing) {
+        return;
+      }
+      if (this.paused) {
+        this.pauseState();
+      } else {
+        this.playState();
+        return;
+      }
+    }, 100);
+  }
+
+  private setFrame(date: Date): Promise<void> {
+    return this.dataService.update(date);
   }
 
 }

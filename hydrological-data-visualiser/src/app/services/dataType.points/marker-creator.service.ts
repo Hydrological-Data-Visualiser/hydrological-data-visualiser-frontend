@@ -24,6 +24,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     maxClusterRadius: zoom => 120 - zoom * 10
   });
   public stationList: Station[] = [];
+  public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
   private markers: { [key: number]: L.Marker } = {};
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
@@ -74,6 +75,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex)}).on('click', event => {
+        this.lastClickedData =
+          // @ts-ignore
+          [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
         this.emitData(
           new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
@@ -91,24 +95,32 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then( d => {
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
         const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
           const color = this.colorService.getColor(rainValue);
-          this.updateMarker(station, this.rgbStringToHex(color), rainValue);
+          this.updateMarker(station, this.rgbStringToHex(color), rainValue, date);
         }
       });
     });
   }
 
-  updateMarker(station: Station, colorHex: string, rainValue: number): void {
+  updateMarker(station: Station, colorHex: string, rainValue: number, date: Date): void {
     const marker = this.markers[station.id];
     if (marker) {
       marker.setIcon(this.getColoredIcon(colorHex));
       marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
+    }
+    if (this.lastClickedData) {
+      if (this.lastClickedData[0].stationId === station.id) {
+        this.emitData(
+          new EmitData(station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+            date, rainValue, this.info.metricLabel)
+        );
+      }
     }
   }
 
@@ -169,7 +181,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   draw(date: Date): void {
     this.putMarkers(
-     this.getDistinctLatLongStations(this.stationList),
+      this.getDistinctLatLongStations(this.stationList),
       this.getDataFromDateAsObservableUsingInstant(date),
       this.info.metricLabel,
       date
@@ -186,6 +198,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   clear(): void {
     this.group.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   getDistinctLatLongStations(stations: Station[]): Station[] {

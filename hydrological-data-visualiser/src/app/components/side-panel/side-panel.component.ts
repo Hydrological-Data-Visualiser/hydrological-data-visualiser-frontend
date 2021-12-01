@@ -54,26 +54,25 @@ export class SidePanelComponent implements OnInit {
       this.clearData();
       this.clicked = false;
       this.status = false;
+      // TODO - replace with real stop @Nezonaru
+      this.animationService.stop();
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
-      if (data.latitude === this.data.latitude && data.longitude === this.data.longitude) {
-        this.clicked = false;
-        this.clearData();
-      } else {
-        this.clicked = true;
-        this.data.date = data.date;
-        this.data.value = data.value;
-        this.data.longitude = data.longitude;
-        this.data.latitude = data.latitude;
-        this.data.stationName = data.stationName;
-        this.data.metricLabel = data.metricLabel;
-        this.status = false;
+      if (!(data.latitude === this.data.latitude && data.longitude === this.data.longitude)) {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
       }
+      this.clicked = true;
+      this.data.date = data.date;
+      this.data.value = data.value;
+      this.data.longitude = data.longitude;
+      this.data.latitude = data.latitude;
+      this.data.stationName = data.stationName;
+      this.data.metricLabel = data.metricLabel;
+      this.status = false;
     });
   }
 
@@ -106,7 +105,6 @@ export class SidePanelComponent implements OnInit {
     this.hours = [];
     const dataProvider = this.dataProvider.getActualService();
 
-    // IT IS IMPORTANT THAT ALL DATAPROVIDERS HAVE THE SAME METHODS!!! IT IS DEALING HERE WITH `ANY` TYPE
     if (dataProvider) {
       dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
         (data: any[]) => {

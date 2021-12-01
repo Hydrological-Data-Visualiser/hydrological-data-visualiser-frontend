@@ -8,7 +8,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
-import { ColorService } from '../color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public map!: L.Map;
   public status = false;
   public url!: string;
-
+  public lastClickedData: [PolygonModel, L.LatLng] | undefined = undefined;
   public polygonLayer = new L.FeatureGroup();
   public info!: DataModelBase;
 
@@ -26,6 +26,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   clear(): void {
     this.polygonLayer.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   emitData(data: EmitData): void {
@@ -43,6 +44,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           .on('click', event => {
             // @ts-ignore
             const coords: L.LatLng = event.latlng;
+            this.lastClickedData = [polygon, coords];
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
@@ -65,10 +67,19 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           .on('click', event => {
             // @ts-ignore
             const coords: L.LatLng = event.latlng;
+            this.lastClickedData = [polygon, coords];
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
           });
+        if (this.lastClickedData) {
+          if (this.lastClickedData[0].id === polygon.id) { // lipnie sprawdzane, wiem xD
+            this.emitData(
+              new EmitData(undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+                polygon.date, polygon.value, this.info.metricLabel)
+            );
+          }
+        }
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
       });

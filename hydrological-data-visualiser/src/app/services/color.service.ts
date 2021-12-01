@@ -1,5 +1,5 @@
-import { Injectable, NgZone } from '@angular/core';
-import { LegendComponent } from '../components/legend/legend.component';
+import {Injectable} from '@angular/core';
+import {LegendComponent} from '../components/legend/legend.component';
 
 // https://www.npmjs.com/package/color-interpolate
 declare var require: any;
@@ -10,13 +10,13 @@ const interpolate = require('color-interpolate');
 })
 export class ColorService {
 
-  private colormap: any = interpolate(["#FFFFFF", "#0000FF"])
-  private minValue: number = 0;
-  private maxValue: number = 50; // mock values
+  private colormap: any = interpolate(['#FFFFFF', '#0000FF']);
+  private minValue = 0;
+  private maxValue = 50; // mock values
   private legend: LegendComponent | undefined;
 
   setLegend(legend: LegendComponent): void {
-    this.legend = legend
+    this.legend = legend;
   }
 
   setColorMap(minValue: number, maxValue: number, startColor: string, endColor: string, metricLabel: string): void {
@@ -29,7 +29,7 @@ export class ColorService {
   }
 
   getColor(value: number): string {
-    if(this.minValue === this.maxValue) {
+    if (this.minValue === this.maxValue) {
       return this.colormap(0);
     }
     return this.colormap((value - this.minValue) / (this.maxValue - this.minValue));

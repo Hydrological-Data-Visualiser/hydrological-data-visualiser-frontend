@@ -9,7 +9,7 @@ import {HttpClient} from '@angular/common/http';
 import {DataServiceInterface} from '../data.service.interface';
 import {DataModelBase} from '../../model/data-model-base';
 import * as moment from 'moment';
-import { ColorService } from '../color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +18,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   public map!: L.Map;
   public info!: DataModelBase;
   public url!: string;
+  public lastClickedData: [RiverPoint, L.LatLng] | undefined = undefined;
 
   public status = false;
   private riverLayer = new L.FeatureGroup();
@@ -29,25 +30,9 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     this.sidePanelService.emitData(data);
   }
 
-  // getColor(d: number, points: RiverPoint[]): string {
-  //   const values = points.map(point => point.value).sort();
-  //   const min = values[0];
-  //   const max = values[values.length - 1];
-  //   const diff = Math.abs(max - min) / 7;
-
-  //   return d < min + diff ? '#0054ff' :
-  //     d < min + 2 * diff ? '#07ffd8' :
-  //       d < min + 3 * diff ? '#00ff29' :
-  //         d < min + 4 * diff ? '#bfff00' :
-  //           d < min + 5 * diff ? '#ffcb00' :
-  //             d < min + 6 * diff ? '#ea7905' :
-  //               d < min + 7 * diff ? '#e74242' :
-  //                 '#ff0000';
-
-  // }
-
   clear(): void {
     this.riverLayer.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   getInfo(): void {
@@ -70,6 +55,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         const polyLine = L.polyline(river, {color})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', () => {
+            this.lastClickedData = [points[i], new L.LatLng(points[i].latitude, points[i].longitude)];
             this.emitData(
               new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
             );
@@ -92,10 +78,18 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         const polyLine = L.polyline(river, {color})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', () => { // TODO
+            this.lastClickedData = [points[i], new L.LatLng(points[i].latitude, points[i].longitude)];
             this.emitData(
               new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
             );
           });
+        if (this.lastClickedData) {
+          if (this.lastClickedData[0].id === points[i].id) {
+            this.emitData(new EmitData(
+              undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng, date, value, this.info.metricLabel)
+            );
+          }
+        }
         this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map); // no fit bounds
