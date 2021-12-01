@@ -73,7 +73,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
             );
           });
         if (this.lastClickedData) {
-          if (this.lastClickedData[0].id === polygon.id) { // lipnie sprawdzane, wiem xD
+          if (this.lastClickedData[0].id === polygon.id) {
             this.emitData(
               new EmitData(undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
                 polygon.date, polygon.value, this.info.metricLabel)
