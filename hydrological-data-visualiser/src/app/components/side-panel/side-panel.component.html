@@ -70,16 +70,24 @@
               </div>
               <div class="buttons">
 
-                <button mat-mini-fab color="primary" *ngIf="!animationPaused" class="m-2" (click)="pauseAnimation()">
+                <button mat-mini-fab *ngIf="!animationPlaying" type="button" disabled="true" class="btn btn-secondary m-1">
                   <mat-icon>pause</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="animationPaused" class="m-2" (click)="pauseAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="!animationPaused && animationPlaying" class="m-2" (click)="pauseAnimation()">
+                  <mat-icon>pause</mat-icon>
+                </button>
+
+                <button mat-mini-fab color="primary" *ngIf="animationPaused && animationPlaying" class="m-2" (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" class="m-2" (click)="playAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
+                </button>
+
+                <button mat-mini-fab *ngIf="animationPlaying" type="submit" class="btn btn-primary m-1 btn-dark" (click)="stopAnimation()">
+                  <mat-icon>stop</mat-icon>
                 </button>
               </div>
             </form>

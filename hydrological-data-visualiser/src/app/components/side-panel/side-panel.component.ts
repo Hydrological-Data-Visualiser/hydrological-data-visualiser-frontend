@@ -16,9 +16,13 @@ import {AbstractControl, FormControl, Validators} from '@angular/forms';
 })
 export class SidePanelComponent implements OnInit {
   // details attributes
-  animationPaused = false;
   sidePanelShowStatus = false;
   clickedOnMap = false;
+  status = false;
+  clicked = false;
+  long: number | undefined;
+  lat: number | undefined;
+  name: string | undefined;
   // form attributes
   public minDate: Date = new Date();
   public maxDate: Date = new Date();
@@ -29,6 +33,8 @@ export class SidePanelComponent implements OnInit {
   isDateAndHourSelected = false;
   hourDropDownList: Date[] = [];
   // animation
+  animationPlaying = false;
+  animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
   animationLength: number | undefined;
@@ -170,6 +176,7 @@ export class SidePanelComponent implements OnInit {
   playAnimation(): void {
     this.animationPaused = false;
     const date = this.selectedDate;
+    this.animationPlaying = true;
     this.animationStart = (moment(date)).format('YYYY-MM-DD');
     this.animationLength = this.animationModel.steps;
     this.animationService.stop();
@@ -200,6 +207,15 @@ export class SidePanelComponent implements OnInit {
   pauseAnimation(): void {
     this.animationPaused = !this.animationPaused;
     this.animationService.pause();
+  }
+
+  stopAnimation(): void {
+    this.animationService.stop();
+    this.animationPlaying = false;
+    this.animationStart = undefined;
+    this.animationLength = undefined;
+    this.animationNow = undefined;
+    this.animationPercentage = 0;
   }
 
   dateFilter = (date: Date) => {
