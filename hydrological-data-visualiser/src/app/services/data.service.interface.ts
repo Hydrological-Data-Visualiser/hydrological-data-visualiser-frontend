@@ -9,6 +9,7 @@ export interface DataServiceInterface<Type> {
   info: DataModelBase;
   map: L.Map;
   lastClickedData: [Type, L.LatLng] | undefined;
+  marker: L.Marker | undefined;
 
   draw(date: Date): void;
 

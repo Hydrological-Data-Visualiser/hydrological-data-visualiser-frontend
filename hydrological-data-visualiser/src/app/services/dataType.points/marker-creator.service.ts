@@ -26,6 +26,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   public stationList: Station[] = [];
   public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
   private markers: { [key: number]: L.Marker } = {};
+  public marker: L.Marker | undefined = undefined;
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
   }

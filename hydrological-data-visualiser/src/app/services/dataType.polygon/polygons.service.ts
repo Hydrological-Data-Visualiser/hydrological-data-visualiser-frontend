@@ -20,6 +20,16 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public lastClickedData: [PolygonModel, L.LatLng] | undefined = undefined;
   public polygonLayer = new L.FeatureGroup();
   public info!: DataModelBase;
+  public marker: L.Marker | undefined = undefined;
+
+  redIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
   }
@@ -48,6 +58,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
+            this.addMarkerOnDataClick(coords);
           });
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
@@ -71,6 +82,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
+            this.addMarkerOnDataClick(coords);
           });
         if (this.lastClickedData) {
           if (this.lastClickedData[0].id === polygon.id) {
@@ -132,5 +144,20 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  addMarkerOnDataClick(coords: L.LatLng): void {
+    if (this.marker) {
+      this.polygonLayer.removeLayer(this.marker);
+      this.marker = undefined;
+    }
+    const marker: L.Marker = L.marker(coords, {icon: this.redIcon})
+      .on('click', () => {
+        this.polygonLayer.removeLayer(marker);
+        this.marker = undefined;
+        this.sidePanelService.emitData(new EmitData(undefined, undefined, undefined, undefined, undefined, undefined));
+      });
+    this.polygonLayer.addLayer(marker);
+    this.marker = marker;
   }
 }

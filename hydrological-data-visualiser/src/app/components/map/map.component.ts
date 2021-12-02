@@ -54,14 +54,12 @@ export class MapComponent implements AfterViewInit {
       this.latLngEventEmitter.emit(new L.LatLng(this.lat, this.long));
       this.clickedEmitter.emit(true);
       this.addMarker(coord);
-      // @Output() latitude = new EventEmitter<string>();
     });
   }
 
   constructor(private dataProvider: DataProviderService) {
     this.lat = 0;
     this.long = 0;
-    // this.dataProvider.getStationsService().map = this.map;
   }
 
   ngAfterViewInit(): void {
@@ -85,7 +83,5 @@ export class MapComponent implements AfterViewInit {
       this.latLngEventEmitter.emit(undefined);
       this.clickedEmitter.emit(false);
     });
-    // .bindPopup('Ionic 4 <br> Leaflet.')
-    // .openPopup();
   }
 }
