@@ -57,6 +57,7 @@ export class SidePanelComponent implements OnInit {
       this.dateFilter = (date: Date): boolean => {
         return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
+      this.stopAnimation();
       this.clear();
       this.clearEmitData();
       this.clickedOnMap = false;
@@ -148,6 +149,7 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.selectedHour!.substr(3, 2), 10),
           Number.parseInt(this.selectedHour!.substr(6, 2), 10)
         );
+      this.stopAnimation();
       const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -155,7 +157,6 @@ export class SidePanelComponent implements OnInit {
             this.dataProvider.getActualService().draw(this.selectedDate);
           }
         });
-      this.animationService.stop();
     }
   }
 
@@ -169,7 +170,6 @@ export class SidePanelComponent implements OnInit {
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
     this.updateHourList(new Date(event.value));
-    this.animationService.stop();
   }
 
   // animation methods
@@ -177,7 +177,7 @@ export class SidePanelComponent implements OnInit {
     this.animationPaused = false;
     const date = this.selectedDate;
     this.animationPlaying = true;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationStart = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     this.animationLength = this.animationModel.steps;
     this.animationService.stop();
 
@@ -207,6 +207,21 @@ export class SidePanelComponent implements OnInit {
   pauseAnimation(): void {
     this.animationPaused = !this.animationPaused;
     this.animationService.pause();
+  }
+
+  stopAndRevertAnimation(): void {
+    const date = this.animationService.getStart();
+    this.stopAnimation();
+
+    if (date !== undefined) {
+      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
+        () => {
+          if (date) {
+            this.dataProvider.getActualService().draw(date);
+          }
+        });
+    }
   }
 
   stopAnimation(): void {

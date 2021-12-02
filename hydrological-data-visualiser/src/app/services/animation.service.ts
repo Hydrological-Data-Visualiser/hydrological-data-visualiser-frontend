@@ -47,6 +47,14 @@ export class AnimationService {
     this.currentPlayData = null;
   }
 
+  getStart(): Date | undefined {
+    if (this.currentPlayData != null) {
+      return this.currentPlayData.getStart();
+    } else {
+      return undefined;
+    }
+  }
+
 }
 
 class PlayData {
@@ -80,6 +88,8 @@ class PlayData {
         // propagate that the frame changed
         this.sidepanel.setAnimationPlaybackData(utcDate, this.currentStep);
         this.setFrame(utcDate).then(() => {
+          console.log(this.startStep.toString() + utcDate);
+          this.sidepanel.setAnimationPlaybackData(utcDate, this.currentStep);
           this.playState();
         });
       });
@@ -122,6 +132,10 @@ class PlayData {
 
   private setFrame(date: Date): Promise<void> {
     return this.dataService.update(date);
+  }
+
+  getStart(): Date {
+    return this.startStep;
   }
 
 }
