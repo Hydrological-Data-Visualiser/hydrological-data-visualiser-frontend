@@ -15,8 +15,8 @@ export class MapComponent implements AfterViewInit {
   long: number;
   clicked = false;
   marker: L.Marker<any> | undefined;
-  @Output() latLngEventEmitter = new EventEmitter<L.LatLng>();
-  @Output() clickedEmitter = new EventEmitter<boolean>();
+  // @Output() latLngEventEmitter = new EventEmitter<L.LatLng>();
+  // @Output() clickedEmitter = new EventEmitter<boolean>();
 
   constructor(private dataProvider: DataProviderService) {
     this.lat = 0;
