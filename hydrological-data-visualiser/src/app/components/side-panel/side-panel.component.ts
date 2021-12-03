@@ -106,20 +106,14 @@ export class SidePanelComponent implements OnInit {
     const dataProvider = this.dataProvider.getActualService();
 
     if (dataProvider) {
-      dataProvider.getDataFromDateAsObservableUsingDate(formattedDate).subscribe(
-        (data: any[]) => {
-          data.forEach(b => {
-            const date = new Date(b.date);
+      dataProvider.getDayTimePointsAsObservable(formattedDate).subscribe(
+        (data: Date[]) => {
+          data.forEach(d => {
+            const date = new Date(d);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            // const value = (moment(nowUtc)).format('HH:mm:SS');
-            if (this.hours.filter(val => val.getTime() === nowUtc.getTime()).length === 0) {
-              if (this.hours.filter(
-                val => val.getTime() - (1000 * 60 * 15) < nowUtc.getTime() &&
-                  val.getTime() + (1000 * 60 * 15) > nowUtc.getTime()).length === 0) {
-                this.hours.push(nowUtc);
-              }
-            }
+            this.hours.push(nowUtc);
+
             // distinct and sort
             // tslint:disable-next-line:no-shadowed-variable
             this.hours = [...new Set(this.hours)].sort((a, b) => {

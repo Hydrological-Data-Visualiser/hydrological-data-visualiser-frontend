@@ -28,9 +28,12 @@ export class ColorService {
     }
   }
 
-  getColor(value: number): string {
+  getColor(value: number | null): string {
     if (this.minValue === this.maxValue) {
       return this.colormap(0);
+    }
+    if (value === null || value === undefined) {
+      return '#000000';
     }
     return this.colormap((value - this.minValue) / (this.maxValue - this.minValue));
   }

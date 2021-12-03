@@ -127,7 +127,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<Date[]>(`${this.url}/dayTimePoints?instantFrom=${formattedDate}`);
+    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
   }
 
   getInfo(): void {

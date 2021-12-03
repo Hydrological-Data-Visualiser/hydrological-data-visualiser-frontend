@@ -67,7 +67,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
         }
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
-      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
+      unusedStations.forEach(station => this.createMarker(station, this.colorService.getColor(null), NaN, metricLabel, date));
       this.map.fitBounds(this.group.getBounds());
     });
   }
@@ -177,7 +177,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<Date[]>(`${this.url}/dayTimePoints?instantFrom=${formattedDate}`);
+    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
   }
 
   draw(date: Date): void {
