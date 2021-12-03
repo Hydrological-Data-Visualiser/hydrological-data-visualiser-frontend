@@ -10,6 +10,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import {DataModelBase} from '../../model/data-model-base';
 import * as moment from 'moment';
 import {ColorService} from '../color.service';
+import {CustomMarkers} from '../custom-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +23,6 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   public status = false;
   public marker: L.Marker | undefined = undefined;
-  redIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
   private riverLayer = new L.FeatureGroup();
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
@@ -154,7 +147,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
       this.riverLayer.removeLayer(this.marker);
       this.marker = undefined;
     }
-    const marker: L.Marker = L.marker(coords, {icon: this.redIcon})
+    const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
       .on('click', () => {
         this.riverLayer.removeLayer(marker);
         this.marker = undefined;

@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
 import {ColorService} from '../color.service';
+import {CustomMarkers} from '../custom-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -151,7 +152,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       this.polygonLayer.removeLayer(this.marker);
       this.marker = undefined;
     }
-    const marker: L.Marker = L.marker(coords, {icon: this.redIcon})
+    const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
       .on('click', () => {
         this.polygonLayer.removeLayer(marker);
         this.marker = undefined;
