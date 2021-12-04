@@ -19,6 +19,7 @@ export class GeotiffComponent implements OnInit {
   @ViewChild('fileInput') fileInput: any;
   fileToUpload!: File;
   geoTiff: any;
+  uploadStarted = false;
 
   constructor(private dataProvider: DataProviderService, private http: HttpClient) {
   }
@@ -36,7 +37,7 @@ export class GeotiffComponent implements OnInit {
       this.geoTiff = null;
     }
     const reader = new FileReader();
-
+    this.uploadStarted = true;
     reader.readAsArrayBuffer(this.fileToUpload);
 
     const map = this.dataProvider.getKocinkaRandomService().map;
@@ -50,10 +51,11 @@ export class GeotiffComponent implements OnInit {
         });
         this.geoTiff.addTo(map);
         map.flyToBounds(this.geoTiff.getBounds());
+        this.uploadStarted = false;
+        // @ts-ignore
+        document.getElementById('dismissButtonGeoTiff').click();
       });
     };
-    // @ts-ignore
-    document.getElementById('dismissButtonGeoTiff').click();
 
   }
 

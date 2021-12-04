@@ -11,6 +11,7 @@ export class GeojsonComponent implements OnInit {
   fileToUpload: File | null = null;
   geoJson: L.GeoJSON | null = null;
   @ViewChild('fileInput') fileInput: any;
+  uploadStarted = false;
 
   constructor(private dataProvider: DataProviderService) {
   }
@@ -27,8 +28,10 @@ export class GeojsonComponent implements OnInit {
       if (this.geoJson) {
         this.delete();
       }
+      this.uploadStarted = true;
       this.geoJson = L.geoJSON(JSON.parse(a), {style: {opacity: 0.5, fillOpacity: 0.5}});
       this.geoJson.addTo(this.dataProvider.getKocinkaRandomService().map);
+      this.uploadStarted = false;
       this.dataProvider.getKocinkaRandomService().map.flyToBounds(this.geoJson.getBounds());
       // @ts-ignore
       document.getElementById('dismissButtonGeoJson').click();
