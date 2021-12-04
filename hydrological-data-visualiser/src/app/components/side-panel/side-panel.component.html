@@ -102,6 +102,7 @@
                 <p *ngIf="data.date"> Date:</p>
               </div>
               <div class="col">
+                <p *ngIf="data.stationName">{{data.stationName}}</p>
                 <p *ngIf="data.latitude">{{data.latitude.toFixed(4)}}</p>
                 <p *ngIf="data.longitude">{{data.longitude.toFixed(4)}}</p>
                 <p *ngIf="data.value">{{data.value.toFixed(2)}} {{data.metricLabel}}</p>

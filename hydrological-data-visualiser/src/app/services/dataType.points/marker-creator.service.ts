@@ -216,9 +216,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
       this.getMaxValue(begin, length).subscribe(maxValue => {
-          this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
-          callback();
-        })
+        this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
+        callback();
+      })
     );
   }
 
