@@ -35,7 +35,7 @@ import {
   NgxMatColorPickerModule
 } from '@angular-material-components/color-picker';
 import {SortPipePipe} from './pipes/sort-pipe.pipe';
-import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
