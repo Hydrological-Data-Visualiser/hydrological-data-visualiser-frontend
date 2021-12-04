@@ -22,7 +22,8 @@
             <form #dataForm="ngForm">
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" [disabled]="!isModelSelected" placeholder="Input & change events"
+                <input matInput [matDatepicker]="picker" [disabled]="!isModelSelected"
+                       placeholder="Input & change events"
                        (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"
                        [min]="minDate"
                        [max]="maxDate">
@@ -174,9 +175,13 @@
         </div>
       </div>
     </nav>
-    <div class="progress" style="height: 2px;">
-      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"
-           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar-mat">
+      <mat-progress-bar mode="determinate" color="primary" value="{{animationPercentage}}"
+                        [attr.aria-valuenow]="animationPercentage"
+                        aria-valuemin="0" aria-valuemax="100" role="progressbar"></mat-progress-bar>
+
+      <!--      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"-->
+      <!--           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>-->
     </div>
     <div class="container-fluid">
       <app-map (latLngEventEmitter)="setLatLng($event)"
