@@ -27,11 +27,14 @@ export class ColorService {
     console.log(startColor)
     this.colormap = interpolate([startColor, endColor]);
     if (this.legend) {
-      this.legend.setScale(minValue, maxValue, startColor, endColor, metricLabel)
+      this.legend.setScale(minValue, maxValue, startColor, endColor, metricLabel);
     }
   }
 
-  getColor(value: number): string {
+  getColor(value: number | null): string {
+    if (value === null || value === undefined) {
+      return '#000000';
+    }
     if (this.minValue === this.maxValue) {
       return this.colormap(0);
     }

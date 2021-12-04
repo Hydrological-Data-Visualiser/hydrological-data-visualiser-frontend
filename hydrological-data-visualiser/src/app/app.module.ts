@@ -1,6 +1,7 @@
 import {HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
+
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {MapComponent} from './components/map/map.component';
@@ -36,6 +37,7 @@ import {
 } from '@angular-material-components/color-picker';
 import {SortPipePipe} from './pipes/sort-pipe.pipe';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { ModelConfigurationComponent } from './components/model-configuration/model-configuration.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +51,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     GeojsonComponent,
     GeotiffComponent,
     LegendComponent,
+    ModelConfigurationComponent,
     SortPipePipe
   ],
   imports: [

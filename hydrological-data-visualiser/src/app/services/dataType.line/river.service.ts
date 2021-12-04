@@ -128,6 +128,11 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
+  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
+    const formattedDate = moment(date).format('YYYY-MM-DD');
+    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
+  }
+
   getMinValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
   }

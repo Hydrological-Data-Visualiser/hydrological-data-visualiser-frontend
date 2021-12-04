@@ -19,9 +19,7 @@ export interface DataServiceInterface<Type> {
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date>;
 
-  getMinValue(begin: string, length: number): Observable<number>;
-
-  getMaxValue(begin: string, length: number): Observable<number>;
+  getDayTimePointsAsObservable(date: Date): Observable<Date[]>;
 
   getInfo(): void;
 
@@ -38,6 +36,10 @@ export interface DataServiceInterface<Type> {
   clear(): void;
 
   emitData(data: EmitData): void;
+
+  getMinValue(begin: string, length: number): Observable<number>;
+
+  getMaxValue(begin: string, length: number): Observable<number>;
 
   changeOpacity(opacity: number): void;
 
