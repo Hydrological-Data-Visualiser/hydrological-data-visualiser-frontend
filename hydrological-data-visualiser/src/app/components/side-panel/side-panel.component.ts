@@ -46,7 +46,7 @@ export class SidePanelComponent implements OnInit {
         return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
       this.clear();
-      this.clearData();
+      this.clearEmitData();
       this.clickedOnMap = false;
       this.sidePanelShowStatus = false;
       // TODO - replace with real stop @Nezonaru
@@ -56,13 +56,16 @@ export class SidePanelComponent implements OnInit {
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
+      // after click on another place on map open details tab
       if (!(data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude)) {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
       }
       this.clickedOnMap = true;
       this.clickedData = new EmitData(data.stationName, data.latitude, data.longitude, data.date, data.value, data.metricLabel);
-      this.sidePanelShowStatus = false;
+      if (!this.animationPaused) {
+        this.sidePanelShowStatus = false;
+      }
     });
   }
 
@@ -78,7 +81,7 @@ export class SidePanelComponent implements OnInit {
     this.clickedOnMap = newItem;
   }
 
-  clickEvent(): void {
+  openOrHideSidePanel(): void {
     this.sidePanelShowStatus = !this.sidePanelShowStatus;
   }
 
@@ -179,7 +182,7 @@ export class SidePanelComponent implements OnInit {
     return false;
   }
 
-  clearData(): void {
+  clearEmitData(): void {
     this.clickedData.date = undefined;
     this.clickedData.value = undefined;
     this.clickedData.longitude = undefined;
