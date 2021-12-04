@@ -6,9 +6,13 @@
         <h1 class="modal-title" id="exampleModalLabel">Data Models</h1>
         <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p class="font-weight-bold">Choose data model</p>
 
+      <div class="d-flex justify-content-center" *ngIf="getModels().length<=4">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <div class="modal-body" *ngIf="getModels().length>4">
+        <p class=" font-weight-bold">Choose data model</p>
         <mat-radio-group
           aria-labelledby="example-radio-group-label"
           class="example-radio-group"

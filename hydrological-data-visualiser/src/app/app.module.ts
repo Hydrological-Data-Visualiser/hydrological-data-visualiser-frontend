@@ -34,6 +34,8 @@ import {
   NGX_MAT_COLOR_FORMATS,
   NgxMatColorPickerModule
 } from '@angular-material-components/color-picker';
+import {SortPipePipe} from './pipes/sort-pipe.pipe';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import {
     SearchFilterPipe,
     GeojsonComponent,
     GeotiffComponent,
-    LegendComponent
+    LegendComponent,
+    SortPipePipe
   ],
   imports: [
     BrowserModule,
@@ -70,6 +73,7 @@ import {
     MatDialogModule,
     MatSliderModule,
     NgxMatColorPickerModule,
+    MatProgressSpinnerModule,
   ],
   providers: [SidePanelComponent, SidePanelService, {provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS}],
   bootstrap: [AppComponent]
