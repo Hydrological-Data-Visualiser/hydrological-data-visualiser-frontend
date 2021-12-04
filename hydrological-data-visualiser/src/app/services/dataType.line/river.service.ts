@@ -77,7 +77,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map);
-      this.map.flyToBounds(this.riverLayer.getBounds());
+      this.map.flyToBounds(this.riverLayer.getBounds(), {duration: 1});
     });
   }
 

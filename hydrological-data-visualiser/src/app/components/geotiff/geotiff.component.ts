@@ -50,7 +50,7 @@ export class GeotiffComponent implements OnInit {
           resolution: 256
         });
         this.geoTiff.addTo(map);
-        map.flyToBounds(this.geoTiff.getBounds());
+        map.flyToBounds(this.geoTiff.getBounds(), {duration: 1});
         this.uploadStarted = false;
         // @ts-ignore
         document.getElementById('dismissButtonGeoTiff').click();
