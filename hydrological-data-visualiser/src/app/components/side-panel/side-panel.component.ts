@@ -29,6 +29,7 @@ export class SidePanelComponent implements OnInit {
   public value: Date | undefined;
   public hour: string | undefined;
   blockedHourDropdown = true;
+  isModelSelected = false;
   isDateAndHourSelected = false;
   // hour
   hours: Date[] = [];
@@ -60,6 +61,7 @@ export class SidePanelComponent implements OnInit {
       this.clicked = false;
       this.status = false;
       this.opacity = 50;
+      this.isModelSelected = true;
 
       const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
       const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);

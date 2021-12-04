@@ -22,7 +22,7 @@
             <form #dataForm="ngForm">
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" placeholder="Input & change events"
+                <input matInput [matDatepicker]="picker" [disabled]="!isModelSelected" placeholder="Input & change events"
                        (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"
                        [min]="minDate"
                        [max]="maxDate">

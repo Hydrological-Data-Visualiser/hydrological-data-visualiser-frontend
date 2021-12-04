@@ -8,8 +8,8 @@
                 aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <div class="form-group" *ngIf="!uploadStarted">
         <p class="font-weight-bold">Choose your own geoTiff file</p>
-        <div class="form-group">
 
           <input
             type="file"
@@ -34,9 +34,10 @@
               Remove GeoTiff
             </button>
           </div>
-          <div class="d-flex justify-content-center m-5" *ngIf="uploadStarted">
-            <mat-spinner></mat-spinner>
-          </div>
+
+        </div>
+        <div class="d-flex justify-content-center m-5" *ngIf="uploadStarted">
+          <mat-spinner></mat-spinner>
         </div>
       </div>
     </div>
