@@ -25,8 +25,8 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   });
   public stationList: Station[] = [];
   public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
-  private markers: { [key: number]: L.Marker } = {};
   public marker: L.Marker | undefined = undefined;
+  private markers: { [key: number]: L.Marker } = {};
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
   }
@@ -115,6 +115,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     if (marker) {
       marker.setIcon(this.getColoredIcon(colorHex));
       marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
+      marker.on('click', () => this.emitData(
+        new EmitData(station.name, station.latitude, station.longitude, date, rainValue, this.info.metricLabel))
+      );
     }
     if (this.lastClickedData) {
       if (this.lastClickedData[0].stationId === station.id) {
