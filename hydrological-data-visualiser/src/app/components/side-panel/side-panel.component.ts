@@ -235,5 +235,4 @@ export class SidePanelComponent implements OnInit {
       .substring(1).match(/.{2}/g)
       .map(x => parseInt(x, 16));
   }
-
 }
