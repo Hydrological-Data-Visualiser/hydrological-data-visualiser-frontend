@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {DataProviderService} from '../../services/data-provider.service';
 import * as L from 'leaflet';
 
@@ -10,6 +10,8 @@ import * as L from 'leaflet';
 export class GeojsonComponent implements OnInit {
   fileToUpload: File | null = null;
   geoJson: L.GeoJSON | null = null;
+  @ViewChild('fileInput') fileInput: any;
+  uploadStarted = false;
 
   constructor(private dataProvider: DataProviderService) {
   }
@@ -26,9 +28,11 @@ export class GeojsonComponent implements OnInit {
       if (this.geoJson) {
         this.delete();
       }
-      this.geoJson = L.geoJSON(JSON.parse(a));
+      this.uploadStarted = true;
+      this.geoJson = L.geoJSON(JSON.parse(a), {style: {opacity: 0.5, fillOpacity: 0.5}});
       this.geoJson.addTo(this.dataProvider.getKocinkaRandomService().map);
-      this.dataProvider.getKocinkaRandomService().map.fitBounds(this.geoJson.getBounds());
+      this.uploadStarted = false;
+      this.dataProvider.getKocinkaRandomService().map.flyToBounds(this.geoJson.getBounds(), {duration: 1});
       // @ts-ignore
       document.getElementById('dismissButtonGeoJson').click();
     }));
@@ -40,5 +44,15 @@ export class GeojsonComponent implements OnInit {
       this.geoJson.removeFrom(this.dataProvider.getKocinkaRandomService().map);
       this.geoJson = null;
     }
+  }
+
+
+  onClickFileInputButton(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onChangeFileInput(): void {
+    const files: { [key: string]: File } = this.fileInput.nativeElement.files;
+    this.fileToUpload = files[0];
   }
 }

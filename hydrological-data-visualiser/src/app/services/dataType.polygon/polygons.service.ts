@@ -23,15 +23,6 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public info!: DataModelBase;
   public marker: L.Marker | undefined = undefined;
 
-  redIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-  });
-
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
   }
 
@@ -50,7 +41,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -63,7 +54,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           });
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
-        this.map.fitBounds(this.polygonLayer.getBounds());
+        this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
       });
     });
   }
@@ -74,7 +65,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -102,12 +93,10 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoObservable().subscribe(info => {
-          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
-          callback();
-        })
-      )
+      this.getMaxValue(begin, length).subscribe(maxValue => {
+        this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
+        callback();
+      })
     );
   }
 
@@ -160,5 +149,14 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       });
     this.polygonLayer.addLayer(marker);
     this.marker = marker;
+  }
+
+  changeOpacity(newOpacity: number): void {
+    this.polygonLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+  }
+
+  updateColor(date: Date): void {
+    this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
+    this.draw(date);
   }
 }

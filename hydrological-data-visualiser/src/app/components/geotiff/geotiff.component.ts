@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 // @ts-ignore
 import parse_georaster from 'georaster';
 import {DataProviderService} from '../../services/data-provider.service';
@@ -16,8 +16,10 @@ window.proj4 = proj4;
   styleUrls: ['./geotiff.component.css']
 })
 export class GeotiffComponent implements OnInit {
+  @ViewChild('fileInput') fileInput: any;
   fileToUpload!: File;
   geoTiff: any;
+  uploadStarted = false;
 
   constructor(private dataProvider: DataProviderService, private http: HttpClient) {
   }
@@ -35,7 +37,7 @@ export class GeotiffComponent implements OnInit {
       this.geoTiff = null;
     }
     const reader = new FileReader();
-
+    this.uploadStarted = true;
     reader.readAsArrayBuffer(this.fileToUpload);
 
     const map = this.dataProvider.getKocinkaRandomService().map;
@@ -44,21 +46,31 @@ export class GeotiffComponent implements OnInit {
       parse_georaster(arrayBuffer).then((georaster: any) => {
         this.geoTiff = new GeoRasterLayer({
           georaster,
-          opacity: 0.7,
+          opacity: 0.5,
           resolution: 256
         });
         this.geoTiff.addTo(map);
-        map.fitBounds(this.geoTiff.getBounds());
+        map.flyToBounds(this.geoTiff.getBounds(), {duration: 1});
+        this.uploadStarted = false;
+        // @ts-ignore
+        document.getElementById('dismissButtonGeoTiff').click();
       });
     };
-    // @ts-ignore
-    document.getElementById('dismissButtonGeoTiff').click();
 
   }
 
   delete(): void {
     this.geoTiff.removeFrom(this.dataProvider.getKocinkaRandomService().map);
     this.geoTiff = null;
+  }
+
+  onClickFileInputButton(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onChangeFileInput(): void {
+    const files: { [key: string]: File } = this.fileInput.nativeElement.files;
+    this.fileToUpload = files[0];
   }
 
 }

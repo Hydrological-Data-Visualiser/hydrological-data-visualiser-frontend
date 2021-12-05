@@ -14,5 +14,4 @@ export class NavbarComponent implements OnInit {
     // @ts-ignore
     document.getElementById('modelsButton').click();
   }
-
 }

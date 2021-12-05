@@ -5,6 +5,8 @@ import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
+import {Color} from '@angular-material-components/color-picker';
+import {AbstractControl, FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-side-panel',
@@ -23,6 +25,7 @@ export class SidePanelComponent implements OnInit {
   public selectedDate: Date | undefined;
   public selectedHour: string | undefined;
   blockedHourDropdown = true;
+  isModelSelected = false;
   isDateAndHourSelected = false;
   hourDropDownList: Date[] = [];
   // animation
@@ -32,6 +35,9 @@ export class SidePanelComponent implements OnInit {
   animationNow: string | undefined;
   animationPercentage: number | undefined;
   clickedData: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
+  opacity = 50;
+  minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
+  maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -51,13 +57,31 @@ export class SidePanelComponent implements OnInit {
       this.sidePanelShowStatus = false;
       // TODO - replace with real stop @Nezonaru
       this.animationService.stop();
+      this.opacity = 50;
+      this.isModelSelected = true;
+
+      const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
+      const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
+      this.minColorCtr = new FormControl(new Color(newMinColor[0], newMinColor[1], newMinColor[2]));
+      this.maxColorCtr = new FormControl(new Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
+
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
-      // after click on another place on map open details tab
-      if (!(data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude)) {
+      if (data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude) {
+        this.clickedOnMap = false;
+        this.clearEmitData();
+      } else {
+        this.clickedOnMap = true;
+        this.clickedData.date = data.date;
+        this.clickedData.value = data.value;
+        this.clickedData.longitude = data.longitude;
+        this.clickedData.latitude = data.latitude;
+        this.clickedData.stationName = data.stationName;
+        this.clickedData.metricLabel = data.metricLabel;
+        this.sidePanelShowStatus = false;
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
       }
@@ -190,4 +214,26 @@ export class SidePanelComponent implements OnInit {
     this.clickedData.stationName = undefined;
     this.clickedData.metricLabel = undefined;
   }
+
+  changeOpacity(value: number): void {
+    this.dataProvider.getActualService().changeOpacity(value / 100);
+  }
+
+  changeColor(minColorCtr: AbstractControl, maxColorCtr: AbstractControl): void {
+    this.dataProvider.getActualService().info.minColour = '#' + minColorCtr.value.hex;
+    this.dataProvider.getActualService().info.maxColour = '#' + maxColorCtr.value.hex;
+    if (this.selectedDate) {
+      this.dataProvider.getActualService().updateColor(this.selectedDate);
+    }
+    this.opacity = 50;
+  }
+
+  hexToRgb(hex: string): number[] {
+    // @ts-ignore
+    return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+      , (m, r, g, b) => '#' + r + r + g + g + b + b)
+      .substring(1).match(/.{2}/g)
+      .map(x => parseInt(x, 16));
+  }
+
 }

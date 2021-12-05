@@ -54,6 +54,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
     this.group.clearLayers();
+
     const usedStations: Station[] = [];
     data.subscribe(d => {
       d.forEach(rainData => {
@@ -67,15 +68,15 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
         }
       });
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
-      unusedStations.forEach(station => this.createMarker(station, this.colorService.getColor(null), NaN, metricLabel, date));
-      this.map.fitBounds(this.group.getBounds());
+      unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
+      this.map.flyToBounds(this.group.getBounds(), {duration: 1});
     });
   }
 
   createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
-        {icon: this.getColoredIcon(colorHex)}).on('click', event => {
+        {icon: this.getColoredIcon(colorHex), opacity: 0.5}).on('click', event => {
         this.lastClickedData =
           // @ts-ignore
           [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
@@ -228,13 +229,24 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoObservable().subscribe(info => {
-          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
-          callback();
-        })
-      )
+      this.getMaxValue(begin, length).subscribe(maxValue => {
+        this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
+        callback();
+      })
     );
   }
 
+  changeOpacity(newOpacity: number): void {
+    this.group.setStyle({opacity: newOpacity, fillOpacity: newOpacity});
+    for (const key in this.markers) {
+      if (this.markers.hasOwnProperty(key)) {
+        this.markers[key].setOpacity(newOpacity);
+      }
+    }
+  }
+
+  updateColor(date: Date): void {
+    this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
+    this.draw(date);
+  }
 }
