@@ -6,6 +6,8 @@ import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
 import * as L from 'leaflet';
+import {Color} from '@angular-material-components/color-picker';
+import {AbstractControl, FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-side-panel',
@@ -27,6 +29,7 @@ export class SidePanelComponent implements OnInit {
   public value: Date | undefined;
   public hour: string | undefined;
   blockedHourDropdown = true;
+  isModelSelected = false;
   isDateAndHourSelected = false;
   // hour
   hours: Date[] = [];
@@ -37,6 +40,9 @@ export class SidePanelComponent implements OnInit {
   animationNow: string | undefined;
   animationPercentage: number | undefined;
   data: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
+  opacity = 50;
+  minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
+  maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -54,6 +60,14 @@ export class SidePanelComponent implements OnInit {
       this.clearData();
       this.clicked = false;
       this.status = false;
+      this.opacity = 50;
+      this.isModelSelected = true;
+
+      const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
+      const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
+      this.minColorCtr = new FormControl(new Color(newMinColor[0], newMinColor[1], newMinColor[2]));
+      this.maxColorCtr = new FormControl(new Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
+
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
     });
@@ -199,6 +213,10 @@ export class SidePanelComponent implements OnInit {
     return false;
   }
 
+  changeOpacity(value: number): void {
+    this.dataProvider.getActualService().changeOpacity(value / 100);
+  }
+
   clearData(): void {
     this.data.date = undefined;
     this.data.value = undefined;
@@ -207,4 +225,22 @@ export class SidePanelComponent implements OnInit {
     this.data.stationName = undefined;
     this.data.metricLabel = undefined;
   }
+
+  changeColor(minColorCtr: AbstractControl, maxColorCtr: AbstractControl): void {
+    this.dataProvider.getActualService().info.minColour = '#' + minColorCtr.value.hex;
+    this.dataProvider.getActualService().info.maxColour = '#' + maxColorCtr.value.hex;
+    if (this.value) {
+      this.dataProvider.getActualService().updateColor(this.value);
+    }
+    this.opacity = 50;
+  }
+
+  hexToRgb(hex: string): number[] {
+    // @ts-ignore
+    return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+      , (m, r, g, b) => '#' + r + r + g + g + b + b)
+      .substring(1).match(/.{2}/g)
+      .map(x => parseInt(x, 16));
+  }
+
 }

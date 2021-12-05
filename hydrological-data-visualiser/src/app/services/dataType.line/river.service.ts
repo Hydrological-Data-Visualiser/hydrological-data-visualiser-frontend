@@ -9,7 +9,7 @@ import {HttpClient} from '@angular/common/http';
 import {DataServiceInterface} from '../data.service.interface';
 import {DataModelBase} from '../../model/data-model-base';
 import * as moment from 'moment';
-import { ColorService } from '../color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -77,7 +77,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map);
-      this.map.fitBounds(this.riverLayer.getBounds());
+      this.map.flyToBounds(this.riverLayer.getBounds(), {duration: 1});
     });
   }
 
@@ -89,7 +89,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
         const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
         const color = this.colorService.getColor(points[i].value);
-        const polyLine = L.polyline(river, {color})
+        const polyLine = L.polyline(river, {color, fillColor: color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', () => { // TODO
             this.emitData(
@@ -105,12 +105,11 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoObservable().subscribe(info => {
-          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
-          callback();
-        })
-      )
+      this.getMaxValue(begin, length).subscribe(maxValue => {
+        this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
+        console.log('callback');
+        callback();
+      })
     );
   }
 
@@ -140,5 +139,14 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  changeOpacity(newOpacity: number): void {
+    this.riverLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+  }
+
+  updateColor(date: Date): void {
+    this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
+    this.draw(date);
   }
 }

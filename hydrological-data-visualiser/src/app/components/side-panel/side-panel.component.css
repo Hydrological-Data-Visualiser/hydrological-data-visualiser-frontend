@@ -64,3 +64,20 @@ input[type="number"] {
     margin-left: -0 !important;
   }
 }
+
+.nav-link {
+  color: black;
+}
+
+.nav-link:hover {
+  color: black;
+}
+
+.mat-slider-horizontal {
+  width: 100%;
+}
+
+.progress-bar-mat {
+  width: 95%;
+  margin: auto;
+}

@@ -9,6 +9,9 @@
           <button class="nav-link" id="nav-details-tab" data-bs-toggle="tab" data-bs-target="#nav-details" type="button"
                   role="tab" aria-controls="nav-details" aria-selected="false">Details
           </button>
+          <button class="nav-link" id="nav-conf-tab" data-bs-toggle="tab" data-bs-target="#nav-conf" type="button"
+                  role="tab" aria-controls="nav-conf" aria-selected="false">Configuration
+          </button>
         </div>
       </nav>
       <div class="tab-content" id="nav-tabContent">
@@ -19,7 +22,8 @@
             <form #dataForm="ngForm">
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" placeholder="Input & change events"
+                <input matInput [matDatepicker]="picker" [disabled]="!isModelSelected"
+                       placeholder="Input & change events"
                        (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"
                        [min]="minDate"
                        [max]="maxDate">
@@ -45,9 +49,11 @@
                 </mat-select>
               </mat-form-field>
               <div>
-                <button *ngIf="isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()">Show
+                <button mat-raised-button color="primary" *ngIf="isDateAndHourSelected" type="button" class="m-1"
+                        (click)="onSubmit()">Show
                 </button>
-                <button *ngIf="!isDateAndHourSelected" type="button" class="btn btn-dark m-1" (click)="onSubmit()"
+                <button mat-raised-button color="primary" *ngIf="!isDateAndHourSelected" type="button" class="m-1"
+                        (click)="onSubmit()"
                         disabled>Show
                 </button>
               </div>
@@ -64,11 +70,18 @@
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </div>
               <div class="buttons">
-                <button *ngIf="!paused" type="button" class="btn btn-secondary  m-1" (click)="pauseAnimation()">Pause
+
+                <button mat-mini-fab color="primary" *ngIf="!paused" class="m-2" (click)="pauseAnimation()">
+                  <mat-icon>pause</mat-icon>
                 </button>
-                <button *ngIf="paused" type="button" class="btn btn-secondary m-1 " (click)="pauseAnimation()">Unpause
+
+                <button mat-mini-fab color="primary" *ngIf="paused" class="m-2" (click)="pauseAnimation()">
+                  <mat-icon>play_arrow</mat-icon>
                 </button>
-                <button type="submit" class="btn btn-primary m-1 btn-dark" (click)="playAnimation()">Play</button>
+
+                <button mat-mini-fab color="primary" class="m-2" (click)="playAnimation()">
+                  <mat-icon>play_arrow</mat-icon>
+                </button>
               </div>
             </form>
           </div>
@@ -100,6 +113,48 @@
             </div>
           </div>
         </div>
+
+        <div class="tab-pane fade" id="nav-conf" role="tabpanel" aria-labelledby="nav-conf-tab">
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 id="example-name-label" class="example-name-label">Opacity: </h2>
+          </div>
+          <mat-slider
+            class="example-margin"
+            [max]=100
+            [min]=0
+            [step]=5
+            [thumbLabel]=true
+            [(ngModel)]="opacity"
+            (input)="changeOpacity($event.value)"
+            [disabled]="!isDateAndHourSelected"
+            color="primary"
+            aria-labelledby="example-name-label">
+          </mat-slider>
+
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 class="example-name-label">Minimal Color: </h2>
+            <mat-form-field>
+              <input matInput [ngxMatColorPicker]="minColorPicker" [formControl]="minColorCtr"
+                     [disabled]="!isDateAndHourSelected">
+              <ngx-mat-color-toggle matSuffix [for]="minColorPicker"></ngx-mat-color-toggle>
+              <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
+            </mat-form-field>
+          </div>
+
+          <div class="example-label-container" [class]="'example-label-horizontal'">
+            <h2 class="example-name-label">Maximal Color: </h2>
+            <mat-form-field>
+              <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
+                     [disabled]="!isDateAndHourSelected">
+              <ngx-mat-color-toggle matSuffix [for]="maxColorPicker"></ngx-mat-color-toggle>
+              <ngx-mat-color-picker #maxColorPicker></ngx-mat-color-picker>
+            </mat-form-field>
+          </div>
+          <button mat-raised-button color="primary" (click)="changeColor(minColorCtr, maxColorCtr)"
+                  [disabled]="!isDateAndHourSelected">Set Colors
+          </button>
+
+        </div>
       </div>
     </div>
   </div>
@@ -107,7 +162,7 @@
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <div class="col">
-          <button class="btn btn-primary btn-dark" (click)="clickEvent()">See Details</button>
+          <button mat-raised-button color="primary" (click)="clickEvent()">See Details</button>
         </div>
         <div class="col">
           <p>Start At: {{animationStart}}</p>
@@ -120,9 +175,13 @@
         </div>
       </div>
     </nav>
-    <div class="progress" style="height: 2px;">
-      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"
-           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar-mat">
+      <mat-progress-bar mode="determinate" color="primary" value="{{animationPercentage}}"
+                        [attr.aria-valuenow]="animationPercentage"
+                        aria-valuemin="0" aria-valuemax="100" role="progressbar"></mat-progress-bar>
+
+      <!--      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"-->
+      <!--           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>-->
     </div>
     <div class="container-fluid">
       <app-map (latLngEventEmitter)="setLatLng($event)"

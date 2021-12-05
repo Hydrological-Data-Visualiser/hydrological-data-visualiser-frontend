@@ -8,7 +8,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
-import { ColorService } from '../color.service';
+import {ColorService} from '../color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -49,7 +49,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           });
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
-        this.map.fitBounds(this.polygonLayer.getBounds());
+        this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
       });
     });
   }
@@ -60,7 +60,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 1, fillOpacity: 0.7})
+        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -78,12 +78,10 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
     this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue =>
-        this.getInfoObservable().subscribe(info => {
-          this.colorService.setColorMap(minValue, maxValue, info.minColour, info.maxColour, info.metricLabel);
-          callback();
-        })
-      )
+      this.getMaxValue(begin, length).subscribe(maxValue => {
+        this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
+        callback();
+      })
     );
   }
 
@@ -121,5 +119,14 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  changeOpacity(newOpacity: number): void {
+    this.polygonLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+  }
+
+  updateColor(date: Date): void {
+    this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
+    this.draw(date);
   }
 }

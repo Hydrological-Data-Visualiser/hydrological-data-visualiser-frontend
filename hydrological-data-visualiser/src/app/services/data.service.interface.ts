@@ -40,4 +40,8 @@ export interface DataServiceInterface<Type> {
   getMinValue(begin: string, length: number): Observable<number>;
 
   getMaxValue(begin: string, length: number): Observable<number>;
+
+  changeOpacity(opacity: number): void;
+
+  updateColor(date: Date): void;
 }
