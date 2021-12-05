@@ -9,6 +9,7 @@ import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
 import {ColorService} from '../color.service';
+import {CustomMarkers} from '../custom-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -17,15 +18,17 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public map!: L.Map;
   public status = false;
   public url!: string;
-
+  public lastClickedData: [PolygonModel, L.LatLng] | undefined = undefined;
   public polygonLayer = new L.FeatureGroup();
   public info!: DataModelBase;
+  public marker: L.Marker | undefined = undefined;
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
   }
 
   clear(): void {
     this.polygonLayer.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   emitData(data: EmitData): void {
@@ -43,9 +46,11 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           .on('click', event => {
             // @ts-ignore
             const coords: L.LatLng = event.latlng;
+            this.lastClickedData = [polygon, coords];
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
+            this.addMarkerOnDataClick(coords);
           });
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
@@ -65,10 +70,20 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           .on('click', event => {
             // @ts-ignore
             const coords: L.LatLng = event.latlng;
+            this.lastClickedData = [polygon, coords];
             this.emitData(
               new EmitData(undefined, coords.lat, coords.lng, polygon.date, polygon.value, this.info.metricLabel)
             );
+            this.addMarkerOnDataClick(coords);
           });
+        if (this.lastClickedData) {
+          if (this.lastClickedData[0].id === polygon.id) {
+            this.emitData(
+              new EmitData(undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+                polygon.date, polygon.value, this.info.metricLabel)
+            );
+          }
+        }
         this.polygonLayer.addLayer(pol);
         this.polygonLayer.addTo(this.map);
       });
@@ -119,6 +134,21 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   getMaxValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
+  }
+
+  addMarkerOnDataClick(coords: L.LatLng): void {
+    if (this.marker) {
+      this.polygonLayer.removeLayer(this.marker);
+      this.marker = undefined;
+    }
+    const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
+      .on('click', () => {
+        this.polygonLayer.removeLayer(marker);
+        this.marker = undefined;
+        this.sidePanelService.emitData(new EmitData(undefined, undefined, undefined, undefined, undefined, undefined));
+      });
+    this.polygonLayer.addLayer(marker);
+    this.marker = marker;
   }
 
   changeOpacity(newOpacity: number): void {

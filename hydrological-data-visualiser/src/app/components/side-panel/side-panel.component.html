@@ -1,5 +1,5 @@
 <div class="d-flex" id="wrapper">
-  <div class="bg-light border-right " id="sidebar-wrapper" [ngClass]="status ? 'hide' : 'show'">
+  <div class="bg-light border-right " id="sidebar-wrapper" [ngClass]="sidePanelShowStatus ? 'hide' : 'show'">
     <div class="list-group list-group-flush px-4 ">
       <nav>
         <div class="nav nav-tabs" id="nav-side-panel" role="tablist">
@@ -22,9 +22,8 @@
             <form #dataForm="ngForm">
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" [disabled]="!isModelSelected"
-                       placeholder="Input & change events"
-                       (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="value"
+                <input matInput [matDatepicker]="picker" placeholder="Input & change events" [disabled]="!isModelSelected"
+                       (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="selectedDate"
                        [min]="minDate"
                        [max]="maxDate">
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -41,7 +40,7 @@
                 <mat-select *ngIf="blockedHourDropdown" disabled>
                 </mat-select>
                 <mat-select *ngIf="!blockedHourDropdown">
-                  <mat-option *ngFor="let hour of hours.sort()" (onSelectionChange)="onHourChange(hour)"
+                  <mat-option *ngFor="let hour of hourDropDownList.sort()" (onSelectionChange)="onHourChange(hour)"
                               [value]="hour">
                     {{hour | date :'HH:mm:ss'}}
 
@@ -71,11 +70,11 @@
               </div>
               <div class="buttons">
 
-                <button mat-mini-fab color="primary" *ngIf="!paused" class="m-2" (click)="pauseAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="!animationPaused" class="m-2" (click)="pauseAnimation()">
                   <mat-icon>pause</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="paused" class="m-2" (click)="pauseAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="animationPaused" class="m-2" (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
@@ -87,28 +86,26 @@
           </div>
         </div>
         <div class="tab-pane fade" id="nav-details" role="tabpanel" aria-labelledby="nav-details-tab">
-          <div *ngIf="clicked == false">
+          <div *ngIf="clickedOnMap == false">
             <br>
             <p class="text-md-center">Select the point on the map for which you want to know the details </p>
           </div>
-          <div id="longLang" *ngIf="clicked == true">
+          <div id="longLang" *ngIf="clickedOnMap == true">
             <br>
             <div class="row">
               <div class="col">
-                <p *ngIf="data.stationName">Station Name:</p>
-                <p *ngIf="data.latitude"> Latitude:</p>
-                <p *ngIf="data.longitude"> Longitude:</p>
-                <p *ngIf="data.value"> Value:</p>
-                <p *ngIf="!data.value"> Value:</p>
-                <p *ngIf="data.date"> Date:</p>
+                <p *ngIf="clickedData.stationName">Station Name:</p>
+                <p *ngIf="clickedData.latitude"> Latitude:</p>
+                <p *ngIf="clickedData.longitude"> Longitude:</p>
+                <p *ngIf="clickedData.value"> Value:</p>
+                <p *ngIf="clickedData.date"> Date:</p>
               </div>
               <div class="col">
-                <p *ngIf="data.stationName">{{data.stationName}}</p>
-                <p *ngIf="data.latitude">{{data.latitude.toFixed(4)}}</p>
-                <p *ngIf="data.longitude">{{data.longitude.toFixed(4)}}</p>
-                <p *ngIf="data.value">{{data.value.toFixed(2)}} {{data.metricLabel}}</p>
-                <p *ngIf="!data.value">No Data</p>
-                <p *ngIf="data.date">{{data.date | date:'medium'}}</p>
+                <p *ngIf="clickedData.stationName">{{clickedData.stationName}}</p>
+                <p *ngIf="clickedData.latitude">{{clickedData.latitude.toFixed(4)}}</p>
+                <p *ngIf="clickedData.longitude">{{clickedData.longitude.toFixed(4)}}</p>
+                <p *ngIf="clickedData.value">{{clickedData.value.toFixed(2)}} {{clickedData.metricLabel}}</p>
+                <p *ngIf="clickedData.date">{{clickedData.date | date:'medium'}}</p>
               </div>
             </div>
           </div>
@@ -162,7 +159,7 @@
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <div class="col">
-          <button mat-raised-button color="primary" (click)="clickEvent()">See Details</button>
+          <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
         </div>
         <div class="col">
           <p>Start At: {{animationStart}}</p>
@@ -184,8 +181,7 @@
       <!--           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>-->
     </div>
     <div class="container-fluid">
-      <app-map (latLngEventEmitter)="setLatLng($event)"
-               (clickedEmitter)="setClicked($event)"></app-map>
+      <app-map></app-map>
     </div>
   </div>
 </div>

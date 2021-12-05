@@ -10,6 +10,7 @@ import {DataServiceInterface} from '../data.service.interface';
 import {DataModelBase} from '../../model/data-model-base';
 import * as moment from 'moment';
 import {ColorService} from '../color.service';
+import {CustomMarkers} from '../custom-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +19,10 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   public map!: L.Map;
   public info!: DataModelBase;
   public url!: string;
+  public lastClickedData: [RiverPoint, L.LatLng] | undefined = undefined;
 
   public status = false;
+  public marker: L.Marker | undefined = undefined;
   private riverLayer = new L.FeatureGroup();
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
@@ -29,25 +32,9 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     this.sidePanelService.emitData(data);
   }
 
-  // getColor(d: number, points: RiverPoint[]): string {
-  //   const values = points.map(point => point.value).sort();
-  //   const min = values[0];
-  //   const max = values[values.length - 1];
-  //   const diff = Math.abs(max - min) / 7;
-
-  //   return d < min + diff ? '#0054ff' :
-  //     d < min + 2 * diff ? '#07ffd8' :
-  //       d < min + 3 * diff ? '#00ff29' :
-  //         d < min + 4 * diff ? '#bfff00' :
-  //           d < min + 5 * diff ? '#ffcb00' :
-  //             d < min + 6 * diff ? '#ea7905' :
-  //               d < min + 7 * diff ? '#e74242' :
-  //                 '#ff0000';
-
-  // }
-
   clear(): void {
     this.riverLayer.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   getInfo(): void {
@@ -69,10 +56,13 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         const color = this.colorService.getColor(points[i].value);
         const polyLine = L.polyline(river, {color})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
-          .on('click', () => {
+          .on('click', (event: any) => {
+            const coords = event.latlng;
+            this.addMarkerOnDataClick(coords);
             this.emitData(
-              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
+              new EmitData(undefined, coords.lat, coords.lng, points[i].date, points[i].value, this.info.metricLabel)
             );
+            this.lastClickedData = [points[i], coords];
           });
         this.riverLayer.addLayer(polyLine);
       }
@@ -91,11 +81,21 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         const color = this.colorService.getColor(points[i].value);
         const polyLine = L.polyline(river, {color, fillColor: color, opacity: 0.5, fillOpacity: 0.5})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
-          .on('click', () => { // TODO
+          .on('click', (event: any) => {
+            const coords = event.latlng;
+            this.lastClickedData = [points[i], coords];
             this.emitData(
-              new EmitData(undefined, points[i].latitude, points[i].longitude, points[i].date, points[i].value, this.info.metricLabel)
+              new EmitData(undefined, coords.lat, coords.lng, points[i].date, points[i].value, this.info.metricLabel)
             );
+            this.addMarkerOnDataClick(coords);
           });
+        if (this.lastClickedData) {
+          if (this.lastClickedData[0].id === points[i].id) {
+            this.emitData(new EmitData(
+              undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng, date, value, this.info.metricLabel)
+            );
+          }
+        }
         this.riverLayer.addLayer(polyLine);
       }
       this.riverLayer.addTo(this.map); // no fit bounds
@@ -148,5 +148,20 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   updateColor(date: Date): void {
     this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
     this.draw(date);
+  }
+
+  addMarkerOnDataClick(coords: L.LatLng): void {
+    if (this.marker) {
+      this.riverLayer.removeLayer(this.marker);
+      this.marker = undefined;
+    }
+    const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
+      .on('click', () => {
+        this.riverLayer.removeLayer(marker);
+        this.marker = undefined;
+        this.sidePanelService.emitData(new EmitData(undefined, undefined, undefined, undefined, undefined, undefined));
+      });
+    this.riverLayer.addLayer(marker);
+    this.marker = marker;
   }
 }

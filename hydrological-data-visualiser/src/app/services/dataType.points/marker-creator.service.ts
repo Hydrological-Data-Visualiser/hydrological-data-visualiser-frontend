@@ -24,6 +24,8 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     maxClusterRadius: zoom => 120 - zoom * 10
   });
   public stationList: Station[] = [];
+  public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
+  public marker: L.Marker | undefined = undefined;
   private markers: { [key: number]: L.Marker } = {};
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
@@ -75,6 +77,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
         {icon: this.getColoredIcon(colorHex), opacity: 0.5}).on('click', event => {
+        this.lastClickedData =
+          // @ts-ignore
+          [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
         this.emitData(
           new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
@@ -99,17 +104,28 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
         if (filteredStations.length > 0) {
           const station = filteredStations[0];
           const color = this.colorService.getColor(rainValue);
-          this.updateMarker(station, this.rgbStringToHex(color), rainValue);
+          this.updateMarker(station, this.rgbStringToHex(color), rainValue, date);
         }
       });
     });
   }
 
-  updateMarker(station: Station, colorHex: string, rainValue: number): void {
+  updateMarker(station: Station, colorHex: string, rainValue: number, date: Date): void {
     const marker = this.markers[station.id];
     if (marker) {
       marker.setIcon(this.getColoredIcon(colorHex));
       marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
+      marker.on('click', () => this.emitData(
+        new EmitData(station.name, station.latitude, station.longitude, date, rainValue, this.info.metricLabel))
+      );
+    }
+    if (this.lastClickedData) {
+      if (this.lastClickedData[0].stationId === station.id) {
+        this.emitData(
+          new EmitData(station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+            date, rainValue, this.info.metricLabel)
+        );
+      }
     }
   }
 
@@ -187,6 +203,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   clear(): void {
     this.group.clearLayers();
+    this.lastClickedData = undefined;
   }
 
   getDistinctLatLongStations(stations: Station[]): Station[] {

@@ -8,6 +8,8 @@ export interface DataServiceInterface<Type> {
   readonly url: string;
   info: DataModelBase;
   map: L.Map;
+  lastClickedData: [Type, L.LatLng] | undefined;
+  marker: L.Marker | undefined;
 
   draw(date: Date): void;
 

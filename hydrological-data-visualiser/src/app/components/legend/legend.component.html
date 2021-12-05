@@ -1,6 +1,6 @@
 <div class="col-12">
   <div class="row legend-scale">
-    <b class="legend-scale">{{scaleData.endValue}} <br> {{scaleData.metric}}</b>
+    <b class="legend-scale">{{scaleData.endValue.toFixed(2)}} <br> {{scaleData.metric}}</b>
   </div>
   <div class="row">
     <svg height="66vh">
@@ -14,6 +14,6 @@
     </svg>
   </div>
   <div class="row legend-scale">
-    <b class="legend-scale">{{scaleData.startValue}} <br> {{scaleData.metric}}</b>
+    <b class="legend-scale">{{scaleData.startValue.toFixed(2)}} <br> {{scaleData.metric}}</b>
   </div>
 </div>
