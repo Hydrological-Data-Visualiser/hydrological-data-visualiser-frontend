@@ -1,4 +1,4 @@
-import {ApplicationRef, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DataProviderService} from '../../services/data-provider.service';
 import {DataType} from '../../model/data-type';
 import {DataModelBase} from '../../model/data-model-base';
@@ -24,16 +24,20 @@ export class ModelConfigurationComponent implements OnInit {
     if (!this.urlAdded) {
       this.dataProvider.apis.push(this.url);
       this.http.get<DataModelBase>(`${this.url}/info`).subscribe(data => {
+        this.dataProvider.addedModelUrls.set(data.name, this.url);
         switch (data.dataType) {
           case DataType.LINE: {
+            this.dataProvider.addedModels.set(data.name, DataType.LINE);
             this.dataProvider.getUniversalLineService().setUrl(this.url);
             break;
           }
           case DataType.POINTS: {
+            this.dataProvider.addedModels.set(data.name, DataType.POINTS);
             this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
             break;
           }
           case DataType.POLYGON: {
+            this.dataProvider.addedModels.set(data.name, DataType.POLYGON);
             this.dataProvider.getUniversalPolygonsService().setUrl(this.url);
             break;
           }

@@ -10,6 +10,7 @@ import {DataServiceInterface} from './data.service.interface';
 import {UniversalPolygonsService} from './dataType.polygon/universal-polygons.service';
 import {UniversalLineService} from './dataType.line/universal-line.service';
 import {UniversalMarkerCreatorService} from './dataType.points/universal-marker-creator.service';
+import {DataType} from '../model/data-type';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +36,10 @@ export class DataProviderService {
     this.kocinkaTemperatureService.url,
     this.polygonsRandomService.url,
   ];
+
+  addedModels: Map<string, DataType> = new Map<string, DataType>();
+
+  addedModelUrls: Map<string, string> = new Map<string, string>();
 
   constructor(
     private http: HttpClient,
@@ -95,7 +100,25 @@ export class DataProviderService {
   }
 
   getActualService(): DataServiceInterface<any> {
-    return this.getAllServices().filter(service => service.info.id === this.selectedModel)[0];
+    let actualService = this.getAllServices().filter(service => service.info.id === this.selectedModel)[0];
+    if (actualService === undefined) {
+      const dataType = this.addedModels.get(this.selectedModel);
+      switch (dataType) {
+        case DataType.POLYGON:
+          this.universalPolygonsService.setUrl(this.addedModelUrls.get(this.selectedModel) as string);
+          actualService = this.universalPolygonsService;
+          break;
+        case DataType.POINTS:
+          this.universalMarkerCreatorService.setUrl(this.addedModelUrls.get(this.selectedModel) as string);
+          actualService = this.universalMarkerCreatorService;
+          break;
+        case DataType.LINE:
+          this.universalLineService.setUrl(this.addedModelUrls.get(this.selectedModel) as string);
+          actualService = this.universalLineService;
+          break;
+      }
+    }
+    return actualService;
   }
 
   getAllServices(): DataServiceInterface<any>[] {
