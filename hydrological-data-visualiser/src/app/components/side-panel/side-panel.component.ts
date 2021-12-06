@@ -16,7 +16,6 @@ import {AbstractControl, FormControl, Validators} from '@angular/forms';
 })
 export class SidePanelComponent implements OnInit {
   // details attributes
-  animationPaused = false;
   sidePanelShowStatus = false;
   clickedOnMap = false;
   // form attributes
@@ -27,8 +26,11 @@ export class SidePanelComponent implements OnInit {
   blockedHourDropdown = true;
   isModelSelected = false;
   isDateAndHourSelected = false;
+  isFormSubmitted = false;
   hourDropDownList: Date[] = [];
   // animation
+  animationPlaying = false;
+  animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
   animationStart: string | undefined;
   animationLength: number | undefined;
@@ -55,10 +57,10 @@ export class SidePanelComponent implements OnInit {
       this.clearEmitData();
       this.clickedOnMap = false;
       this.sidePanelShowStatus = false;
-      // TODO - replace with real stop @Nezonaru
-      this.animationService.stop();
+
       this.opacity = 50;
       this.isModelSelected = true;
+      this.isFormSubmitted = false;
 
       const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
       const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
@@ -67,6 +69,7 @@ export class SidePanelComponent implements OnInit {
 
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
+      this.stopAnimation();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -142,6 +145,8 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.selectedHour!.substr(3, 2), 10),
           Number.parseInt(this.selectedHour!.substr(6, 2), 10)
         );
+      this.stopAnimation();
+      this.isFormSubmitted = true;
       const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -149,7 +154,6 @@ export class SidePanelComponent implements OnInit {
             this.dataProvider.getActualService().draw(this.selectedDate);
           }
         });
-      this.animationService.stop();
     }
   }
 
@@ -163,14 +167,14 @@ export class SidePanelComponent implements OnInit {
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
     this.updateHourList(new Date(event.value));
-    this.animationService.stop();
   }
 
   // animation methods
   playAnimation(): void {
     this.animationPaused = false;
     const date = this.selectedDate;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD');
+    this.animationPlaying = true;
+    this.animationStart = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     this.animationLength = this.animationModel.steps;
     this.animationService.stop();
 
@@ -200,6 +204,30 @@ export class SidePanelComponent implements OnInit {
   pauseAnimation(): void {
     this.animationPaused = !this.animationPaused;
     this.animationService.pause();
+  }
+
+  stopAndRevertAnimation(): void {
+    const date = this.animationService.getStart();
+    this.stopAnimation();
+
+    if (date !== undefined) {
+      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
+        () => {
+          if (date) {
+            this.dataProvider.getActualService().draw(date);
+          }
+        });
+    }
+  }
+
+  stopAnimation(): void {
+    this.animationService.stop();
+    this.animationPlaying = false;
+    this.animationStart = undefined;
+    this.animationLength = undefined;
+    this.animationNow = undefined;
+    this.animationPercentage = 0;
   }
 
   dateFilter = (date: Date) => {

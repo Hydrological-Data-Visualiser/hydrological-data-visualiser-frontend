@@ -22,7 +22,8 @@
             <form #dataForm="ngForm">
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose a date</mat-label>
-                <input matInput [matDatepicker]="picker" placeholder="Input & change events" [disabled]="!isModelSelected"
+                <input matInput [matDatepicker]="picker" placeholder="Input & change events"
+                       [disabled]="!isModelSelected"
                        (dateInput)="onValueChange($event)" [matDatepickerFilter]="dateFilter" [value]="selectedDate"
                        [min]="minDate"
                        [max]="maxDate">
@@ -59,27 +60,39 @@
               <br>
 
               <label for="days" class="col-form-label">Animation span: </label>
-              <div class="col-3">
+              <div class="col-6">
                 <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
                        name="days" #days="ngModel">
               </div>
               <label for="timestep" class="col-form-label">Animation Timestep [ms]:</label>
-              <div class="col-3">
+              <div class="col-6">
                 <input type="number" id="timestep" class="form-control"
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </div>
-              <div class="buttons">
-
-                <button mat-mini-fab color="primary" *ngIf="!animationPaused" class="m-2" (click)="pauseAnimation()">
+              <div class="buttons mt-2">
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" type="button" disabled="true"
+                        class="m-2">
                   <mat-icon>pause</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="animationPaused" class="m-2" (click)="pauseAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="!animationPaused && animationPlaying" class="m-2"
+                        (click)="pauseAnimation()">
+                  <mat-icon>pause</mat-icon>
+                </button>
+
+                <button mat-mini-fab color="primary" *ngIf="animationPaused && animationPlaying" class="m-2"
+                        [disabled]="!isFormSubmitted" (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" class="m-2" (click)="playAnimation()">
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted"
+                        (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
+                </button>
+
+                <button mat-mini-fab color="accent" *ngIf="animationPlaying" type="submit" class="m-2"
+                        (click)="stopAndRevertAnimation()">
+                  <mat-icon>stop</mat-icon>
                 </button>
               </div>
             </form>
@@ -161,13 +174,13 @@
         <div class="col">
           <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
         </div>
-        <div class="col">
-          <p>Start At: {{animationStart}}</p>
+        <div class="col" *ngIf="animationPlaying">
+          <p>Start At: {{animationStart | date: 'medium'}}</p>
         </div>
-        <div class="col">
-          <p>Now: {{animationNow}}</p>
+        <div class="col" *ngIf="animationPlaying">
+          <p>Now: {{animationNow | date: 'medium'}}</p>
         </div>
-        <div class="col">
+        <div class="col" *ngIf="animationPlaying">
           <p>Length: {{animationLength}}</p>
         </div>
       </div>

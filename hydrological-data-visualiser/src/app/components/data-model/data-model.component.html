@@ -7,17 +7,18 @@
         <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <div class="d-flex justify-content-center m-5" *ngIf="getModels().length<=4">
+      <div class="d-flex justify-content-center m-5" *ngIf="getModels().length<getModelCount()">
         <mat-spinner></mat-spinner>
       </div>
 
-      <div class="modal-body" *ngIf="getModels().length>4">
+      <div class="modal-body" *ngIf="getModels().length>=getModelCount()">
         <p class=" font-weight-bold">Choose data model</p>
         <mat-radio-group
           aria-labelledby="example-radio-group-label"
           class="example-radio-group"
           [(ngModel)]="selectedModel">
-          <mat-radio-button color="primary" class="example-radio-button" *ngFor="let model of getModels() | sortPipe" [value]=model
+          <mat-radio-button color="primary" class="example-radio-button" *ngFor="let model of getModels() | sortPipe"
+                            [value]=model
                             (change)="changeModelStatus(model.id)">
             {{model.name}} - {{model.description}} - {{model.dataType}}
           </mat-radio-button>

@@ -33,9 +33,9 @@ export class StationsComponent implements OnInit {
     const map = this.dataProvider.getActualService().map;
     if (station.latitude && station.longitude) {
       this.query = '';
-      map.setView([station.latitude, station.longitude], 13, {
+      map.flyTo([station.latitude, station.longitude], 13, {
         animate: true,
-        duration: 2
+        duration: 1
       });
     }
   }

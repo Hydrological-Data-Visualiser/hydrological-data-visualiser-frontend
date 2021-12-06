@@ -8,9 +8,11 @@ export class SortPipePipe implements PipeTransform {
 
   transform(array: Array<DataModelBase>): Array<DataModelBase> {
     array.sort((a: DataModelBase, b: DataModelBase) => {
-      if (a.name < b.name) {
+      const c = a.name.toLowerCase();
+      const d = b.name.toLowerCase();
+      if (c < d) {
         return -1;
-      } else if (a.name > b.name) {
+      } else if (c > d) {
         return 1;
       } else {
         return 0;

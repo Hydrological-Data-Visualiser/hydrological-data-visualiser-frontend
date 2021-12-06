@@ -17,13 +17,8 @@ export class UniversalMarkerCreatorService extends MarkerCreatorService{
     this.info = new DataModelBase('creator-service-model-base', '', '', DataType.POINTS, [], '', '', '');
   }
 
-  getData(): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
-  }
-
   setUrl(url: string): void {
     this.url = url;
-    this.getData();
     this.getInfo();
     this.getStations();
   }

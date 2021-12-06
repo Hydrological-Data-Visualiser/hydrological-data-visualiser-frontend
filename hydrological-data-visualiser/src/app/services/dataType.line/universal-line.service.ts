@@ -17,13 +17,8 @@ export class UniversalLineService extends RiverService{
     this.info = new DataModelBase('line-service-model-base', '', '', DataType.LINE, [], '', '', '');
   }
 
-  getData(): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
-  }
-
   setUrl(url: string): void {
     this.url = url;
-    this.getData();
     this.getInfo();
   }
 }

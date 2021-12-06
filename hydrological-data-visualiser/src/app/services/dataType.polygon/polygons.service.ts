@@ -53,9 +53,9 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
             this.addMarkerOnDataClick(coords);
           });
         this.polygonLayer.addLayer(pol);
-        this.polygonLayer.addTo(this.map);
-        this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
       });
+      this.polygonLayer.addTo(this.map);
+      this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
     });
   }
 
@@ -85,8 +85,8 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
           }
         }
         this.polygonLayer.addLayer(pol);
-        this.polygonLayer.addTo(this.map);
       });
+      this.polygonLayer.addTo(this.map);
     });
   }
 
