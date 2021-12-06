@@ -18,11 +18,6 @@ export class SidePanelComponent implements OnInit {
   // details attributes
   sidePanelShowStatus = false;
   clickedOnMap = false;
-  status = false;
-  clicked = false;
-  long: number | undefined;
-  lat: number | undefined;
-  name: string | undefined;
   // form attributes
   public minDate: Date = new Date();
   public maxDate: Date = new Date();
@@ -31,6 +26,7 @@ export class SidePanelComponent implements OnInit {
   blockedHourDropdown = true;
   isModelSelected = false;
   isDateAndHourSelected = false;
+  isFormSubmitted = false;
   hourDropDownList: Date[] = [];
   // animation
   animationPlaying = false;
@@ -57,15 +53,15 @@ export class SidePanelComponent implements OnInit {
       this.dateFilter = (date: Date): boolean => {
         return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
-      this.stopAnimation();
       this.clear();
       this.clearEmitData();
       this.clickedOnMap = false;
       this.sidePanelShowStatus = false;
       // TODO - replace with real stop @Nezonaru
-      this.animationService.stop();
+      // this.animationService.stop();
       this.opacity = 50;
       this.isModelSelected = true;
+      this.isFormSubmitted = false;
 
       const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
       const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
@@ -74,6 +70,7 @@ export class SidePanelComponent implements OnInit {
 
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
+      this.stopAnimation();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -150,6 +147,7 @@ export class SidePanelComponent implements OnInit {
           Number.parseInt(this.selectedHour!.substr(6, 2), 10)
         );
       this.stopAnimation();
+      this.isFormSubmitted = true;
       const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
