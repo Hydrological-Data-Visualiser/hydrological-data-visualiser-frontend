@@ -71,6 +71,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
       this.map.flyToBounds(this.group.getBounds(), {duration: 1});
     });
+    this.map.addLayer(this.group);
   }
 
   createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
@@ -92,7 +93,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       }
       this.markers[station.id] = marker;
       this.group.addLayer(marker);
-      this.map.addLayer(this.group);
     }
   }
 

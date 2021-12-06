@@ -18,7 +18,11 @@ export class DataModelComponent implements OnInit {
   }
 
   getModels(): DataModelBase[] {
-    return this.dataProvider.dataModels;
+    return this.dataProvider.dataModels.sort((a, b) => a.name > b.name ? 1 : -1);
+  }
+
+  getModelCount(): number {
+    return this.dataProvider.dataModels.length;
   }
 
   changeModelStatus(name: string): void {

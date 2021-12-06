@@ -18,13 +18,8 @@ export class UniversalPolygonsService extends PolygonsService{
     this.info = new DataModelBase('polygon-service-model-base', '', '', DataType.POLYGON, [], '', '', '');
   }
 
-  getData(): Observable<PrecipitationDayDataNew[]> {
-    return this.http.get<PrecipitationDayDataNew[]>(`${this.url}/data`);
-  }
-
   setUrl(url: string): void {
     this.url = url;
-    this.getData();
     this.getInfo();
   }
 }
