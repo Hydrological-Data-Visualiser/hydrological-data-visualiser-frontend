@@ -57,8 +57,7 @@ export class SidePanelComponent implements OnInit {
       this.clearEmitData();
       this.clickedOnMap = false;
       this.sidePanelShowStatus = false;
-      // TODO - replace with real stop @Nezonaru
-      // this.animationService.stop();
+
       this.opacity = 50;
       this.isModelSelected = true;
       this.isFormSubmitted = false;
