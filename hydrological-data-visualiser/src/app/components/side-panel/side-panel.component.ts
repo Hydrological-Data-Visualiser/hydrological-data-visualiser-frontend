@@ -174,7 +174,7 @@ export class SidePanelComponent implements OnInit {
     this.animationPaused = false;
     const date = this.selectedDate;
     this.animationPlaying = true;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    this.animationStart = (moment(date)).format('YYYY-MM-DD | HH:mm:SS');
     this.animationLength = this.animationModel.steps;
     this.animationService.stop();
 
@@ -197,7 +197,7 @@ export class SidePanelComponent implements OnInit {
     ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
-    const formattedDate = (moment(animationNow)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(animationNow)).format('YYYY-MM-DD | HH:mm:SS');
     this.animationNow = formattedDate;
   }
 
