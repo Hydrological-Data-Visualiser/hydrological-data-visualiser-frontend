@@ -36,6 +36,9 @@ export class SidePanelComponent implements OnInit {
   animationLength: number | undefined;
   animationNow: string | undefined;
   animationPercentage: number | undefined;
+  // non animation
+  showingDate: string | undefined; // used for showing displayed non animation data
+
   clickedData: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
   opacity = 50;
   minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
@@ -70,6 +73,7 @@ export class SidePanelComponent implements OnInit {
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
       this.stopAnimation();
+      this.showingDate = undefined;
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -147,6 +151,7 @@ export class SidePanelComponent implements OnInit {
         );
       this.stopAnimation();
       this.isFormSubmitted = true;
+      this.showingDate = (moment(this.selectedDate)).format('YYYY-MM-DD | HH:mm:SS');
       const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {

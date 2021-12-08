@@ -170,76 +170,9 @@
   </div>
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
-      <!-- <mat-toolbar> -->
+
       <div class="container-fluid">
         <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
-        <!-- <span class="spacer"></span> -->
-        <!-- <span *ngIf="animationPlaying" style='font-size:50%;'>
-          Start At: 
-        </span>
-        <span *ngIf="animationPlaying">
-          Start At: {{animationStart | date: 'medium'}}
-        </span>
-        <span *ngIf="animationPlaying">
-          Now: {{animationNow | date: 'medium'}}
-        </span>
-        <span *ngIf="animationPlaying">
-          Length: {{animationLength}}
-        </span> -->
-        <!-- <table mat-table class="mat-elevation-z8" [dataSource]="[0, 0]">
-          <ng-container matColumnDef="description">
-            <div *matHeaderCellDef>Description</div>
-            <div class="description-cell"
-                      *matCellDef="let lesson"> {{animationStart | date: 'medium'}} </div>
-          </ng-container>
-
-          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-        </table> -->
-        <!-- <table class="mat-table" >
-          <tr class="mat-header-row">
-            <th class="mat-header-cell">Start At:</th>
-            <span *ngIf="animationPlaying"></span>
-            <th class="mat-header-cell">Now:</th>
-            <span *ngIf="animationPlaying"></span>
-            <th class="mat-header-cell">Length:</th>
-          </tr>
-          <tr class="mat-row">
-            <td class="mat-cell">{{animationStart | date: 'medium'}}</td>
-            <span *ngIf="animationPlaying"></span>
-            <td class="mat-cell">{{animationNow | date: 'medium'}}</td>
-            <span *ngIf="animationPlaying"></span>
-            <td class="mat-cell">{{animationLength}}</td>
-          </tr>
-        </table> -->
-        <!-- <table>
-          <tr class="mat-header-row">
-            <th class="mat-header-cell">Start:</th>
-          </tr>
-          <tr class="mat-row">
-            <td class="mat-cell">{{animationStart | date: 'medium'}}</td>
-          </tr>
-        </table>
-        <span class="spacer"></span>
-        <table>
-          <tr class="mat-header-row">
-            <th class="mat-header-cell">Now:</th>
-          </tr>
-          <tr class="mat-row">
-            <td class="mat-cell">{{animationNow | date: 'medium'}}</td>
-          </tr>
-        </table>
-        <span class="spacer"></span>
-        <table>
-          <tr class="mat-header-row">
-            <th class="mat-header-cell">Length:</th>
-          </tr>
-          <tr class="mat-row">
-            <th class="mat-header-cell"> 
-              <input type="text" id="country" name="country" value="{{animationLength}}" readonly>
-            </th>
-          </tr>
-        </table> -->
         <div *ngIf="animationPlaying">
           <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Animation Start:</mat-label>
@@ -254,10 +187,14 @@
             <input matInput value="{{animationLength}}" readonly>
           </mat-form-field>
         </div>
-        <!-- <span *ngIf="animationPlaying"></span> -->
+        <div *ngIf="showingDate!=undefined && !animationPlaying">
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Showing</mat-label>
+            <input matInput value="{{showingDate}}" readonly>
+          </mat-form-field>
+        </div>
 
       </div>
-    <!-- </mat-toolbar> -->
     </nav>
     <div class="progress-bar-mat">
       <mat-progress-bar mode="determinate" color="primary" value="{{animationPercentage}}"
