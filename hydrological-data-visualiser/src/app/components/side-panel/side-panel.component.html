@@ -175,22 +175,22 @@
         <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
         <div *ngIf="animationPlaying">
           <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Animation Length:</mat-label>
+            <input matInput value="{{animationLength}}" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Animation Start:</mat-label>
-            <input matInput value="{{animationStart}}" readonly>
+            <input matInput value="{{animationStart | date:'medium'}}" readonly>
           </mat-form-field>
           <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Showing:</mat-label>
-            <input matInput value="{{animationNow}}" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="standard" class="content-no-underline">
-            <mat-label>Animation Length:</mat-label>
-            <input matInput value="{{animationLength}}" readonly>
+            <input matInput value="{{animationNow | date:'medium'}}" readonly>
           </mat-form-field>
         </div>
         <div *ngIf="showingDate!=undefined && !animationPlaying">
           <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Showing</mat-label>
-            <input matInput value="{{showingDate}}" readonly>
+            <input matInput value="{{showingDate | date:'medium'}}" readonly>
           </mat-form-field>
         </div>
 
