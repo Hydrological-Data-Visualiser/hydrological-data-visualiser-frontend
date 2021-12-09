@@ -24,6 +24,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   public status = false;
   public marker: L.Marker | undefined = undefined;
   private riverLayer = new L.FeatureGroup();
+  public markerLayer = new L.FeatureGroup();
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
   }
@@ -151,17 +152,19 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   }
 
   addMarkerOnDataClick(coords: L.LatLng): void {
+    this.markerLayer.addTo(this.map);
     if (this.marker) {
-      this.riverLayer.removeLayer(this.marker);
+      this.markerLayer.removeLayer(this.marker);
       this.marker = undefined;
     }
     const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
       .on('click', () => {
-        this.riverLayer.removeLayer(marker);
+        this.markerLayer.removeLayer(marker);
         this.marker = undefined;
         this.sidePanelService.emitData(new EmitData(undefined, undefined, undefined, undefined, undefined, undefined));
+        this.lastClickedData = undefined;
       });
-    this.riverLayer.addLayer(marker);
+    this.markerLayer.addLayer(marker);
     this.marker = marker;
   }
 }

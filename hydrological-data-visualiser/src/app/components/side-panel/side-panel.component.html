@@ -59,16 +59,16 @@
               </div>
               <br>
 
-              <label for="days" class="col-form-label">Animation span: </label>
-              <div class="col-6">
-                <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
+              <mat-form-field>
+                <mat-label>Animation span</mat-label>
+                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"
                        name="days" #days="ngModel">
-              </div>
-              <label for="timestep" class="col-form-label">Animation Timestep [ms]:</label>
-              <div class="col-6">
-                <input type="number" id="timestep" class="form-control"
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Animation Timestep [ms]</mat-label>
+                <input matInput type="number" id="timestep"
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
-              </div>
+              </mat-form-field>
               <div class="buttons mt-2">
                 <button mat-mini-fab color="primary" *ngIf="!animationPlaying" type="button" disabled="true"
                         class="m-2">
@@ -99,11 +99,11 @@
           </div>
         </div>
         <div class="tab-pane fade" id="nav-details" role="tabpanel" aria-labelledby="nav-details-tab">
-          <div *ngIf="clickedOnMap == false">
+          <div *ngIf="clickedOnMap === false">
             <br>
             <p class="text-md-center">Select the point on the map for which you want to know the details </p>
           </div>
-          <div id="longLang" *ngIf="clickedOnMap == true">
+          <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
             <div class="row">
               <div class="col">
@@ -125,41 +125,41 @@
         </div>
 
         <div class="tab-pane fade" id="nav-conf" role="tabpanel" aria-labelledby="nav-conf-tab">
-          <div class="example-label-container" [class]="'example-label-horizontal'">
-            <h2 id="example-name-label" class="example-name-label">Opacity: </h2>
-          </div>
-          <mat-slider
-            class="example-margin"
-            [max]=100
-            [min]=0
-            [step]=5
-            [thumbLabel]=true
-            [(ngModel)]="opacity"
-            (input)="changeOpacity($event.value)"
-            [disabled]="!isDateAndHourSelected"
-            color="primary"
-            aria-labelledby="example-name-label">
-          </mat-slider>
+          <mat-form-field floatLabel="always" appearance="'nope'" class="m-2 mu-4 mt-4 w-100">
+            <mat-label>Opacity</mat-label>
+            <mat-slider
+              class="example-margin"
+              [max]=100
+              [min]=0
+              [step]=5
+              [thumbLabel]=true
+              [(ngModel)]="opacity"
+              (input)="changeOpacity($event.value)"
+              [disabled]="!isDateAndHourSelected"
+              color="primary"
+              aria-labelledby="example-name-label">
+            </mat-slider>
+            <textarea matInput hidden></textarea>
+          </mat-form-field>
 
-          <div class="example-label-container" [class]="'example-label-horizontal'">
-            <h2 class="example-name-label">Minimal Color: </h2>
-            <mat-form-field>
-              <input matInput [ngxMatColorPicker]="minColorPicker" [formControl]="minColorCtr"
-                     [disabled]="!isDateAndHourSelected">
-              <ngx-mat-color-toggle matSuffix [for]="minColorPicker"></ngx-mat-color-toggle>
-              <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
-            </mat-form-field>
-          </div>
 
-          <div class="example-label-container" [class]="'example-label-horizontal'">
-            <h2 class="example-name-label">Maximal Color: </h2>
-            <mat-form-field>
-              <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
-                     [disabled]="!isDateAndHourSelected">
-              <ngx-mat-color-toggle matSuffix [for]="maxColorPicker"></ngx-mat-color-toggle>
-              <ngx-mat-color-picker #maxColorPicker></ngx-mat-color-picker>
-            </mat-form-field>
-          </div>
+          <mat-form-field class="m-2 ">
+            <mat-label>Minimal Color</mat-label>
+            <input matInput [ngxMatColorPicker]="minColorPicker" [formControl]="minColorCtr"
+                   [disabled]="!isDateAndHourSelected">
+            <ngx-mat-color-toggle matSuffix [for]="minColorPicker"></ngx-mat-color-toggle>
+            <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
+          </mat-form-field>
+
+
+          <mat-form-field class="m-2">
+            <mat-label>Maximal Color</mat-label>
+            <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
+                   [disabled]="!isDateAndHourSelected">
+            <ngx-mat-color-toggle matSuffix [for]="maxColorPicker"></ngx-mat-color-toggle>
+            <ngx-mat-color-picker #maxColorPicker></ngx-mat-color-picker>
+          </mat-form-field>
+
           <button mat-raised-button color="primary" (click)="changeColor(minColorCtr, maxColorCtr)"
                   [disabled]="!isDateAndHourSelected">Set Colors
           </button>
