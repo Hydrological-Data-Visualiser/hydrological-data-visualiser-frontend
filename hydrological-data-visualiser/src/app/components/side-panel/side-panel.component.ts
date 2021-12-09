@@ -54,7 +54,7 @@ export class SidePanelComponent implements OnInit {
         return tab.map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
       this.clear();
-      this.clearEmitData();
+      this.setClickedData(undefined);
       this.clickedOnMap = false;
       this.sidePanelShowStatus = false;
 
@@ -73,25 +73,18 @@ export class SidePanelComponent implements OnInit {
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
-      if (!data.latitude && !data.longitude && !data.value && !data.date && !data.stationName && !data.metricLabel) {
-        this.clickedOnMap = false;
-        this.clearEmitData();
-      } else if (data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude) {
-        this.clickedOnMap = false;
-        this.clearEmitData();
-      } else {
-        this.clickedOnMap = true;
-        this.clickedData.date = data.date;
-        this.clickedData.value = data.value;
-        this.clickedData.longitude = data.longitude;
-        this.clickedData.latitude = data.latitude;
-        this.clickedData.stationName = data.stationName;
-        this.clickedData.metricLabel = data.metricLabel;
-        this.sidePanelShowStatus = false;
+      if (data.latitude !== this.clickedData.latitude && data.longitude !== this.clickedData.longitude) {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
       }
-      this.clickedData = new EmitData(data.stationName, data.latitude, data.longitude, data.date, data.value, data.metricLabel);
+      if (data.latitude === undefined && data.longitude === undefined) {
+        this.clickedOnMap = false;
+        this.setClickedData(undefined);
+      } else {
+        this.clickedOnMap = true;
+        this.setClickedData(data);
+        this.sidePanelShowStatus = false;
+      }
       if (!this.animationPaused) {
         this.sidePanelShowStatus = false;
       }
@@ -236,15 +229,6 @@ export class SidePanelComponent implements OnInit {
     return false;
   }
 
-  clearEmitData(): void {
-    this.clickedData.date = undefined;
-    this.clickedData.value = undefined;
-    this.clickedData.longitude = undefined;
-    this.clickedData.latitude = undefined;
-    this.clickedData.stationName = undefined;
-    this.clickedData.metricLabel = undefined;
-  }
-
   changeOpacity(value: number): void {
     this.dataProvider.getActualService().changeOpacity(value / 100);
   }
@@ -264,5 +248,23 @@ export class SidePanelComponent implements OnInit {
       , (m, r, g, b) => '#' + r + r + g + g + b + b)
       .substring(1).match(/.{2}/g)
       .map(x => parseInt(x, 16));
+  }
+
+  setClickedData(data: EmitData | undefined): void {
+    if (data) {
+      this.clickedData.date = data.date;
+      this.clickedData.value = data.value;
+      this.clickedData.longitude = data.longitude;
+      this.clickedData.latitude = data.latitude;
+      this.clickedData.stationName = data.stationName;
+      this.clickedData.metricLabel = data.metricLabel;
+    } else {
+      this.clickedData.date = undefined;
+      this.clickedData.value = undefined;
+      this.clickedData.longitude = undefined;
+      this.clickedData.latitude = undefined;
+      this.clickedData.stationName = undefined;
+      this.clickedData.metricLabel = undefined;
+    }
   }
 }

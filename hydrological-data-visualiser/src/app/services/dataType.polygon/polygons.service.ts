@@ -20,6 +20,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public url!: string;
   public lastClickedData: [PolygonModel, L.LatLng] | undefined = undefined;
   public polygonLayer = new L.FeatureGroup();
+  public markerLayer = new L.FeatureGroup();
   public info!: DataModelBase;
   public marker: L.Marker | undefined = undefined;
 
@@ -137,17 +138,19 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   }
 
   addMarkerOnDataClick(coords: L.LatLng): void {
+    this.markerLayer.addTo(this.map);
     if (this.marker) {
-      this.polygonLayer.removeLayer(this.marker);
+      this.markerLayer.removeLayer(this.marker);
       this.marker = undefined;
     }
     const marker: L.Marker = L.marker(coords, {icon: CustomMarkers.blackIcon})
       .on('click', () => {
-        this.polygonLayer.removeLayer(marker);
+        this.markerLayer.removeLayer(marker);
         this.marker = undefined;
         this.sidePanelService.emitData(new EmitData(undefined, undefined, undefined, undefined, undefined, undefined));
+        this.lastClickedData = undefined;
       });
-    this.polygonLayer.addLayer(marker);
+    this.markerLayer.addLayer(marker);
     this.marker = marker;
   }
 
