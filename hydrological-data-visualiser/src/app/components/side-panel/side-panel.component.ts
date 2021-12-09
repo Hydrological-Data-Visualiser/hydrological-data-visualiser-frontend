@@ -73,7 +73,10 @@ export class SidePanelComponent implements OnInit {
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
-      if (data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude) {
+      if (!data.latitude && !data.longitude && !data.value && !data.date && !data.stationName && !data.metricLabel) {
+        this.clickedOnMap = false;
+        this.clearEmitData();
+      } else if (data.latitude === this.clickedData.latitude && data.longitude === this.clickedData.longitude) {
         this.clickedOnMap = false;
         this.clearEmitData();
       } else {
@@ -88,7 +91,6 @@ export class SidePanelComponent implements OnInit {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
       }
-      this.clickedOnMap = true;
       this.clickedData = new EmitData(data.stationName, data.latitude, data.longitude, data.date, data.value, data.metricLabel);
       if (!this.animationPaused) {
         this.sidePanelShowStatus = false;
