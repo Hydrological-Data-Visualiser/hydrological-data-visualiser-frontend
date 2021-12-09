@@ -3,7 +3,7 @@
   <div class="modal-dialog modal-lg  modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title" id="exampleModalLabel">Stations</h1>
+        <mat-card-title class="modal-title" id="exampleModalLabel">Stations</mat-card-title>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -12,7 +12,7 @@
           <div class="form-group">
             <mat-form-field class=" mb-4 w-100" appearance="fill">
               <mat-label>{{allStations.length === 0 ? 'There are no stations in this model' : 'Station'}}</mat-label>
-              <input matInput [disabled]="allStations.length === 0" [(ngModel)]="query">
+              <input matInput [disabled]="allStations.length === 0" [(ngModel)]="query" name="station">
             </mat-form-field>
           </div>
           <div class="row">

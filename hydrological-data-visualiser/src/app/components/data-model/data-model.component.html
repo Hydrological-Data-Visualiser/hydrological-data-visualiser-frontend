@@ -3,7 +3,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title" id="exampleModalLabel">Data Models</h1>
+        <mat-card-title class="modal-title" id="exampleModalLabel">Data Models</mat-card-title>
         <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
@@ -12,7 +12,7 @@
       </div>
 
       <div class="modal-body" *ngIf="getModels().length>=getModelCount()">
-        <p class=" font-weight-bold">Choose data model</p>
+        <mat-label class=" font-weight-bold">Choose data model</mat-label>
         <mat-radio-group
           aria-labelledby="example-radio-group-label"
           class="example-radio-group"
