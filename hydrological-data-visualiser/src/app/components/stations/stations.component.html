@@ -3,17 +3,17 @@
   <div class="modal-dialog modal-lg  modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title" id="exampleModalLabel">Stations</h1>
+        <mat-card-title class="modal-title" id="exampleModalLabel">Stations</mat-card-title>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 
         <div class="row align-items-center p-2 form-group">
           <div class="form-group">
-            <input *ngIf="allStations.length > 0" type="text" class="form-control mb-4" placeholder="Search"
-                   [(ngModel)]="query">
-            <input *ngIf="allStations.length === 0" type="text" class="form-control mb-4"
-                   placeholder="There are no stations in this model" [(ngModel)]="query" disabled>
+            <mat-form-field class=" mb-4 w-100" appearance="fill">
+              <mat-label>{{allStations.length === 0 ? 'There are no stations in this model' : 'Station'}}</mat-label>
+              <input matInput [disabled]="allStations.length === 0" [(ngModel)]="query" name="station">
+            </mat-form-field>
           </div>
           <div class="row">
             <div *ngFor="let station of allStations | searchFilter: query" class="col-4">
