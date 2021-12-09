@@ -59,16 +59,16 @@
               </div>
               <br>
 
-              <label for="days" class="col-form-label">Animation span: </label>
-              <div class="col-6">
-                <input type="number" id="days" class="form-control" [(ngModel)]="animationModel.steps"
+              <mat-form-field>
+                <mat-label>Animation span</mat-label>
+                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"
                        name="days" #days="ngModel">
-              </div>
-              <label for="timestep" class="col-form-label">Animation Timestep [ms]:</label>
-              <div class="col-6">
-                <input type="number" id="timestep" class="form-control"
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Animation Timestep [ms]</mat-label>
+                <input matInput type="number" id="timestep"
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
-              </div>
+              </mat-form-field>
               <div class="buttons mt-2">
                 <button mat-mini-fab color="primary" *ngIf="!animationPlaying" type="button" disabled="true"
                         class="m-2">
