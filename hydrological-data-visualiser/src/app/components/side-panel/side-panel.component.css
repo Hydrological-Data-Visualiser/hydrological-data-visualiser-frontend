@@ -81,3 +81,13 @@ input[type="number"] {
   width: 95%;
   margin: auto;
 }
+
+.content-no-underline .mat-form-field-underline {
+  display: none;
+  margin-bottom: -10px;
+  padding-bottom: -10px;
+}
+.content-no-underline .mat-form-field-wrapper {
+  margin-bottom: -2em;
+  margin-top: -0.9em;
+}

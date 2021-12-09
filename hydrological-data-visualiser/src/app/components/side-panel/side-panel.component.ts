@@ -32,10 +32,13 @@ export class SidePanelComponent implements OnInit {
   animationPlaying = false;
   animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
-  animationStart: string | undefined;
+  animationStart: Date | undefined;
   animationLength: number | undefined;
-  animationNow: string | undefined;
+  animationNow: Date | undefined;
   animationPercentage: number | undefined;
+  // non animation
+  showingDate: Date | undefined; // used for showing displayed non animation data
+
   clickedData: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
   opacity = 50;
   minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
@@ -70,6 +73,7 @@ export class SidePanelComponent implements OnInit {
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
       this.stopAnimation();
+      this.showingDate = undefined;
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -142,6 +146,7 @@ export class SidePanelComponent implements OnInit {
         );
       this.stopAnimation();
       this.isFormSubmitted = true;
+      this.showingDate = this.selectedDate;
       const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -169,7 +174,8 @@ export class SidePanelComponent implements OnInit {
     this.animationPaused = false;
     const date = this.selectedDate;
     this.animationPlaying = true;
-    this.animationStart = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    this.animationStart = date;
+    this.animationNow = date;
     this.animationLength = this.animationModel.steps;
     this.animationService.stop();
 
@@ -187,13 +193,11 @@ export class SidePanelComponent implements OnInit {
 
   // called by animationService
   setAnimationPlaybackData(animationNow: Date, currentFrame: number): void {
-    console.log(animationNow);
     if (this.animationLength !== undefined
     ) {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
-    const formattedDate = (moment(animationNow)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    this.animationNow = formattedDate;
+    this.animationNow = animationNow;
   }
 
   pauseAnimation(): void {

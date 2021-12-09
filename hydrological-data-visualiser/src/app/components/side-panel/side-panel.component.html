@@ -170,19 +170,30 @@
   </div>
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
+
       <div class="container-fluid">
-        <div class="col">
-          <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
+        <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
+        <div *ngIf="animationPlaying">
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Animation Length:</mat-label>
+            <input matInput value="{{animationLength}}" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Animation Start:</mat-label>
+            <input matInput value="{{animationStart | date:'medium'}}" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Showing:</mat-label>
+            <input matInput value="{{animationNow | date:'medium'}}" readonly>
+          </mat-form-field>
         </div>
-        <div class="col" *ngIf="animationPlaying">
-          <p>Start At: {{animationStart | date: 'medium'}}</p>
+        <div *ngIf="showingDate!=undefined && !animationPlaying">
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Showing</mat-label>
+            <input matInput value="{{showingDate | date:'medium'}}" readonly>
+          </mat-form-field>
         </div>
-        <div class="col" *ngIf="animationPlaying">
-          <p>Now: {{animationNow | date: 'medium'}}</p>
-        </div>
-        <div class="col" *ngIf="animationPlaying">
-          <p>Length: {{animationLength}}</p>
-        </div>
+
       </div>
     </nav>
     <div class="progress-bar-mat">
