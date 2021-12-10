@@ -105,22 +105,26 @@
           </div>
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
-            <div class="row">
-              <div class="col">
-                <p *ngIf="clickedData.stationName">Station Name:</p>
-                <p *ngIf="clickedData.latitude"> Latitude:</p>
-                <p *ngIf="clickedData.longitude"> Longitude:</p>
-                <p *ngIf="clickedData.value"> Value:</p>
-                <p *ngIf="clickedData.date"> Date:</p>
-              </div>
-              <div class="col">
-                <p *ngIf="clickedData.stationName">{{clickedData.stationName}}</p>
-                <p *ngIf="clickedData.latitude">{{clickedData.latitude.toFixed(4)}}</p>
-                <p *ngIf="clickedData.longitude">{{clickedData.longitude.toFixed(4)}}</p>
-                <p *ngIf="clickedData.value">{{clickedData.value.toFixed(2)}} {{clickedData.metricLabel}}</p>
-                <p *ngIf="clickedData.date">{{clickedData.date | date:'medium'}}</p>
-              </div>
-            </div>
+            <mat-form-field *ngIf="clickedData.stationName" appearance="standard" class="content-no-underline m-3">
+              <mat-label>StationName</mat-label>
+              <input matInput value="{{clickedData.stationName}}" readonly>
+            </mat-form-field>
+            <mat-form-field *ngIf="clickedData.latitude" appearance="standard" class="content-no-underline m-3">
+              <mat-label>Latitude</mat-label>
+              <input matInput value="{{clickedData.latitude.toFixed(4)}}" readonly>
+            </mat-form-field>
+            <mat-form-field *ngIf="clickedData.longitude" appearance="standard" class="content-no-underline m-3">
+              <mat-label>Longitude</mat-label>
+              <input matInput value="{{clickedData.longitude.toFixed(4)}}" readonly>
+            </mat-form-field>
+            <mat-form-field *ngIf="clickedData.value" appearance="standard" class="content-no-underline m-3">
+              <mat-label>Value</mat-label>
+              <input matInput value="{{clickedData.value}}" readonly>
+            </mat-form-field>
+            <mat-form-field *ngIf="clickedData.date" appearance="standard" class="content-no-underline m-3">
+              <mat-label>Date</mat-label>
+              <input matInput value="{{clickedData.date | date: 'medium'}}" readonly>
+            </mat-form-field>
           </div>
         </div>
 
