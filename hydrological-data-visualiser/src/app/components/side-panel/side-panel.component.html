@@ -119,7 +119,7 @@
             </mat-form-field>
             <mat-form-field *ngIf="clickedData.value" appearance="standard" class="content-no-underline m-3">
               <mat-label>Value</mat-label>
-              <input matInput value="{{clickedData.value}}" readonly>
+              <input matInput value="{{clickedData.value}} {{clickedData.metricLabel}}" readonly>
             </mat-form-field>
             <mat-form-field *ngIf="clickedData.date" appearance="standard" class="content-no-underline m-3">
               <mat-label>Date</mat-label>
