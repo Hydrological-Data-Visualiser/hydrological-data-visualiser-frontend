@@ -23,10 +23,12 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   public status = false;
   public marker: L.Marker | undefined = undefined;
-  private riverLayer = new L.FeatureGroup();
   public markerLayer = new L.FeatureGroup();
+  public opacity = 0.5;
+  private riverLayer = new L.FeatureGroup();
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
+    this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
   emitData(data: EmitData): void {
@@ -55,7 +57,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
         const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
         const color = this.colorService.getColor(points[i].value);
-        const polyLine = L.polyline(river, {color})
+        const polyLine = L.polyline(river, {color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', (event: any) => {
             const coords = event.latlng;
@@ -80,7 +82,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
         river.push(new LatLng(points[i + 1].latitude, points[i + 1].longitude));
         const value = (Number(points[i].value) + Number(points[i + 1].value)) / 2;
         const color = this.colorService.getColor(points[i].value);
-        const polyLine = L.polyline(river, {color, fillColor: color, opacity: 0.5, fillOpacity: 0.5})
+        const polyLine = L.polyline(river, {color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity})
           .bindPopup(`${value.toFixed(2)} ${this.info.metricLabel}`)
           .on('click', (event: any) => {
             const coords = event.latlng;
@@ -144,6 +146,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   changeOpacity(newOpacity: number): void {
     this.riverLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+    this.opacity = newOpacity;
   }
 
   updateColor(date: Date): void {

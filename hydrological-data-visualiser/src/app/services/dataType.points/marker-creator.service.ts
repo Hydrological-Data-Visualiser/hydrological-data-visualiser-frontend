@@ -26,9 +26,11 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   public stationList: Station[] = [];
   public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
   public marker: L.Marker | undefined = undefined;
+  public opacity = 0.5;
   private markers: { [key: number]: L.Marker } = {};
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
+    this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
   getColoredIcon(color: string): L.DivIcon {
@@ -77,7 +79,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
     if (station.longitude && station.latitude) {
       const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
-        {icon: this.getColoredIcon(colorHex), opacity: 0.5}).on('click', event => {
+        {icon: this.getColoredIcon(colorHex), opacity: this.opacity}).on('click', event => {
         this.lastClickedData =
           // @ts-ignore
           [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
@@ -240,6 +242,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   changeOpacity(newOpacity: number): void {
+    this.opacity = newOpacity;
     this.group.setStyle({opacity: newOpacity, fillOpacity: newOpacity});
     for (const key in this.markers) {
       if (this.markers.hasOwnProperty(key)) {

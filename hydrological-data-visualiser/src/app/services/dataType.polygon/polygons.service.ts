@@ -23,8 +23,10 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   public markerLayer = new L.FeatureGroup();
   public info!: DataModelBase;
   public marker: L.Marker | undefined = undefined;
+  public opacity = 0.5;
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
+    this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
   clear(): void {
@@ -42,7 +44,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
+        const pol = new L.Polygon(latLngs, {color, opacity: this.opacity, fillOpacity: this.opacity})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -66,7 +68,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
-        const pol = new L.Polygon(latLngs, {color, opacity: 0.5, fillOpacity: 0.5})
+        const pol = new L.Polygon(latLngs, {color, opacity: this.opacity, fillOpacity: this.opacity})
           .bindPopup(`${polygon.value} ${this.info.metricLabel}`)
           .on('click', event => {
             // @ts-ignore
@@ -156,6 +158,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   changeOpacity(newOpacity: number): void {
     this.polygonLayer.setStyle({fillOpacity: newOpacity, opacity: newOpacity});
+    this.opacity = newOpacity;
   }
 
   updateColor(date: Date): void {
