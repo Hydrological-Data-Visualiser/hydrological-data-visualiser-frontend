@@ -24,7 +24,6 @@ export class ColorService {
     this.minValue = minValue
     this.maxValue = maxValue
     this.metricLabel = metricLabel;
-    console.log(startColor)
     this.colormap = interpolate([startColor, endColor]);
     if (this.legend) {
       this.legend.setScale(minValue, maxValue, startColor, endColor, metricLabel);
