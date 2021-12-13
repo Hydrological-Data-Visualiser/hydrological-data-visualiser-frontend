@@ -49,7 +49,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   }
 
   draw(date: Date): void {
-    this.riverLayer.clearLayers();
+    this.clear();
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
         const river = [];
