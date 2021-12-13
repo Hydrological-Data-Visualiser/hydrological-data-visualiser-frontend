@@ -38,6 +38,9 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   clear(): void {
     this.riverLayer.clearLayers();
     this.lastClickedData = undefined;
+    if (this.marker) {
+      this.markerLayer.removeLayer(this.marker);
+    }
   }
 
   getInfo(): void {

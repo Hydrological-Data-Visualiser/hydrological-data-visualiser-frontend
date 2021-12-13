@@ -32,6 +32,9 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   clear(): void {
     this.polygonLayer.clearLayers();
     this.lastClickedData = undefined;
+    if (this.marker) {
+      this.markerLayer.removeLayer(this.marker);
+    }
   }
 
   emitData(data: EmitData): void {
