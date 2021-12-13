@@ -38,6 +38,9 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   clear(): void {
     this.riverLayer.clearLayers();
     this.lastClickedData = undefined;
+    if (this.marker) {
+      this.markerLayer.removeLayer(this.marker);
+    }
   }
 
   getInfo(): void {
@@ -49,7 +52,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   }
 
   draw(date: Date): void {
-    this.riverLayer.clearLayers();
+    this.clear();
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
         const river = [];
@@ -76,6 +79,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
 
   update(date: Date): Promise<void> {
     return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(points => {
+      this.riverLayer.clearLayers();
       for (let i = 0; i < points.length - 1; i++) {
         const river = [];
         river.push(new LatLng(points[i].latitude, points[i].longitude));
@@ -110,7 +114,6 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
     this.getMinValue(begin, length).subscribe(minValue =>
       this.getMaxValue(begin, length).subscribe(maxValue => {
         this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
-        console.log('callback');
         callback();
       })
     );

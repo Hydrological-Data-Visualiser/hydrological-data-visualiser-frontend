@@ -32,6 +32,9 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
   clear(): void {
     this.polygonLayer.clearLayers();
     this.lastClickedData = undefined;
+    if (this.marker) {
+      this.markerLayer.removeLayer(this.marker);
+    }
   }
 
   emitData(data: EmitData): void {
@@ -64,7 +67,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
 
   update(date: Date): Promise<void> {
     return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(polygons => {
-      this.clear();
+      this.polygonLayer.clearLayers();
       polygons.forEach(polygon => {
         const latLngs: L.LatLng[] = polygon.points.map(a => new L.LatLng(a[1], a[0]));
         const color = this.colorService.getColor(polygon.value);
