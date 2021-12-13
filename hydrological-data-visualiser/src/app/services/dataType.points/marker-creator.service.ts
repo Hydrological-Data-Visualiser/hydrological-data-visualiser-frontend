@@ -55,6 +55,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
+    this.sidePanelService.finishEmitter.emit(true);
     this.group.clearLayers();
 
     const usedStations: Station[] = [];
@@ -72,7 +73,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
       unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
       this.map.flyToBounds(this.group.getBounds(), {duration: 1});
-      this.sidePanelService.finishEmitter.emit(true);
+      this.sidePanelService.finishEmitter.emit(false);
     });
     this.map.addLayer(this.group);
   }

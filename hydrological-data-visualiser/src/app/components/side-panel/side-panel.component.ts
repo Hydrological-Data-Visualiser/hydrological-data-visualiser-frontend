@@ -96,7 +96,7 @@ export class SidePanelComponent implements OnInit {
       }
     });
 
-    this.sidePanelService.finishEmitter.subscribe(() => this.showLoadingScreen = false);
+    this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
   }
 
   clear(): void {
@@ -140,7 +140,6 @@ export class SidePanelComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.showLoadingScreen = true;
     if (this.selectedDate) {
       this.selectedDate
         .setHours(

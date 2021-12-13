@@ -52,6 +52,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
   }
 
   draw(date: Date): void {
+    this.sidePanelService.finishEmitter.emit(true);
     this.clear();
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(points => {
       for (let i = 0; i < points.length - 1; i++) {
@@ -74,7 +75,7 @@ export abstract class RiverService implements DataServiceInterface<RiverPoint> {
       }
       this.riverLayer.addTo(this.map);
       this.map.flyToBounds(this.riverLayer.getBounds(), {duration: 1});
-      this.sidePanelService.finishEmitter.emit(true);
+      this.sidePanelService.finishEmitter.emit(false);
     });
   }
 
