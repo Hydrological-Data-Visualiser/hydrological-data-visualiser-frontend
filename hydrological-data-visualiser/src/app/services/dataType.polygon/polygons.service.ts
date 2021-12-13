@@ -62,6 +62,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonMod
       });
       this.polygonLayer.addTo(this.map);
       this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
+      this.sidePanelService.finishEmitter.emit(true);
     });
   }
 

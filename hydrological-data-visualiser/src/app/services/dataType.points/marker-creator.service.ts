@@ -72,6 +72,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       const unusedStations: Station[] = stations.filter(n => !usedStations.includes(n));
       unusedStations.forEach(station => this.createMarker(station, this.rgbToHex(0, 0, 0), NaN, metricLabel, date));
       this.map.flyToBounds(this.group.getBounds(), {duration: 1});
+      this.sidePanelService.finishEmitter.emit(true);
     });
     this.map.addLayer(this.group);
   }
