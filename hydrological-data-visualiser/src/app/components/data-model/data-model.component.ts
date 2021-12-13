@@ -18,7 +18,7 @@ export class DataModelComponent implements OnInit {
   }
 
   getModels(): DataModelBase[] {
-    return this.dataProvider.dataModels.sort((a, b) => a.name > b.name ? 1 : -1);
+    return this.dataProvider.dataModels.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
   }
 
   getModelCount(): number {
