@@ -11,9 +11,13 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li>
-            <button mat-button id="modelsButton" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal" href="">Data models
-            </button>
+            <div *ngIf="!blockModelButton">
+              <button mat-button id="modelsButton" data-bs-toggle="modal" data-bs-target="#exampleModal">Data models
+              </button>
+            </div>
+            <div *ngIf="blockModelButton" (click)="openSnackBarModelChange()">
+              <button  mat-button>Data models</button>
+            </div>
           </li>
           <li>
             <div *ngIf="visibleStations">

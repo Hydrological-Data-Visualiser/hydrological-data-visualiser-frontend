@@ -44,6 +44,8 @@ export class SidePanelComponent implements OnInit {
   minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
   maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
+  showLoadingScreen = false;
+
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
   }
@@ -93,6 +95,8 @@ export class SidePanelComponent implements OnInit {
         this.sidePanelShowStatus = false;
       }
     });
+
+    this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
   }
 
   clear(): void {

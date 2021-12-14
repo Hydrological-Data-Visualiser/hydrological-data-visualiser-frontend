@@ -49,16 +49,22 @@
                 </mat-select>
               </mat-form-field>
               <div>
-                <button mat-raised-button color="primary" *ngIf="isDateAndHourSelected" type="button" class="m-1"
+                <button mat-raised-button color="primary" *ngIf="isDateAndHourSelected && !showLoadingScreen"
+                        type="button" class="m-1"
                         (click)="onSubmit()">Show
                 </button>
-                <button mat-raised-button color="primary" *ngIf="!isDateAndHourSelected" type="button" class="m-1"
+                <button mat-raised-button color="primary" *ngIf="!isDateAndHourSelected && !showLoadingScreen"
+                        type="button" class="m-1"
                         (click)="onSubmit()"
                         disabled>Show
                 </button>
+                <button mat-raised-button color="primary" *ngIf="showLoadingScreen" type="button" class="m-1" disabled>
+                  <mat-icon>
+                    <mat-spinner diameter="20"></mat-spinner>
+                  </mat-icon>
+                </button>
               </div>
               <br>
-
               <mat-form-field>
                 <mat-label>Animation span</mat-label>
                 <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"
@@ -106,7 +112,7 @@
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
             <mat-form-field *ngIf="clickedData.stationName" appearance="standard" class="content-no-underline m-3">
-              <mat-label>StationName</mat-label>
+              <mat-label>Station name</mat-label>
               <input matInput value="{{clickedData.stationName}}" readonly>
             </mat-form-field>
             <mat-form-field *ngIf="clickedData.latitude" appearance="standard" class="content-no-underline m-3">
