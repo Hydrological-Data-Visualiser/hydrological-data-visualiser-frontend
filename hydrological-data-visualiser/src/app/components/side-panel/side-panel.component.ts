@@ -36,6 +36,8 @@ export class SidePanelComponent implements OnInit {
   animationLength: number | undefined;
   animationNow: Date | undefined;
   animationPercentage: number | undefined;
+  selectedAnimationDate: Date | undefined;
+  isAnimationRangeSelected = false;
   // non animation
   showingDate: Date | undefined; // used for showing displayed non animation data
 
@@ -108,6 +110,7 @@ export class SidePanelComponent implements OnInit {
     this.selectedDate = undefined;
     this.blockedHourDropdown = true;
     this.isDateAndHourSelected = false;
+    this.isAnimationRangeSelected = false;
   }
 
   setClicked(newItem: boolean): void {
@@ -161,6 +164,10 @@ export class SidePanelComponent implements OnInit {
             this.dataProvider.getActualService().draw(this.selectedDate);
           }
         });
+      this.animationDateFilter = (date: Date): boolean => {
+        return date >= this.selectedDate! && this.dataProvider.getActualService().info.availableDates.sort()
+          .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
+      };
     }
   }
 
@@ -174,6 +181,11 @@ export class SidePanelComponent implements OnInit {
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
     this.updateHourList(new Date(event.value));
+  }
+
+  onAnimationDateChange(event: any): void {
+    this.selectedAnimationDate = event.value;
+    this.isAnimationRangeSelected = true;
   }
 
   // animation methods
@@ -237,6 +249,10 @@ export class SidePanelComponent implements OnInit {
   }
 
   dateFilter = (date: Date) => {
+    return false;
+  }
+
+  animationDateFilter = (date: Date) => {
     return false;
   }
 

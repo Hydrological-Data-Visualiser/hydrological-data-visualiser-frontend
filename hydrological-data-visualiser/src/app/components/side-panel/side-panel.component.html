@@ -65,14 +65,31 @@
                 </button>
               </div>
               <br>
-              <mat-form-field>
-                <mat-label>Animation span</mat-label>
-                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"
-                       name="days" #days="ngModel">
+              <!--              <mat-form-field>-->
+              <!--                <mat-label>Animation span</mat-label>-->
+              <!--                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"-->
+              <!--                       name="days" #days="ngModel">-->
+              <!--              </mat-form-field>-->
+
+              <mat-form-field class="example-full-width" appearance="fill">
+                <mat-label>Choose animation range</mat-label>
+                <input matInput [matDatepicker]="animationPicker"
+                       [disabled]="!isFormSubmitted" (dateInput)="onAnimationDateChange($event)"
+                       [matDatepickerFilter]="animationDateFilter" [value]="selectedAnimationDate"
+                       [min]="minDate"
+                       [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="animationPicker"></mat-datepicker-toggle>
+                <mat-datepicker #animationPicker>
+                  <mat-datepicker-actions>
+                    <button mat-button matDatepickerCancel>Cancel</button>
+                    <button mat-raised-button color="primary" matDatepickerApply>Apply</button>
+                  </mat-datepicker-actions>
+                </mat-datepicker>
               </mat-form-field>
+
               <mat-form-field>
                 <mat-label>Animation Timestep [ms]</mat-label>
-                <input matInput type="number" id="timestep"
+                <input matInput type="number" id="timestep" [disabled]="!isFormSubmitted"
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </mat-form-field>
               <div class="buttons mt-2">
@@ -87,11 +104,11 @@
                 </button>
 
                 <button mat-mini-fab color="primary" *ngIf="animationPaused && animationPlaying" class="m-2"
-                        [disabled]="!isFormSubmitted" (click)="pauseAnimation()">
+                        [disabled]="!isFormSubmitted || !isAnimationRangeSelected" (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted"
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted || !isAnimationRangeSelected"
                         (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
