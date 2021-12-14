@@ -45,6 +45,7 @@ export class SidePanelComponent implements OnInit {
   maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
   showLoadingScreen = false;
+  selected: any;
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -76,6 +77,8 @@ export class SidePanelComponent implements OnInit {
       document.getElementById('nav-form-tab').click();
       this.stopAnimation();
       this.showingDate = undefined;
+
+      this.init();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
@@ -273,6 +276,38 @@ export class SidePanelComponent implements OnInit {
       this.clickedData.latitude = undefined;
       this.clickedData.stationName = undefined;
       this.clickedData.metricLabel = undefined;
+    }
+  }
+
+  init(): void {
+    this.blockedHourDropdown = false;
+    this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
+    this.updateHourList(this.selectedDate);
+    this.hourDropDownList = [];
+    const dataProvider = this.dataProvider.getActualService();
+
+    if (dataProvider) {
+      dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
+        (data: Date[]) => {
+          this.hourDropDownList = [];
+          data.forEach(d => {
+            const date = new Date(d);
+            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            this.hourDropDownList.push(nowUtc);
+
+            // distinct and sort
+            // tslint:disable-next-line:no-shadowed-variable
+            this.hourDropDownList = [...new Set(this.hourDropDownList)].sort((a, b) => {
+              return (new Date(b) as any) - (new Date(a) as any);
+            });
+          });
+          this.selectedHour = moment(this.hourDropDownList.sort()[0]).format('HH:mm:ss');
+          this.selected = this.hourDropDownList.sort()[0];
+          this.isDateAndHourSelected = true;
+          this.onSubmit();
+        }
+      );
     }
   }
 }
