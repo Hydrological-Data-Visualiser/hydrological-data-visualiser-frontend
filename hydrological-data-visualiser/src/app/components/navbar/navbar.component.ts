@@ -40,7 +40,7 @@ export class NavbarComponent implements OnInit, AfterViewInit {
   }
 
 
-  openSnackBar1(): void {
+  openSnackBarModelChange(): void {
     this.snackBar.open('You cannot change model during downloading data', 'Ok', {
       duration: 5000,
       panelClass: ['mat-toolbar', 'mat-primary']
