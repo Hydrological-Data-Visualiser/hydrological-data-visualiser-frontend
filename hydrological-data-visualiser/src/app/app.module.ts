@@ -39,7 +39,8 @@ import {SortPipePipe} from './pipes/sort-pipe.pipe';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {ModelConfigurationComponent} from './components/model-configuration/model-configuration.component';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-import { MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {NgChartsModule} from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -80,7 +81,8 @@ import { MatSnackBarModule} from '@angular/material/snack-bar';
     NgxMatColorPickerModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    NgChartsModule
   ],
   providers: [SidePanelComponent, SidePanelService, {provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS}],
   bootstrap: [AppComponent]

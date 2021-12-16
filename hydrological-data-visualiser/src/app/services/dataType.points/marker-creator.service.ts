@@ -21,7 +21,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   public map!: L.Map;
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: zoom => 120 - zoom * 10
+    maxClusterRadius: zoom => 140 - zoom * 10
   });
   public stationList: Station[] = [];
   public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
@@ -86,7 +86,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
           // @ts-ignore
           [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
         this.emitData(
-          new EmitData(station.name, station.latitude, station.longitude, date, rainValue, metricLabel)
+          new EmitData(station, station.latitude, station.longitude, date, rainValue, metricLabel)
         );
       });
 
@@ -120,13 +120,13 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       marker.setIcon(this.getColoredIcon(colorHex));
       marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
       marker.on('click', () => this.emitData(
-        new EmitData(station.name, station.latitude, station.longitude, date, rainValue, this.info.metricLabel))
+        new EmitData(station, station.latitude, station.longitude, date, rainValue, this.info.metricLabel))
       );
     }
     if (this.lastClickedData) {
       if (this.lastClickedData[0].stationId === station.id) {
         this.emitData(
-          new EmitData(station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+          new EmitData(station, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
             date, rainValue, this.info.metricLabel)
         );
       }
@@ -256,5 +256,11 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   updateColor(date: Date): void {
     this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
     this.draw(date);
+  }
+
+  getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station): Observable<HydrologicalDataBase> {
+    const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<HydrologicalDataBase>(`${this.url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);
   }
 }

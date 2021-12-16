@@ -108,7 +108,8 @@
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted || !isAnimationRangeSelected"
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2"
+                        [disabled]="!isFormSubmitted || !isAnimationRangeSelected"
                         (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
@@ -128,9 +129,9 @@
           </div>
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
-            <mat-form-field *ngIf="clickedData.stationName" appearance="standard" class="content-no-underline m-3">
+            <mat-form-field *ngIf="clickedData.station" appearance="standard" class="content-no-underline m-3">
               <mat-label>Station name</mat-label>
-              <input matInput value="{{clickedData.stationName}}" readonly>
+              <input matInput value="{{clickedData.station.name}}" readonly>
             </mat-form-field>
             <mat-form-field *ngIf="clickedData.latitude" appearance="standard" class="content-no-underline m-3">
               <mat-label>Latitude</mat-label>
@@ -148,6 +149,16 @@
               <mat-label>Date</mat-label>
               <input matInput value="{{clickedData.date | date: 'medium'}}" readonly>
             </mat-form-field>
+          </div>
+          <div *ngIf="barChartData.datasets.length >0 && selectedDate && selectedAnimationDate">
+            <div>
+              <canvas baseChart
+                      [data]="barChartData"
+                      [options]="barChartOptions"
+                      [plugins]="barChartPlugins"
+                      [type]="'bar'">
+              </canvas>
+            </div>
           </div>
         </div>
 

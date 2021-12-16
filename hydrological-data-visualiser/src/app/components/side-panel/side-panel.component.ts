@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import * as moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
@@ -7,6 +7,10 @@ import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
 import {Color} from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
+import {DataType} from '../../model/data-type';
+import {HydrologicalDataBase} from '../../model/hydrological-data-base';
+import {ChartConfiguration, ChartData} from 'chart.js';
+import {BaseChartDirective} from 'ng2-charts';
 
 @Component({
   selector: 'app-side-panel',
@@ -47,6 +51,33 @@ export class SidePanelComponent implements OnInit {
   maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
 
   showLoadingScreen = false;
+
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+
+  public barChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: []
+  };
+
+  public barChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    // We use these empty structures as placeholders for dynamic theming.
+    scales: {
+      x: {},
+      y: {}
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      // datalabels: {
+      //   anchor: 'end',
+      //   align: 'end'
+      // }
+    },
+  };
+
+  public barChartPlugins = [];
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -96,6 +127,7 @@ export class SidePanelComponent implements OnInit {
       if (!this.animationPaused) {
         this.sidePanelShowStatus = false;
       }
+      this.getDataToChart();
     });
 
     this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
@@ -183,6 +215,7 @@ export class SidePanelComponent implements OnInit {
   onAnimationDateChange(event: any): void {
     this.selectedAnimationDate = event.value;
     this.isAnimationRangeSelected = true;
+    this.getDataToChart();
   }
 
   // animation methods
@@ -280,15 +313,52 @@ export class SidePanelComponent implements OnInit {
       this.clickedData.value = data.value;
       this.clickedData.longitude = data.longitude;
       this.clickedData.latitude = data.latitude;
-      this.clickedData.stationName = data.stationName;
+      this.clickedData.station = data.station;
       this.clickedData.metricLabel = data.metricLabel;
     } else {
       this.clickedData.date = undefined;
       this.clickedData.value = undefined;
       this.clickedData.longitude = undefined;
       this.clickedData.latitude = undefined;
-      this.clickedData.stationName = undefined;
+      this.clickedData.station = undefined;
       this.clickedData.metricLabel = undefined;
     }
+  }
+
+  getDataToChart(): void {
+    this.barChartData.datasets = [];
+    this.barChartData.labels = [];
+    if (this.dataProvider.getActualService().info.dataType === DataType.POINTS &&
+      this.clickedData.station && this.selectedDate && this.selectedAnimationDate) {
+      this.dataProvider.getActualService()
+        // @ts-ignore
+        .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate, this.clickedData.station)
+        .subscribe((data: HydrologicalDataBase[]) => {
+          this.createDataChart(data);
+        });
+    }
+  }
+
+  createDataChart(data: HydrologicalDataBase[]): void {
+    const dataPoints: Date[] = [];
+    let actualDate: Date = this.selectedDate!;
+    while (actualDate <= this.selectedAnimationDate!) {
+      // this.dataProvider.getActualService().getDayTimePointsAsObservable(actualDate).subscribe((points: Date[]) => {
+      //   dataPoints.push(...points);
+      // });
+      dataPoints.push(actualDate);
+      actualDate = new Date(actualDate.getTime() + (1000 * 60 * 60 * 24));
+    }
+    const dataset: { data: number[], label: string } = {data: [], label: this.dataProvider.getActualService().info.metricLabel};
+    dataPoints.forEach(point => {
+      this.barChartData.labels?.push(moment(point).format('YYYY-MM-DD'));
+      if (data.map(a => moment(a.date).format('YYYY-MM-DD')).includes(moment(point).format('YYYY-MM-DD'))) {
+        dataset.data.push(data.filter(a => moment(a.date).format('YYYY-MM-DD') === moment(point).format('YYYY-MM-DD'))[0].value);
+      } else {
+        dataset.data.push(0);
+      }
+    });
+    this.barChartData.datasets.push(dataset);
+    this.chart?.update();
   }
 }
