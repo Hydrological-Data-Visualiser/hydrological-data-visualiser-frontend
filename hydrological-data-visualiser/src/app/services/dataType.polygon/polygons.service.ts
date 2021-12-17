@@ -50,7 +50,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
     this.clear();
     this.getDataFromDateAsObservableUsingInstant(date).subscribe(polygonDataArr => {
       polygonDataArr.forEach(polygonData => {
-        const polygon = this.stationList[polygonData.polygonId];
+        const polygon = this.stationList.find(a => a.id === polygonData.polygonId);
         if (polygon) {
           const latlngs: L.LatLng[] = polygon.points.map(points => new L.LatLng(points[0], points[1]));
           const color = this.colorService.getColor(polygonData.value);
