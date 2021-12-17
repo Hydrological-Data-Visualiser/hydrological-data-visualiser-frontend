@@ -30,10 +30,9 @@ export interface DataServiceInterface<Type> {
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void;
 
-  // only in points services
-  getStationsObservable?(): Observable<Station[]>;
+  getStationsObservable(): Observable<Station[]>;
 
-  getStations?(): void;
+  getStations(): void;
 
   clear(): void;
 

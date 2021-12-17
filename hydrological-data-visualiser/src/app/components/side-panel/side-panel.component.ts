@@ -53,6 +53,7 @@ export class SidePanelComponent implements OnInit {
   ngOnInit(): void {
     this.sidePanelService.modelEmitter.subscribe(name => {
       const tab = this.dataProvider.getActualService().info.availableDates.sort();
+      this.dataProvider.getActualService().getStations();
       this.minDate = tab[0];
       this.maxDate = tab[tab.length - 1];
       this.dateFilter = (date: Date): boolean => {
@@ -264,14 +265,14 @@ export class SidePanelComponent implements OnInit {
       this.clickedData.value = data.value;
       this.clickedData.longitude = data.longitude;
       this.clickedData.latitude = data.latitude;
-      this.clickedData.stationName = data.stationName;
+      this.clickedData.name = data.name;
       this.clickedData.metricLabel = data.metricLabel;
     } else {
       this.clickedData.date = undefined;
       this.clickedData.value = undefined;
       this.clickedData.longitude = undefined;
       this.clickedData.latitude = undefined;
-      this.clickedData.stationName = undefined;
+      this.clickedData.name = undefined;
       this.clickedData.metricLabel = undefined;
     }
   }

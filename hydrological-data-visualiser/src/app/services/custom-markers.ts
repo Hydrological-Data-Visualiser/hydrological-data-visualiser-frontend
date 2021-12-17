@@ -28,4 +28,25 @@ export class CustomMarkers {
     shadowSize: [41, 41]
   });
 
+
+  static getColoredIcon(color: string): L.DivIcon {
+    const markerHtmlStyles = `
+      background-color: ${color};
+      width: 2rem;
+      height: 2rem;
+      display: block;
+      left: -1rem;
+      top: -1rem;
+      position: relative;
+      border-radius: 2rem 2rem 0;
+      transform: rotate(45deg);
+      border: 2px solid #000000`;
+
+    return L.divIcon({
+      iconAnchor: [0, 24],
+      popupAnchor: [1, -36],
+      shadowSize: [41, 41],
+      html: `<span style="${markerHtmlStyles}" />`
+    });
+  }
 }

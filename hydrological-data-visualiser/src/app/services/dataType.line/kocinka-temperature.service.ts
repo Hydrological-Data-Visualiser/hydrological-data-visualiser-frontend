@@ -9,7 +9,7 @@ import { ColorService } from '../color.service';
   providedIn: 'root'
 })
 export class KocinkaTemperatureService extends RiverService {
-  public url = 'https://imgw-mock.herokuapp.com/kocinkaTemperature';
+  public url = 'http://localhost:8080/kocinkaTemperature';
 
   constructor(public http: HttpClient, public sidePanelService: SidePanelService, colorService: ColorService) {
     super(sidePanelService, http, colorService);

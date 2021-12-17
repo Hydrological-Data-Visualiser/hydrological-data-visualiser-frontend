@@ -8,11 +8,10 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
   providedIn: 'root'
 })
 export class KocinkaSurfaceHeightService extends MarkerCreatorService {
-  public url = 'https://imgw-mock.herokuapp.com/kocinkaPressure';
+  public url = 'http://localhost:8080/kocinkaPressure';
 
   constructor(public http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
     super(colorService, sidePanelService, http);
     this.getInfo();
-    this.getStations();
   }
 }

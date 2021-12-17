@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
-import {Observable} from 'rxjs';
-import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {RiverService} from './river.service';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataType} from '../../model/data-type';
