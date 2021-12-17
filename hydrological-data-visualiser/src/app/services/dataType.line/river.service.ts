@@ -70,7 +70,7 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
             opacity: this.opacity,
             fillOpacity: this.opacity
           })
-            .bindPopup(`${polylineData.value.toFixed(2)} ${this.info.metricLabel}`)
+            .bindPopup(`${polylineData.value} ${this.info.metricLabel}`)
             .on('click', (event: any) => {
               const coords = event.latlng;
               this.addMarkerOnDataClick(coords);
@@ -98,7 +98,7 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
           if (polyline) {
             const color = this.colorService.getColor(polylineData.value);
             polyline.setStyle({color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity});
-            polyline.bindPopup(`${polylineData.value.toFixed(2)} ${this.info.metricLabel}`)
+            polyline.bindPopup(`${polylineData.value} ${this.info.metricLabel}`)
               .on('click', (event: any) => {
                 const coords = event.latlng;
                 this.lastClickedData = [polylineData, coords];
