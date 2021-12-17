@@ -82,10 +82,10 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
           this.riverLayer.addLayer(lPolyline);
           this.polyLines.set(polyline, lPolyline);
         }
-        this.riverLayer.addTo(this.map);
-        this.map.flyToBounds(this.riverLayer.getBounds(), {duration: 1});
-        this.sidePanelService.finishEmitter.emit(false);
       });
+      this.riverLayer.addTo(this.map);
+      this.map.flyToBounds(this.riverLayer.getBounds(), {duration: 1});
+      this.sidePanelService.finishEmitter.emit(false);
     });
   }
 
