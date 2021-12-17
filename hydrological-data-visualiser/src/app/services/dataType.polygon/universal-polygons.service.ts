@@ -19,5 +19,6 @@ export class UniversalPolygonsService extends PolygonsService{
   setUrl(url: string): void {
     this.url = url;
     this.getInfo();
+    this.getStations();
   }
 }

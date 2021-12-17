@@ -18,6 +18,7 @@ export class UniversalMarkerCreatorService extends MarkerCreatorService{
   setUrl(url: string): void {
     this.url = url;
     this.getInfo();
+    this.getStations();
   }
 
 }

@@ -18,5 +18,6 @@ export class UniversalLineService extends RiverService{
   setUrl(url: string): void {
     this.url = url;
     this.getInfo();
+    this.getStations();
   }
 }

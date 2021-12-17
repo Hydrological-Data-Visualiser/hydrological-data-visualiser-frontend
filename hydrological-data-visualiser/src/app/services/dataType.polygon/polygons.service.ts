@@ -60,7 +60,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
             opacity: this.opacity,
             fillOpacity: this.opacity
           })
-            .bindPopup(`${polygonData.value.toFixed(2)} ${this.info.metricLabel}`)
+            .bindPopup(`${polygonData.value} ${this.info.metricLabel}`)
             .on('click', (event: any) => {
               const coords: L.LatLng = event.latlng;
               this.lastClickedData = [polygonData, coords];
@@ -70,7 +70,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
               this.addMarkerOnDataClick(coords);
             });
           this.polygonLayer.addLayer(lPolygon);
-          this.polygons.set(polygon, lPolygon);
+          // this.polygons.set(polygon, lPolygon);
         }
         this.polygonLayer.addTo(this.map);
         this.map.flyToBounds(this.polygonLayer.getBounds(), {duration: 1});
@@ -88,7 +88,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
           if (polygon) {
             const color = this.colorService.getColor(polygonData.value);
             polygon.setStyle({color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity});
-            polygon.bindPopup(`${polygonData.value.toFixed(2)} ${this.info.metricLabel}`)
+            polygon.bindPopup(`${polygonData.value} ${this.info.metricLabel}`)
               .on('click', (event: any) => {
                 const coords = event.latlng;
                 this.lastClickedData = [polygonData, coords];
