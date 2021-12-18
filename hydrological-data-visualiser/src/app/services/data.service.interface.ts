@@ -43,6 +43,8 @@ export interface DataServiceInterface<Type> {
 
   getMaxValue(begin: string, length: number): Observable<number>;
 
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number>;
+
   changeOpacity(opacity: number): void;
 
   updateColor(date: Date): void;

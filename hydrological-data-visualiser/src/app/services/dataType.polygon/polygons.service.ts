@@ -141,6 +141,12 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
     return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
   }
 
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
+  }
+
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
   }

@@ -151,6 +151,12 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
     return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
   }
 
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
+  }
+
   getMinValue(begin: string, length: number): Observable<number> {
     return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
   }

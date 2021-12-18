@@ -168,6 +168,12 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
     return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
   }
 
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
+  }
+
   draw(date: Date): void {
     this.putMarkers(
       this.getDistinctLatLongStations(this.stationList),
