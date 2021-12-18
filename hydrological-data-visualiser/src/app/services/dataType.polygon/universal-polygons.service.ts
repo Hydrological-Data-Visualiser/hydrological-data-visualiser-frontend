@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
 import {PolygonsService} from './polygons.service';
-import {Observable} from 'rxjs';
-import {PrecipitationDayDataNew} from '../../model/precipitation-day-data-new';
 import {DataModelBase} from '../../model/data-model-base';
 import {DataType} from '../../model/data-type';
 import {ColorService} from '../color.service';
@@ -21,5 +19,6 @@ export class UniversalPolygonsService extends PolygonsService{
   setUrl(url: string): void {
     this.url = url;
     this.getInfo();
+    this.getStations();
   }
 }
