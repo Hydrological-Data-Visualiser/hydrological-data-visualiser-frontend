@@ -10,7 +10,7 @@ import {PointData} from '../../model/point-data';
   providedIn: 'root'
 })
 export class PrecipitationService extends MarkerCreatorService {
-  public url = 'http://localhost:8080/imgw';
+  public url = 'https://imgw-mock.herokuapp.com//imgw';
 
   constructor(http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
     super(colorService, sidePanelService, http);
