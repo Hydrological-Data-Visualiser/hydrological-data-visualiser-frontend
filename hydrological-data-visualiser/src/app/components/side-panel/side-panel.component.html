@@ -40,7 +40,7 @@
                 <mat-label>Choose hour</mat-label>
                 <mat-select *ngIf="blockedHourDropdown" disabled>
                 </mat-select>
-                <mat-select *ngIf="!blockedHourDropdown">
+                <mat-select *ngIf="!blockedHourDropdown" [(value)]="selected">
                   <mat-option *ngFor="let hour of hourDropDownList.sort()" (onSelectionChange)="onHourChange(hour)"
                               [value]="hour">
                     {{hour | date :'HH:mm:ss'}}
