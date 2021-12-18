@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
@@ -139,7 +139,7 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(d);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-              hourListContainer.hourList.push(nowUtc);
+            hourListContainer.hourList.push(nowUtc);
 
             // distinct and sort
             // tslint:disable-next-line:no-shadowed-variable
@@ -172,7 +172,10 @@ export class SidePanelComponent implements OnInit {
           }
         });
       this.animationDateFilter = (date: Date): boolean => {
-        return date >= this.selectedDate! && this.dataProvider.getActualService().info.availableDates.sort()
+        const selecatedTimelessDate =
+          new Date(this.selectedDate!.getFullYear(), this.selectedDate!.getMonth(), this.selectedDate!.getDate());
+
+        return date >= selecatedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
           .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
     }
@@ -217,10 +220,10 @@ export class SidePanelComponent implements OnInit {
     this.animationPlaying = true;
     this.animationStart = startDate;
     this.animationNow = startDate;
-    console.log(this.selectedDate);
-    console.log(this.selectedAnimationDate);
+    console.log("selectedAnimtaiton: " + this.selectedAnimationDate);
+    console.log("startDate: " + startDate);
+
     this.dataProvider.getActualService().getLengthBetweenObservable(startDate, this.selectedAnimationDate).subscribe( length => {
-        console.log(length);
         this.setAnimationLength(length);
         console.log(this.animationLength);
 
