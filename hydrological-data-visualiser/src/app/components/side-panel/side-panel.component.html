@@ -111,9 +111,9 @@
           </div>
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
-            <mat-form-field *ngIf="clickedData.stationName" appearance="standard" class="content-no-underline m-3">
-              <mat-label>Station name</mat-label>
-              <input matInput value="{{clickedData.stationName}}" readonly>
+            <mat-form-field *ngIf="clickedData.name" appearance="standard" class="content-no-underline m-3">
+              <mat-label>Name</mat-label>
+              <input matInput value="{{clickedData.name}}" readonly>
             </mat-form-field>
             <mat-form-field *ngIf="clickedData.latitude" appearance="standard" class="content-no-underline m-3">
               <mat-label>Latitude</mat-label>
