@@ -10,6 +10,7 @@ export interface DataServiceInterface<Type> {
   map: L.Map;
   lastClickedData: [Type, L.LatLng] | undefined;
   marker: L.Marker | undefined;
+  stationList: Station[];
 
   draw(date: Date): void;
 

@@ -54,7 +54,6 @@ export class SidePanelComponent implements OnInit {
   ngOnInit(): void {
     this.sidePanelService.modelEmitter.subscribe(name => {
       const tab = this.dataProvider.getActualService().info.availableDates.sort();
-      this.dataProvider.getActualService().getStations();
       this.minDate = tab[0];
       this.maxDate = tab[tab.length - 1];
       this.dateFilter = (date: Date): boolean => {
@@ -282,33 +281,34 @@ export class SidePanelComponent implements OnInit {
 
   init(): void {
     this.blockedHourDropdown = false;
-    this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
-    this.updateHourList(this.selectedDate);
     this.hourDropDownList = [];
     const dataProvider = this.dataProvider.getActualService();
-
     if (dataProvider) {
-      dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
-        (data: Date[]) => {
-          this.hourDropDownList = [];
-          data.forEach(d => {
-            const date = new Date(d);
-            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            this.hourDropDownList.push(nowUtc);
+      dataProvider.getStationsObservable().subscribe(stations => {
+        dataProvider.stationList = stations;
+        this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
+        this.updateHourList(this.selectedDate);
+        dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
+          (data: Date[]) => {
+            this.hourDropDownList = [];
+            data.forEach(d => {
+              const date = new Date(d);
+              const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+                date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+              this.hourDropDownList.push(nowUtc);
 
-            // distinct and sort
-            // tslint:disable-next-line:no-shadowed-variable
-            this.hourDropDownList = [...new Set(this.hourDropDownList)].sort((a, b) => {
-              return (new Date(b) as any) - (new Date(a) as any);
+              // distinct and sort
+              // tslint:disable-next-line:no-shadowed-variable
+              this.hourDropDownList = [...new Set(this.hourDropDownList)].sort((a, b) => {
+                return (new Date(b) as any) - (new Date(a) as any);
+              });
             });
+            this.selectedHour = moment(this.hourDropDownList.sort()[0]).format('HH:mm:ss');
+            this.selected = this.hourDropDownList.sort()[0];
+            this.isDateAndHourSelected = true;
+            this.onSubmit();
           });
-          this.selectedHour = moment(this.hourDropDownList.sort()[0]).format('HH:mm:ss');
-          this.selected = this.hourDropDownList.sort()[0];
-          this.isDateAndHourSelected = true;
-          this.onSubmit();
-        }
-      );
+      });
     }
   }
 }
