@@ -66,16 +66,11 @@
                 </button>
               </div>
               <br>
-              <!--              <mat-form-field>-->
-              <!--                <mat-label>Animation span</mat-label>-->
-              <!--                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"-->
-              <!--                       name="days" #days="ngModel">-->
-              <!--              </mat-form-field>-->
-
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose animation range</mat-label>
                 <input matInput [matDatepicker]="animationPicker"
-                       [disabled]="!isFormSubmitted || !blockedAnimationRange" (dateInput)="onAnimationDateChange($event)"
+                       [disabled]="!isFormSubmitted || blockedAnimationRange"
+                       (dateInput)="onAnimationDateChange($event)"
                        [matDatepickerFilter]="animationDateFilter" [value]="selectedAnimationDate"
                        [min]="minDate"
                        [max]="maxDate">
@@ -90,9 +85,8 @@
 
               <mat-form-field>
                 <mat-label>Choose hour</mat-label>
-                <mat-select *ngIf="blockedAnimationHourDropdown" disabled> </mat-select>
-                <mat-select *ngIf="!blockedAnimationHourDropdown"[(value)]="selectedAnimation">
-                  <mat-option (onSelectionChange)="onAnimationHourChange(animationHour, $event);"  
+                <mat-select [disabled]="blockedAnimationHourDropdown">
+                  <mat-option (onSelectionChange)="onAnimationHourChange(animationHour, $event);"
                               *ngFor="let animationHour of animationHourDropDownList.hourList.sort()"
                               [value]="animationHour">
                     {{animationHour | date :'HH:mm:ss'}}
@@ -118,11 +112,13 @@
                 </button>
 
                 <button mat-mini-fab color="primary" *ngIf="animationPaused && animationPlaying" class="m-2"
-                        [disabled]="!isFormSubmitted || blockedAnimationHourDropdown" (click)="pauseAnimation()">
+                        [disabled]="!isFormSubmitted || blockedAnimationHourDropdown || !isAnimationDateAndHourSelected"
+                        (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted || blockedAnimationHourDropdown"
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2"
+                        [disabled]="!isFormSubmitted || blockedAnimationHourDropdown || !isAnimationDateAndHourSelected"
                         (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
@@ -135,6 +131,8 @@
             </form>
           </div>
         </div>
+
+
         <div class="tab-pane fade" id="nav-details" role="tabpanel" aria-labelledby="nav-details-tab">
           <div *ngIf="clickedOnMap === false">
             <br>
@@ -165,6 +163,7 @@
           </div>
         </div>
 
+
         <div class="tab-pane fade" id="nav-conf" role="tabpanel" aria-labelledby="nav-conf-tab">
           <mat-form-field floatLabel="always" appearance="'nope'" class="m-2 mu-4 mt-4 w-100">
             <mat-label>Opacity</mat-label>
@@ -192,7 +191,6 @@
             <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
           </mat-form-field>
 
-
           <mat-form-field class="m-2">
             <mat-label>Maximal Color</mat-label>
             <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
@@ -209,6 +207,8 @@
       </div>
     </div>
   </div>
+
+
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
 
@@ -241,9 +241,6 @@
       <mat-progress-bar mode="determinate" color="primary" value="{{animationPercentage}}"
                         [attr.aria-valuenow]="animationPercentage"
                         aria-valuemin="0" aria-valuemax="100" role="progressbar"></mat-progress-bar>
-
-      <!--      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"-->
-      <!--           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>-->
     </div>
     <div class="container-fluid">
       <app-map></app-map>

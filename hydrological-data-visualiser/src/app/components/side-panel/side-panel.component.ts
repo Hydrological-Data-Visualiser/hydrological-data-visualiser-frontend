@@ -150,8 +150,6 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(d);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            console.log("xd" + nowUtc);
-            console.log("xdd" + notBeforeHour);
             if (!notBeforeHour || notBeforeHour.getTime() <= nowUtc.getTime()) {
               hourListContainer.hourList.push(nowUtc);
             }
@@ -172,6 +170,7 @@ export class SidePanelComponent implements OnInit {
       const drawDate = this.getSelectedTime();
       this.stopAnimation();
       this.isFormSubmitted = true;
+      this.blockedAnimationRange = false;
       this.showingDate = drawDate;
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
@@ -181,12 +180,12 @@ export class SidePanelComponent implements OnInit {
           }
         });
       this.animationDateFilter = (date: Date): boolean => {
-        console.log("timelessDate: " + date);
-        const selecatedTimelessDate =
+        const selectedTimelessDate =
           // tslint:disable-next-line: no-non-null-assertion
           new Date(drawDate!.getFullYear(), drawDate!.getMonth(), drawDate!.getDate());
 
-        return date >= selecatedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
+        // tslint:disable-next-line:no-non-null-assertion
+        return date >= selectedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
           .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
     }
@@ -198,7 +197,6 @@ export class SidePanelComponent implements OnInit {
       this.selectedHour = moment(hour).format('HH:mm:ss');
       this.isDateAndHourSelected = true;
       this.selectedAnimationHour = undefined;
-      this.blockedAnimationRange = false;
     }
   }
 
@@ -237,9 +235,8 @@ export class SidePanelComponent implements OnInit {
       this.animationEnd = endDate;
       this.animationNow = startDate;
 
-      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe( length => {
+      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe(length => {
         this.setAnimationLength(length);
-        console.log(this.animationLength);
 
         const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
         this.dataProvider.getActualService().setScaleAndColour(formattedStart, length,
@@ -251,7 +248,7 @@ export class SidePanelComponent implements OnInit {
             }
             this.animationService.play();
           });
-        });
+      });
     }
   }
 
@@ -290,6 +287,7 @@ export class SidePanelComponent implements OnInit {
     }
     this.animationNow = animationNow;
   }
+
   setAnimationLength(length: number): void {
     this.animationLength = length;
   }
@@ -405,6 +403,8 @@ export class SidePanelComponent implements OnInit {
     }
   }
 }
+
 export class HourListContainer {
-    constructor(public hourList: Date[]) {}
+  constructor(public hourList: Date[]) {
+  }
 }
