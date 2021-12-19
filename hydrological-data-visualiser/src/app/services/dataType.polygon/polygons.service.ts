@@ -65,7 +65,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
               const coords: L.LatLng = event.latlng;
               this.lastClickedData = [polygonData, coords];
               this.emitData(
-                new EmitData(polygon.name, coords.lat, coords.lng, polygonData.date, polygonData.value, this.info.metricLabel)
+                new EmitData(polygon, coords.lat, coords.lng, polygonData.date, polygonData.value, this.info.metricLabel)
               );
               this.addMarkerOnDataClick(coords);
             });
@@ -100,7 +100,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
             if (this.lastClickedData) {
               if (this.lastClickedData[0].polygonId === polygonData.polygonId) {
                 this.emitData(new EmitData(
-                  station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+                  station, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
                   polygonData.date, polygonData.value, this.info.metricLabel)
                 );
               }

@@ -10,6 +10,7 @@ import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {DataType} from '../../model/data-type';
 import {ChartConfiguration, ChartData} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
+import {PointData} from '../../model/point-data';
 
 @Component({
   selector: 'app-side-panel',
@@ -203,6 +204,7 @@ export class SidePanelComponent implements OnInit {
           // tslint:disable-next-line: no-non-null-assertion
           new Date(drawDate!.getFullYear(), drawDate!.getMonth(), drawDate!.getDate());
 
+        // tslint:disable-next-line:no-non-null-assertion
         return date >= selecatedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
           .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
@@ -210,16 +212,16 @@ export class SidePanelComponent implements OnInit {
   }
 
   onHourChange(hour: Date): void {
-    console.log("origHour:" + hour);
+    console.log('origHour:' + hour);
     this.selectedHour = moment(hour).format('HH:mm:ss');
-    console.log("Hour: " + this.selectedHour);
+    console.log('Hour: ' + this.selectedHour);
     this.isDateAndHourSelected = true;
   }
 
   onAnimationHourChange(hour: Date): void {
-    console.log("origAnimHour:" + hour);
+    console.log('origAnimHour:' + hour);
     this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
-    console.log("AnimHour: " + this.selectedAnimationHour);
+    console.log('AnimHour: ' + this.selectedAnimationHour);
     this.isAnimationDateAndHourSelected = true;
   }
 
@@ -249,8 +251,8 @@ export class SidePanelComponent implements OnInit {
       this.animationPlaying = true;
       this.animationStart = startDate;
       this.animationNow = startDate;
-      console.log("selectedAnimtaiton: " + endDate);
-      console.log("startDate: " + startDate);
+      console.log('selectedAnimtaiton: ' + endDate);
+      console.log('startDate: ' + startDate);
 
       this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe( length => {
         this.setAnimationLength(length);
@@ -394,13 +396,13 @@ export class SidePanelComponent implements OnInit {
       this.dataProvider.getActualService()
         // @ts-ignore
         .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate, this.clickedData.station)
-        .subscribe((data: HydrologicalDataBase[]) => {
+        .subscribe((data: PointData[]) => {
           this.createDataChart(data);
         });
     }
   }
 
-  createDataChart(data: HydrologicalDataBase[]): void {
+  createDataChart(data: PointData[]): void {
     const dataPoints: Date[] = [];
     let actualDate: Date = this.selectedDate!;
     while (actualDate <= this.selectedAnimationDate!) {

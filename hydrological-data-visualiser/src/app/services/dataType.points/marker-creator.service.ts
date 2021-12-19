@@ -241,7 +241,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
     this.draw(date);
   }
 
-  getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station): Observable<HydrologicalDataBase> {
+  getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station): Observable<PointData> {
     const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     return this.http.get<PointData>(`${this.url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);

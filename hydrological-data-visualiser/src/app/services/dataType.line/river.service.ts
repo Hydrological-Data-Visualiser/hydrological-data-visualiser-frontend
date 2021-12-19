@@ -75,7 +75,7 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
               const coords = event.latlng;
               this.addMarkerOnDataClick(coords);
               this.emitData(
-                new EmitData(polyline.name, coords.lat, coords.lng, polylineData.date, polylineData.value, this.info.metricLabel)
+                new EmitData(polyline, coords.lat, coords.lng, polylineData.date, polylineData.value, this.info.metricLabel)
               );
               this.lastClickedData = [polylineData, coords];
             });
@@ -110,7 +110,7 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
             if (this.lastClickedData) {
               if (this.lastClickedData[0].polylineId === polylineData.polylineId) {
                 this.emitData(new EmitData(
-                  undefined, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+                  station, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
                   polylineData.date, polylineData.value, this.info.metricLabel)
                 );
               }
