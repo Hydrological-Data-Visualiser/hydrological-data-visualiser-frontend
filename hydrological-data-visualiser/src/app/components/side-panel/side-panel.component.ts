@@ -40,12 +40,13 @@ export class SidePanelComponent implements OnInit {
   animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
   animationStart: Date | undefined;
+  animationEnd: Date | undefined;
   animationLength: number | undefined;
   animationNow: Date | undefined;
   animationPercentage: number | undefined;
   selectedAnimationDate: Date | undefined;
   selectedAnimationHour: string | undefined;
-  isAnimationRangeSelected = false;
+  blockedAnimationRange = true;
   // non animation
   showingDate: Date | undefined; // used for showing displayed non animation data
 
@@ -140,18 +141,26 @@ export class SidePanelComponent implements OnInit {
     this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
   }
 
+  clearAfterAnimationDate(): void {
+    this.isAnimationDateAndHourSelected = false;
+    this.selectedAnimationHour = undefined;
+  }
+
+  clearAfterHour(): void {
+    this.animationHourDropDownList.hourList = [];
+    this.selectedAnimationDate = undefined;
+    this.blockedAnimationHourDropdown = true;
+    this.clearAfterAnimationDate();
+  }
+
   clear(): void {
     this.hourDropDownList.hourList = [];
-    this.animationHourDropDownList.hourList = [];
     this.selectedHour = undefined;
     this.selectedDate = undefined;
-    this.selectedAnimationHour = undefined;
-    this.selectedAnimationDate = undefined;
     this.blockedHourDropdown = true;
-    this.blockedAnimationHourDropdown = true;
+    this.blockedAnimationRange = true;
     this.isDateAndHourSelected = false;
-    this.isAnimationDateAndHourSelected = false;
-    this.isAnimationRangeSelected = false;
+    this.clearAfterHour();
   }
 
   setClicked(newItem: boolean): void {
@@ -162,7 +171,7 @@ export class SidePanelComponent implements OnInit {
     this.sidePanelShowStatus = !this.sidePanelShowStatus;
   }
 
-  updateHourList(formattedDate: Date, hourListContainer: HourListContainer): void {
+  updateHourList(formattedDate: Date, hourListContainer: HourListContainer, notBeforeHour: Date | undefined): void {
     hourListContainer.hourList = [];
     const dataProvider = this.dataProvider.getActualService();
 
@@ -173,7 +182,9 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(d);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            hourListContainer.hourList.push(nowUtc);
+            if (!notBeforeHour || notBeforeHour.getTime() <= nowUtc.getTime()) {
+              hourListContainer.hourList.push(nowUtc);
+            }
 
             // distinct and sort
             // tslint:disable-next-line:no-shadowed-variable
@@ -191,6 +202,7 @@ export class SidePanelComponent implements OnInit {
       const drawDate = this.getSelectedTime();
       this.stopAnimation();
       this.isFormSubmitted = true;
+      this.blockedAnimationRange = false;
       this.showingDate = drawDate;
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
@@ -200,42 +212,45 @@ export class SidePanelComponent implements OnInit {
           }
         });
       this.animationDateFilter = (date: Date): boolean => {
-        const selecatedTimelessDate =
+        const selectedTimelessDate =
           // tslint:disable-next-line: no-non-null-assertion
           new Date(drawDate!.getFullYear(), drawDate!.getMonth(), drawDate!.getDate());
 
         // tslint:disable-next-line:no-non-null-assertion
-        return date >= selecatedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
+        return date >= selectedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
           .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
       };
     }
   }
 
-  onHourChange(hour: Date): void {
-    console.log('origHour:' + hour);
-    this.selectedHour = moment(hour).format('HH:mm:ss');
-    console.log('Hour: ' + this.selectedHour);
-    this.isDateAndHourSelected = true;
+  onHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      this.clearAfterHour();
+      this.selectedHour = moment(hour).format('HH:mm:ss');
+      this.isDateAndHourSelected = true;
+      this.selectedAnimationHour = undefined;
+    }
   }
 
-  onAnimationHourChange(hour: Date): void {
-    console.log('origAnimHour:' + hour);
-    this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
-    console.log('AnimHour: ' + this.selectedAnimationHour);
-    this.isAnimationDateAndHourSelected = true;
+  onAnimationHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
+      this.isAnimationDateAndHourSelected = true;
+    }
   }
 
   onValueChange(event: any): void {
     this.clear();
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
-    this.updateHourList(new Date(event.value), this.hourDropDownList);
+    this.updateHourList(new Date(event.value), this.hourDropDownList, undefined);
   }
 
   onAnimationDateChange(event: any): void {
+    this.clearAfterAnimationDate();
     this.blockedAnimationHourDropdown = false;
     this.selectedAnimationDate = event.value;
-    this.updateHourList(new Date(event.value), this.animationHourDropDownList);
+    this.updateHourList(new Date(event.value), this.animationHourDropDownList, this.getSelectedTime());
     this.getDataToChart();
   }
 
@@ -250,13 +265,11 @@ export class SidePanelComponent implements OnInit {
       const endDate = this.getSelectedAnimationTime()!;
       this.animationPlaying = true;
       this.animationStart = startDate;
+      this.animationEnd = endDate;
       this.animationNow = startDate;
-      console.log('selectedAnimtaiton: ' + endDate);
-      console.log('startDate: ' + startDate);
 
-      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe( length => {
+      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe(length => {
         this.setAnimationLength(length);
-        console.log(this.animationLength);
 
         const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
         this.dataProvider.getActualService().setScaleAndColour(formattedStart, length,
@@ -268,7 +281,7 @@ export class SidePanelComponent implements OnInit {
             }
             this.animationService.play();
           });
-        });
+      });
     }
   }
 
@@ -307,6 +320,7 @@ export class SidePanelComponent implements OnInit {
     }
     this.animationNow = animationNow;
   }
+
   setAnimationLength(length: number): void {
     this.animationLength = length;
   }
@@ -335,6 +349,7 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
     this.animationPlaying = false;
     this.animationStart = undefined;
+    this.animationEnd = undefined;
     this.animationLength = undefined;
     this.animationNow = undefined;
     this.animationPercentage = 0;
@@ -433,7 +448,7 @@ export class SidePanelComponent implements OnInit {
       dataProvider.getStationsObservable().subscribe(stations => {
         dataProvider.stationList = stations;
         this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
-        this.updateHourList(this.selectedDate, this.hourDropDownList);
+        this.updateHourList(this.selectedDate, this.hourDropDownList, undefined);
         dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
           (data: Date[]) => {
             this.hourDropDownList.hourList = [];
@@ -458,6 +473,8 @@ export class SidePanelComponent implements OnInit {
     }
   }
 }
+
 export class HourListContainer {
-    constructor(public hourList: Date[]) {}
+  constructor(public hourList: Date[]) {
+  }
 }
