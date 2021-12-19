@@ -137,12 +137,12 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
   }
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolylineData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<PolylineData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
@@ -152,8 +152,8 @@ export abstract class RiverService implements DataServiceInterface<PolylineData>
   }
 
   getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
-    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
   }
 

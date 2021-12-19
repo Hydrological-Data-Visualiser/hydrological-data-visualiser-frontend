@@ -127,12 +127,12 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   }
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolygonData[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<PolygonData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
@@ -142,8 +142,8 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   }
 
   getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
-    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
   }
 

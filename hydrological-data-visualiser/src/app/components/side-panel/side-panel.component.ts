@@ -160,7 +160,7 @@ export class SidePanelComponent implements OnInit {
       this.stopAnimation();
       this.isFormSubmitted = true;
       this.showingDate = drawDate;
-      const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
           if (drawDate) {
@@ -179,13 +179,15 @@ export class SidePanelComponent implements OnInit {
   }
 
   onHourChange(hour: Date): void {
-    this.selectedHour = moment(hour).format('HH:mm:SS');
+    console.log("origHour:" + hour);
+    this.selectedHour = moment(hour).format('HH:mm:ss');
     console.log("Hour: " + this.selectedHour);
     this.isDateAndHourSelected = true;
   }
 
   onAnimationHourChange(hour: Date): void {
-    this.selectedAnimationHour = moment(hour).format('HH:mm:SS');
+    console.log("origAnimHour:" + hour);
+    this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
     console.log("AnimHour: " + this.selectedAnimationHour);
     this.isAnimationDateAndHourSelected = true;
   }
@@ -222,7 +224,7 @@ export class SidePanelComponent implements OnInit {
         this.setAnimationLength(length);
         console.log(this.animationLength);
 
-        const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+        const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
         this.dataProvider.getActualService().setScaleAndColour(formattedStart, length,
           () => {
             if (startDate) {
@@ -285,7 +287,7 @@ export class SidePanelComponent implements OnInit {
     this.stopAnimation();
 
     if (date !== undefined) {
-      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
           if (date) {
