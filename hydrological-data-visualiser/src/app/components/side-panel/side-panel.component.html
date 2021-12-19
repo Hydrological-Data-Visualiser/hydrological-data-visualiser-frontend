@@ -75,7 +75,7 @@
               <mat-form-field class="example-full-width" appearance="fill">
                 <mat-label>Choose animation range</mat-label>
                 <input matInput [matDatepicker]="animationPicker"
-                       [disabled]="!isFormSubmitted" (dateInput)="onAnimationDateChange($event)"
+                       [disabled]="!isFormSubmitted || !blockedAnimationRange" (dateInput)="onAnimationDateChange($event)"
                        [matDatepickerFilter]="animationDateFilter" [value]="selectedAnimationDate"
                        [min]="minDate"
                        [max]="maxDate">
