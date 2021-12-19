@@ -178,18 +178,22 @@ export class SidePanelComponent implements OnInit {
     }
   }
 
-  onHourChange(hour: Date): void {
-    console.log("origHour:" + hour);
-    this.selectedHour = moment(hour).format('HH:mm:ss');
-    console.log("Hour: " + this.selectedHour);
-    this.isDateAndHourSelected = true;
+  onHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      console.log("origHour:" + hour);
+      this.selectedHour = moment(hour).format('HH:mm:ss');
+      console.log("Hour: " + this.selectedHour);
+      this.isDateAndHourSelected = true;
+    }
   }
 
-  onAnimationHourChange(hour: Date): void {
-    console.log("origAnimHour:" + hour);
-    this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
-    console.log("AnimHour: " + this.selectedAnimationHour);
-    this.isAnimationDateAndHourSelected = true;
+  onAnimationHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      console.log("origAnimHour:" + hour);
+      this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
+      console.log("AnimHour: " + this.selectedAnimationHour);
+      this.isAnimationDateAndHourSelected = true;
+    }
   }
 
   onValueChange(event: any): void {
