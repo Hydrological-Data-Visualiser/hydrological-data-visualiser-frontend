@@ -140,7 +140,7 @@
           </div>
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
-            <mat-form-field *ngIf="clickedData.station" appearance="standard" class="content-no-underline m-3">
+            <mat-form-field *ngIf="clickedData.station && clickedData.station.name" appearance="standard" class="content-no-underline m-3">
               <mat-label>Station name</mat-label>
               <input matInput value="{{clickedData.station.name}}" readonly>
             </mat-form-field>

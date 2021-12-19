@@ -1,21 +1,20 @@
 import {Injectable} from '@angular/core';
 import * as L from 'leaflet';
-import {Observable} from 'rxjs';
 import {EmitData} from '../../model/emit-data';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
 import {DataServiceInterface} from '../data.service.interface';
-import * as moment from 'moment';
 import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
 import {ColorService} from '../color.service';
 import {CustomMarkers} from '../custom-markers';
 import {PolygonData} from '../../model/polygon-data';
 import {Station} from 'src/app/model/station';
+import {ApiConnector} from '../api-connector';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class PolygonsService implements DataServiceInterface<PolygonData> {
+export abstract class PolygonsService extends ApiConnector<PolygonData> implements DataServiceInterface<PolygonData> {
   public map!: L.Map;
   public status = false;
   public url!: string;
@@ -29,6 +28,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   public polygons: Map<Station, L.Polygon> = new Map<Station, L.Polygon>();
 
   protected constructor(public sidePanelService: SidePanelService, public http: HttpClient, private colorService: ColorService) {
+    super(http);
     this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
@@ -48,7 +48,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   draw(date: Date): void {
     this.sidePanelService.finishEmitter.emit(true);
     this.clear();
-    this.getDataFromDateAsObservableUsingInstant(date).subscribe(polygonDataArr => {
+    this.getDataFromDateAsObservableUsingInstant(date, this.url).subscribe(polygonDataArr => {
       polygonDataArr.forEach(polygonData => {
         const polygon = this.stationList.find(a => a.id === polygonData.polygonId);
         if (polygon) {
@@ -80,7 +80,7 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(polygonDataArr => {
+    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(polygonDataArr => {
       polygonDataArr.forEach(polygonData => {
         const station = this.stationList.find(a => a.id === polygonData.polygonId);
         if (station) {
@@ -113,54 +113,16 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
 
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
-    this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue => {
+    this.getMinValue(begin, length, this.url).subscribe(minValue =>
+      this.getMaxValue(begin, length, this.url).subscribe(maxValue => {
         this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
         callback();
       })
     );
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonData[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<PolygonData[]>(`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolygonData[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<PolygonData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
-  }
-
-  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
-  }
-
-  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
-  }
-
-  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
-    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
-  }
-
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoObservable(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
-  }
-
-  getMinValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
-  }
-
-  getMaxValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
   }
 
   addMarkerOnDataClick(coords: L.LatLng): void {
@@ -190,12 +152,8 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
     this.draw(date);
   }
 
-  getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>(`${this.url}/stations`);
-  }
-
   getStations(): void {
-    this.getStationsObservable().subscribe(data => {
+    this.getStationsObservable(this.url).subscribe(data => {
       this.stationList = data;
     });
   }

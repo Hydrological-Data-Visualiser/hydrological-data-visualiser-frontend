@@ -7,7 +7,6 @@ import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
 import {Color} from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
-import {DataType} from '../../model/data-type';
 import {ChartConfiguration, ChartData} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
 import {PointData} from '../../model/point-data';
@@ -176,7 +175,7 @@ export class SidePanelComponent implements OnInit {
     const dataProvider = this.dataProvider.getActualService();
 
     if (dataProvider) {
-      dataProvider.getDayTimePointsAsObservable(formattedDate).subscribe(
+      dataProvider.getDayTimePointsAsObservable(formattedDate, dataProvider.url).subscribe(
         (data: Date[]) => {
           data.forEach(d => {
             const date = new Date(d);
@@ -204,6 +203,12 @@ export class SidePanelComponent implements OnInit {
       this.isFormSubmitted = true;
       this.blockedAnimationRange = false;
       this.showingDate = drawDate;
+      this.selectedAnimationDate = new Date(this.dataProvider.getActualService().info
+        .availableDates[this.dataProvider.getActualService().info.availableDates.length - 1]);
+      this.clearAfterAnimationDate();
+      this.blockedAnimationHourDropdown = false;
+      this.updateHourList(this.selectedAnimationDate, this.animationHourDropDownList, this.getSelectedTime());
+      this.getDataToChart();
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -268,7 +273,8 @@ export class SidePanelComponent implements OnInit {
       this.animationEnd = endDate;
       this.animationNow = startDate;
 
-      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe(length => {
+      this.dataProvider.getActualService()
+        .getLengthBetweenObservable(startDate, endDate, this.dataProvider.getActualService().url).subscribe(length => {
         this.setAnimationLength(length);
 
         const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
@@ -406,34 +412,27 @@ export class SidePanelComponent implements OnInit {
   getDataToChart(): void {
     this.barChartData.datasets = [];
     this.barChartData.labels = [];
-    if (this.dataProvider.getActualService().info.dataType === DataType.POINTS &&
+    if (
       this.clickedData.station && this.selectedDate && this.selectedAnimationDate) {
       this.dataProvider.getActualService()
-        // @ts-ignore
-        .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate, this.clickedData.station)
+        .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate,
+          this.clickedData.station, this.dataProvider.getActualService().url)
         .subscribe((data: PointData[]) => {
-          this.createDataChart(data);
+          this.createDataChart(data.filter(a => a.date));
         });
     }
   }
 
-  createDataChart(data: PointData[]): void {
-    const dataPoints: Date[] = [];
-    let actualDate: Date = this.selectedDate!;
-    while (actualDate <= this.selectedAnimationDate!) {
-      // this.dataProvider.getActualService().getDayTimePointsAsObservable(actualDate).subscribe((points: Date[]) => {
-      //   dataPoints.push(...points);
-      // });
-      dataPoints.push(actualDate);
-      actualDate = new Date(actualDate.getTime() + (1000 * 60 * 60 * 24));
-    }
-    const dataset: { data: number[], label: string } = {data: [], label: this.dataProvider.getActualService().info.metricLabel};
+  createDataChart(data: any[]): void {
+    const dataPoints: Date[] = [...new Set(data.map(item => item.date))];
+    const dataset: { data: number[], label: string } = {
+      data: [],
+      label: this.dataProvider.getActualService().info.metricLabel
+    };
     dataPoints.forEach(point => {
-      this.barChartData.labels?.push(moment(point).format('YYYY-MM-DD'));
-      if (data.map(a => moment(a.date).format('YYYY-MM-DD')).includes(moment(point).format('YYYY-MM-DD'))) {
+      if (point) {
+        this.barChartData.labels?.push(moment(point).format('YYYY-MM-DD'));
         dataset.data.push(data.filter(a => moment(a.date).format('YYYY-MM-DD') === moment(point).format('YYYY-MM-DD'))[0].value);
-      } else {
-        dataset.data.push(0);
       }
     });
     this.barChartData.datasets.push(dataset);
@@ -445,11 +444,11 @@ export class SidePanelComponent implements OnInit {
     this.hourDropDownList.hourList = [];
     const dataProvider = this.dataProvider.getActualService();
     if (dataProvider) {
-      dataProvider.getStationsObservable().subscribe(stations => {
+      dataProvider.getStationsObservable(this.dataProvider.getActualService().url).subscribe(stations => {
         dataProvider.stationList = stations;
         this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
         this.updateHourList(this.selectedDate, this.hourDropDownList, undefined);
-        dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
+        dataProvider.getDayTimePointsAsObservable(this.selectedDate, this.dataProvider.getActualService().url).subscribe(
           (data: Date[]) => {
             this.hourDropDownList.hourList = [];
             data.forEach(d => {

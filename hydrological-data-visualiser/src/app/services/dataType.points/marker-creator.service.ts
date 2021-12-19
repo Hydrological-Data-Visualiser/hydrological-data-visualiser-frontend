@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
 import * as L from 'leaflet';
-import * as moment from 'moment';
 import {PointData} from '../../model/point-data';
 import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
@@ -12,11 +11,12 @@ import {DataServiceInterface} from '../data.service.interface';
 import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../../model/data-model-base';
 import {CustomMarkers} from '../custom-markers';
+import {ApiConnector} from '../api-connector';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class MarkerCreatorService implements DataServiceInterface<PointData> {
+export abstract class MarkerCreatorService extends ApiConnector<PointData> implements DataServiceInterface<PointData> {
   public url!: string;
   public info!: DataModelBase;
   public map!: L.Map;
@@ -31,6 +31,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
   private markers: Map<Station, L.Marker> = new Map<Station, L.Marker>();
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
+    super(http);
     this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
@@ -78,7 +79,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(d => {
+    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
         const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
@@ -133,12 +134,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
     this.sidePanelService.emitData(data);
   }
 
-  getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>(`${this.url}/stations`);
-  }
 
   getStations(): void {
-    this.getStationsObservable().subscribe(data => {
+    this.getStationsObservable(this.url).subscribe(data => {
       this.stationList = data;
     });
   }
@@ -147,37 +145,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
     return this.http.get<PointData[]>(`${this.url}/data`);
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PointData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<PointData[]>
-    (`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PointData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<PointData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
-  }
-
-  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
-  }
-
-  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
-  }
-
-  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
-    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
-  }
-
   draw(date: Date): void {
     this.putMarkers(
       this.getDistinctLatLongStations(this.stationList),
-      this.getDataFromDateAsObservableUsingInstant(date),
+      this.getDataFromDateAsObservableUsingInstant(date, this.url),
       this.info.metricLabel,
       date
     );
@@ -185,10 +156,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoObservable(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
   clear(): void {
@@ -212,18 +179,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
     return retVal;
   }
 
-  getMinValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
-  }
-
-  getMaxValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
-  }
-
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
-    this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue => {
+    this.getMinValue(begin, length, this.url).subscribe(minValue =>
+      this.getMaxValue(begin, length, this.url).subscribe(maxValue => {
         this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
         callback();
       })
@@ -239,11 +198,5 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Point
   updateColor(date: Date): void {
     this.colorService.updateColorMap(this.info.minColour, this.info.maxColour, this.info.metricLabel);
     this.draw(date);
-  }
-
-  getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station): Observable<PointData> {
-    const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<PointData>(`${this.url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);
   }
 }
