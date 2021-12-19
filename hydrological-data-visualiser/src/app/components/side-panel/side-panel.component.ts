@@ -113,6 +113,8 @@ export class SidePanelComponent implements OnInit {
     this.animationHourDropDownList.hourList = [];
     this.selectedHour = undefined;
     this.selectedDate = undefined;
+    this.selectedAnimationHour = undefined;
+    this.selectedAnimationDate = undefined;
     this.blockedHourDropdown = true;
     this.blockedAnimationHourDropdown = true;
     this.isDateAndHourSelected = false;
@@ -154,26 +156,21 @@ export class SidePanelComponent implements OnInit {
 
   onSubmit(): void {
     if (this.selectedDate) {
-      this.selectedDate
-        .setHours(
-          // tslint:disable:no-non-null-assertion
-          Number.parseInt(this.selectedHour!.substr(0, 2), 10),
-          Number.parseInt(this.selectedHour!.substr(3, 2), 10),
-          Number.parseInt(this.selectedHour!.substr(6, 2), 10)
-        );
+      const drawDate = this.getSelectedTime();
       this.stopAnimation();
       this.isFormSubmitted = true;
-      this.showingDate = this.selectedDate;
-      const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.showingDate = drawDate;
+      const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
-          if (this.selectedDate) {
-            this.dataProvider.getActualService().draw(this.selectedDate);
+          if (drawDate) {
+            this.dataProvider.getActualService().draw(drawDate);
           }
         });
       this.animationDateFilter = (date: Date): boolean => {
         const selecatedTimelessDate =
-          new Date(this.selectedDate!.getFullYear(), this.selectedDate!.getMonth(), this.selectedDate!.getDate());
+          // tslint:disable-next-line: no-non-null-assertion
+          new Date(drawDate!.getFullYear(), drawDate!.getMonth(), drawDate!.getDate());
 
         return date >= selecatedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
           .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
@@ -183,11 +180,13 @@ export class SidePanelComponent implements OnInit {
 
   onHourChange(hour: Date): void {
     this.selectedHour = moment(hour).format('HH:mm:SS');
+    console.log("Hour: " + this.selectedHour);
     this.isDateAndHourSelected = true;
   }
 
   onAnimationHourChange(hour: Date): void {
     this.selectedAnimationHour = moment(hour).format('HH:mm:SS');
+    console.log("AnimHour: " + this.selectedAnimationHour);
     this.isAnimationDateAndHourSelected = true;
   }
 
@@ -208,26 +207,22 @@ export class SidePanelComponent implements OnInit {
   playAnimation(): void {
     this.animationService.stop();
     this.animationPaused = false;
-    if(this.selectedDate !== undefined && this.selectedAnimationDate !== undefined){
-    const startDate = this.selectedDate;
-    this.selectedAnimationDate
-        .setHours(
-          // tslint:disable:no-non-null-assertion
-          Number.parseInt(this.selectedAnimationHour!.substr(0, 2), 10),
-          Number.parseInt(this.selectedAnimationHour!.substr(3, 2), 10),
-          Number.parseInt(this.selectedAnimationHour!.substr(6, 2), 10)
-        );
-    this.animationPlaying = true;
-    this.animationStart = startDate;
-    this.animationNow = startDate;
-    console.log("selectedAnimtaiton: " + this.selectedAnimationDate);
-    console.log("startDate: " + startDate);
+    if (this.selectedDate !== undefined && this.selectedAnimationDate !== undefined) {
+      // tslint:disable-next-line: no-non-null-assertion
+      const startDate = this.getSelectedTime()!;
+      // tslint:disable-next-line: no-non-null-assertion
+      const endDate = this.getSelectedAnimationTime()!;
+      this.animationPlaying = true;
+      this.animationStart = startDate;
+      this.animationNow = startDate;
+      console.log("selectedAnimtaiton: " + endDate);
+      console.log("startDate: " + startDate);
 
-    this.dataProvider.getActualService().getLengthBetweenObservable(startDate, this.selectedAnimationDate).subscribe( length => {
+      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe( length => {
         this.setAnimationLength(length);
         console.log(this.animationLength);
 
-        const formattedStart = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+        const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
         this.dataProvider.getActualService().setScaleAndColour(formattedStart, length,
           () => {
             if (startDate) {
@@ -237,7 +232,34 @@ export class SidePanelComponent implements OnInit {
             }
             this.animationService.play();
           });
-      });
+        });
+    }
+  }
+
+  getParsedTime(date: Date, time: string): Date {
+    const copiedDate = new Date(date.getTime());
+    copiedDate.setHours(
+      // tslint:disable:no-non-null-assertion
+      Number.parseInt(time.substr(0, 2), 10),
+      Number.parseInt(time.substr(3, 2), 10),
+      Number.parseInt(time.substr(6, 2), 10)
+    );
+    return copiedDate;
+  }
+
+  getSelectedTime(): Date | undefined {
+    if (this.selectedDate && this.selectedHour) {
+      return this.getParsedTime(this.selectedDate!, this.selectedHour);
+    } else {
+      return undefined;
+    }
+  }
+
+  getSelectedAnimationTime(): Date | undefined {
+    if (this.selectedAnimationDate && this.selectedAnimationHour) {
+      return this.getParsedTime(this.selectedAnimationDate!, this.selectedAnimationHour!);
+    } else {
+      return undefined;
     }
   }
 
@@ -297,8 +319,9 @@ export class SidePanelComponent implements OnInit {
   changeColor(minColorCtr: AbstractControl, maxColorCtr: AbstractControl): void {
     this.dataProvider.getActualService().info.minColour = '#' + minColorCtr.value.hex;
     this.dataProvider.getActualService().info.maxColour = '#' + maxColorCtr.value.hex;
-    if (this.selectedDate) {
-      this.dataProvider.getActualService().updateColor(this.selectedDate);
+    const selectedDate = this.getSelectedTime();
+    if (selectedDate) {
+      this.dataProvider.getActualService().updateColor(selectedDate);
     }
     this.opacity = 50;
   }
