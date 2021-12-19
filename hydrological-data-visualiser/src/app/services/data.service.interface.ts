@@ -10,6 +10,7 @@ export interface DataServiceInterface<Type> {
   map: L.Map;
   lastClickedData: [Type, L.LatLng] | undefined;
   marker: L.Marker | undefined;
+  stationList: Station[];
 
   draw(date: Date): void;
 
@@ -30,10 +31,9 @@ export interface DataServiceInterface<Type> {
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void;
 
-  // only in points services
-  getStationsObservable?(): Observable<Station[]>;
+  getStationsObservable(): Observable<Station[]>;
 
-  getStations?(): void;
+  getStations(): void;
 
   clear(): void;
 
@@ -42,6 +42,8 @@ export interface DataServiceInterface<Type> {
   getMinValue(begin: string, length: number): Observable<number>;
 
   getMaxValue(begin: string, length: number): Observable<number>;
+
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number>;
 
   changeOpacity(opacity: number): void;
 

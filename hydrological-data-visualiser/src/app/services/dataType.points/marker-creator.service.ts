@@ -3,7 +3,7 @@ import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
 import * as L from 'leaflet';
 import * as moment from 'moment';
-import {HydrologicalDataBase} from '../../model/hydrological-data-base';
+import {PointData} from '../../model/point-data';
 import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
 import {EmitData} from '../../model/emit-data';
@@ -11,11 +11,12 @@ import {SidePanelService} from '../../components/side-panel/side-panel-service';
 import {DataServiceInterface} from '../data.service.interface';
 import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../../model/data-model-base';
+import {CustomMarkers} from '../custom-markers';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class MarkerCreatorService implements DataServiceInterface<HydrologicalDataBase> {
+export abstract class MarkerCreatorService implements DataServiceInterface<PointData> {
   public url!: string;
   public info!: DataModelBase;
   public map!: L.Map;
@@ -24,39 +25,18 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     maxClusterRadius: zoom => 140 - zoom * 10
   });
   public stationList: Station[] = [];
-  public lastClickedData: [HydrologicalDataBase, L.LatLng] | undefined = undefined;
+  public lastClickedData: [PointData, L.LatLng] | undefined = undefined;
   public marker: L.Marker | undefined = undefined;
   public opacity = 0.5;
-  private markers: { [key: number]: L.Marker } = {};
+  private markers: Map<Station, L.Marker> = new Map<Station, L.Marker>();
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
     this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
-  getColoredIcon(color: string): L.DivIcon {
-    const markerHtmlStyles = `
-      background-color: ${color};
-      width: 2rem;
-      height: 2rem;
-      display: block;
-      left: -1rem;
-      top: -1rem;
-      position: relative;
-      border-radius: 2rem 2rem 0;
-      transform: rotate(45deg);
-      border: 2px solid #000000`;
-
-    return L.divIcon({
-      iconAnchor: [0, 24],
-      popupAnchor: [1, -36],
-      shadowSize: [41, 41],
-      html: `<span style="${markerHtmlStyles}" />`
-    });
-  }
-
-  putMarkers(stations: Station[], data: Observable<HydrologicalDataBase[]>, metricLabel: string, date: Date): void {
+  putMarkers(stations: Station[], data: Observable<PointData[]>, metricLabel: string, date: Date): void {
     this.sidePanelService.finishEmitter.emit(true);
-    this.group.clearLayers();
+    this.clear();
 
     const usedStations: Station[] = [];
     data.subscribe(d => {
@@ -79,23 +59,20 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   createMarker(station: Station, colorHex: string, rainValue: number, metricLabel: string, date: Date): void {
-    if (station.longitude && station.latitude) {
-      const marker = L.marker(new L.LatLng(station.latitude, station.longitude),
-        {icon: this.getColoredIcon(colorHex), opacity: this.opacity}).on('click', event => {
-        this.lastClickedData =
-          // @ts-ignore
-          [new HydrologicalDataBase(station.id, station.id, date, rainValue), new L.LatLng(station.latitude, station.longitude)];
-        this.emitData(
-          new EmitData(station, station.latitude, station.longitude, date, rainValue, metricLabel)
-        );
-      });
-
-      if (!isNaN(rainValue)) {
-        marker.bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`);
-      } else {
-        marker.bindPopup(station.name + ' no data');
-      }
-      this.markers[station.id] = marker;
+    if (station.points && station.points[0]) {
+      const latitude = station.points[0][0];
+      const longitude = station.points[0][1];
+      const marker = L.marker(new L.LatLng(latitude, longitude),
+        {icon: CustomMarkers.getColoredIcon(colorHex), opacity: this.opacity})
+        .bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`)
+        .on('click', event => {
+          this.lastClickedData =
+            [new PointData(station.id, station.id, date, rainValue), new L.LatLng(latitude, longitude)];
+          this.emitData(
+            new EmitData(station, latitude, longitude, date, rainValue, metricLabel)
+          );
+        });
+      this.markers.set(station, marker);
       this.group.addLayer(marker);
     }
   }
@@ -115,13 +92,16 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   updateMarker(station: Station, colorHex: string, rainValue: number, date: Date): void {
-    const marker = this.markers[station.id];
+    const marker = this.markers.get(station);
+    const latitude = station.points[0][0];
+    const longitude = station.points[0][1];
     if (marker) {
-      marker.setIcon(this.getColoredIcon(colorHex));
-      marker.setPopupContent(station.name + ' ' + rainValue.toString() + 'mm');
-      marker.on('click', () => this.emitData(
-        new EmitData(station, station.latitude, station.longitude, date, rainValue, this.info.metricLabel))
-      );
+      marker.setIcon(CustomMarkers.getColoredIcon(colorHex));
+      marker.setPopupContent(station.name + ' ' + rainValue.toString() + this.info.metricLabel);
+      marker
+        .on('click', () => this.emitData(
+          new EmitData(station, latitude, longitude, date, rainValue, this.info.metricLabel))
+        );
     }
     if (this.lastClickedData) {
       if (this.lastClickedData[0].stationId === station.id) {
@@ -163,29 +143,35 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     });
   }
 
-  getData(): Observable<HydrologicalDataBase[]> {
-    return this.http.get<HydrologicalDataBase[]>(`${this.url}/data`);
+  getData(): Observable<PointData[]> {
+    return this.http.get<PointData[]>(`${this.url}/data`);
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<HydrologicalDataBase[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<PointData[]> {
     const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<HydrologicalDataBase[]>
+    return this.http.get<PointData[]>
     (`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<HydrologicalDataBase[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<HydrologicalDataBase[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PointData[]> {
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    return this.http.get<PointData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
   getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
     return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
+  }
+
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
   }
 
   draw(date: Date): void {
@@ -208,13 +194,14 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   clear(): void {
     this.group.clearLayers();
     this.lastClickedData = undefined;
+    this.markers.clear();
   }
 
   getDistinctLatLongStations(stations: Station[]): Station[] {
     const tab: number[] = [];
     const retVal: Station[] = [];
     stations.forEach(a => {
-      const latitude = a.latitude;
+      const latitude = a.points[0][0];
       if (latitude) {
         if (!tab.includes(latitude)) {
           tab.push(latitude);
@@ -246,11 +233,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   changeOpacity(newOpacity: number): void {
     this.opacity = newOpacity;
     this.group.setStyle({opacity: newOpacity, fillOpacity: newOpacity});
-    for (const key in this.markers) {
-      if (this.markers.hasOwnProperty(key)) {
-        this.markers[key].setOpacity(newOpacity);
-      }
-    }
+    this.markers.forEach(marker => marker.setOpacity(newOpacity));
   }
 
   updateColor(date: Date): void {
@@ -261,6 +244,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station): Observable<HydrologicalDataBase> {
     const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
     const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    return this.http.get<HydrologicalDataBase>(`${this.url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);
+    return this.http.get<PointData>(`${this.url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);
   }
 }

@@ -31,9 +31,9 @@ export class StationsComponent implements OnInit {
   zoomTo(id: number): void {
     const station = this.allStations.filter(a => a.id === id)[0];
     const map = this.dataProvider.getActualService().map;
-    if (station.latitude && station.longitude) {
+    if (station.points[0]) {
       this.query = '';
-      map.flyTo([station.latitude, station.longitude], 13, {
+      map.flyTo([station.points[0][0], station.points[0][1]], 13, {
         animate: true,
         duration: 1
       });

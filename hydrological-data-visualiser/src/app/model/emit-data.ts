@@ -1,7 +1,6 @@
 import {Station} from './station';
 
 export class EmitData {
-
   constructor(
     public station?: Station,
     public latitude?: number,

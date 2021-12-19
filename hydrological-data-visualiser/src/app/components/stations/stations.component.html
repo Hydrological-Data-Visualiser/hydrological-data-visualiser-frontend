@@ -18,8 +18,8 @@
           <div class="row">
             <div *ngFor="let station of allStations | searchFilter: query" class="col-4">
               <a href="#" (click)="zoomTo(station.id)" data-bs-dismiss="modal"
-                 *ngIf="station.longitude && station.latitude"><p> {{station.name}}</p></a>
-              <p *ngIf="!station.longitude || !station.latitude"> {{station.name}}</p>
+                 *ngIf="station.points[0][0] && station.points[0][1]"><p> {{station.name}}</p></a>
+              <p *ngIf="!station.points[0][0] || !station.points[0][1]"> {{station.name}}</p>
             </div>
             <div *ngIf="(allStations | searchFilter: query).length === 0 && query.length>0; else other">
               <p class="text-center">No matches</p>
