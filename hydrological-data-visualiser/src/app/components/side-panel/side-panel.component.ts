@@ -36,6 +36,7 @@ export class SidePanelComponent implements OnInit {
   animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
   animationStart: Date | undefined;
+  animationEnd: Date | undefined;
   animationLength: number | undefined;
   animationNow: Date | undefined;
   animationPercentage: number | undefined;
@@ -233,9 +234,8 @@ export class SidePanelComponent implements OnInit {
       const endDate = this.getSelectedAnimationTime()!;
       this.animationPlaying = true;
       this.animationStart = startDate;
+      this.animationEnd = endDate;
       this.animationNow = startDate;
-      console.log("selectedAnimtaiton: " + endDate);
-      console.log("startDate: " + startDate);
 
       this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe( length => {
         this.setAnimationLength(length);
@@ -318,6 +318,7 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
     this.animationPlaying = false;
     this.animationStart = undefined;
+    this.animationEnd = undefined;
     this.animationLength = undefined;
     this.animationNow = undefined;
     this.animationPercentage = 0;
