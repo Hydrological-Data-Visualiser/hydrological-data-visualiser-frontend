@@ -50,6 +50,7 @@ export class ModelConfigurationComponent implements OnInit {
       // @ts-ignore -
       document.getElementById('dismissButtonModalLabel').click();
     }
+    this.url = '';
   }
 
   checkIfUrlAlreadyAdded(): void {
