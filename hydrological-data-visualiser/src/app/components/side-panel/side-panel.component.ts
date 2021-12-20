@@ -9,7 +9,7 @@ import {Color} from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {ChartConfiguration, ChartData} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
-import {HydrologicalData} from "../../model/hydrological-data";
+import {HydrologicalData} from '../../model/hydrological-data';
 
 @Component({
   selector: 'app-side-panel',
@@ -68,7 +68,7 @@ export class SidePanelComponent implements OnInit {
     responsive: true,
     // We use these empty structures as placeholders for dynamic theming.
     scales: {
-      x: {},
+      x: {display: false},
       y: {}
     },
     plugins: {
@@ -423,18 +423,13 @@ export class SidePanelComponent implements OnInit {
     }
   }
 
-  createDataChart(data: any[]): void {
-    const dataPoints: Date[] = [...new Set(data.map(item => item.date))];
+  createDataChart(data: HydrologicalData[]): void {
+    data = data.sort((a, b) => a.date < b.date ? -1 : 1);
+    this.barChartData.labels = data.map(item => moment(item.date).format('YYYY-MM-DD HH:mm:SS'));
     const dataset: { data: number[], label: string } = {
-      data: [],
+      data: data.map(item => item.value),
       label: this.dataProvider.getActualService().info.metricLabel
     };
-    dataPoints.forEach(point => {
-      if (point) {
-        this.barChartData.labels?.push(moment(point).format('YYYY-MM-DD'));
-        dataset.data.push(data.filter(a => moment(a.date).format('YYYY-MM-DD') === moment(point).format('YYYY-MM-DD'))[0].value);
-      }
-    });
     this.barChartData.datasets.push(dataset);
     this.chart?.update();
   }
