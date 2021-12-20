@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
 import * as L from 'leaflet';
+import * as moment from 'moment';
 import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
 import {EmitData} from '../../model/emit-data';

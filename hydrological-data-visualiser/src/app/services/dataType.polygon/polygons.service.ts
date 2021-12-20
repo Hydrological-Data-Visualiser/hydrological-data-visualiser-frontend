@@ -80,8 +80,8 @@ export abstract class PolygonsService extends ApiConnector<HydrologicalData> imp
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(HydrologicalDataArr => {
-      HydrologicalDataArr.forEach(hydrologicalData => {
+    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(hydrologicalDataArr => {
+      hydrologicalDataArr.forEach(hydrologicalData => {
         const station = this.stationList.find(a => a.id === hydrologicalData.stationId);
         if (station) {
           const polygon = this.polygons.get(station);
