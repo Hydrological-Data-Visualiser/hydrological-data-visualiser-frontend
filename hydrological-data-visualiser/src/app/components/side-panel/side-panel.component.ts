@@ -8,7 +8,7 @@ import {EmitData} from '../../model/emit-data';
 import * as PickerColor from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {ChartDataSets, ChartOptions} from 'chart.js';
-import {BaseChartDirective, Color, Label} from 'ng2-charts';
+import {BaseChartDirective, Label} from 'ng2-charts';
 import {HydrologicalData} from '../../model/hydrological-data';
 
 @Component({
@@ -109,9 +109,11 @@ export class SidePanelComponent implements OnInit {
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
+      let showChart = false;
       if (data.latitude !== this.clickedData.latitude && data.longitude !== this.clickedData.longitude) {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
+        showChart = true;
       }
       if (data.latitude === undefined && data.longitude === undefined) {
         this.clickedOnMap = false;
@@ -124,7 +126,9 @@ export class SidePanelComponent implements OnInit {
       if (!this.animationPaused) {
         this.sidePanelShowStatus = false;
       }
-      this.getDataToChart();
+      if (showChart) {
+        this.getDataToChart();
+      }
     });
 
     this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
