@@ -5,10 +5,10 @@ import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
-import {Color} from '@angular-material-components/color-picker';
+import * as PickerColor from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
-import {ChartConfiguration, ChartData} from 'chart.js';
-import {BaseChartDirective} from 'ng2-charts';
+import {ChartDataSets, ChartOptions} from 'chart.js';
+import {BaseChartDirective, Color, Label} from 'ng2-charts';
 import {HydrologicalData} from '../../model/hydrological-data';
 
 @Component({
@@ -51,38 +51,28 @@ export class SidePanelComponent implements OnInit {
 
   clickedData: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
   opacity = 50;
-  minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
-  maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
+  minColorCtr: AbstractControl = new FormControl(new PickerColor.Color(255, 243, 0), [Validators.required]);
+  maxColorCtr: AbstractControl = new FormControl(new PickerColor.Color(255, 243, 0), [Validators.required]);
 
   showLoadingScreen = false;
   selected: any;
 
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
-  public barChartData: ChartData<'bar'> = {
-    labels: [],
-    datasets: []
-  };
-
-  public barChartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    // We use these empty structures as placeholders for dynamic theming.
-    scales: {
-      x: {display: false},
-      y: {}
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      // datalabels: {
-      //   anchor: 'end',
-      //   align: 'end'
-      // }
-    },
-  };
-
+  public barChartData: ChartDataSets[] = [];
+  public barChartLabels: Label[] = [];
   public barChartPlugins = [];
+  public barChartOptions: ChartOptions = {
+    responsive: true,
+    legend: {
+      display: false
+    },
+    scales: {
+      xAxes: [{
+        display: false,
+      }]
+    }
+  };
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
               private sidePanelService: SidePanelService) {
@@ -107,8 +97,8 @@ export class SidePanelComponent implements OnInit {
 
       const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
       const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
-      this.minColorCtr = new FormControl(new Color(newMinColor[0], newMinColor[1], newMinColor[2]));
-      this.maxColorCtr = new FormControl(new Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
+      this.minColorCtr = new FormControl(new PickerColor.Color(newMinColor[0], newMinColor[1], newMinColor[2]));
+      this.maxColorCtr = new FormControl(new PickerColor.Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
 
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
@@ -410,8 +400,8 @@ export class SidePanelComponent implements OnInit {
   }
 
   getDataToChart(): void {
-    this.barChartData.datasets = [];
-    this.barChartData.labels = [];
+    this.barChartLabels = [];
+    this.barChartData = [];
     if (
       this.clickedData.station && this.selectedDate && this.selectedAnimationDate) {
       this.dataProvider.getActualService()
@@ -425,12 +415,13 @@ export class SidePanelComponent implements OnInit {
 
   createDataChart(data: HydrologicalData[]): void {
     data = data.sort((a, b) => a.date < b.date ? -1 : 1);
-    this.barChartData.labels = data.map(item => moment(item.date).format('YYYY-MM-DD HH:mm:SS'));
-    const dataset: { data: number[], label: string } = {
+    this.barChartData.push({
       data: data.map(item => item.value),
-      label: this.dataProvider.getActualService().info.metricLabel
-    };
-    this.barChartData.datasets.push(dataset);
+      label: this.dataProvider.getActualService().info.metricLabel,
+      backgroundColor: 'rgba(63, 81, 181)',
+      hoverBackgroundColor: 'rgba(255, 68, 132)'
+    });
+    data.map(item => moment(item.date).format('YYYY-MM-DD HH:mm:ss')).forEach(a => this.barChartLabels.push(a));
     this.chart?.update();
   }
 

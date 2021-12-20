@@ -161,13 +161,16 @@
               <input matInput value="{{clickedData.date | date: 'medium'}}" readonly>
             </mat-form-field>
           </div>
-          <div *ngIf="barChartData.datasets.length >0 && selectedDate && selectedAnimationDate">
+          <div *ngIf=" selectedDate && selectedAnimationDate">
             <div>
               <canvas baseChart
-                      [data]="barChartData"
+                      [datasets]="barChartData"
+                      [labels]="barChartLabels"
+                      [legend]="false"
                       [options]="barChartOptions"
                       [plugins]="barChartPlugins"
-                      [type]="'bar'">
+                      [chartType]="'bar'"
+                     >
               </canvas>
             </div>
           </div>

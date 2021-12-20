@@ -11,8 +11,8 @@ export abstract class ApiConnector<Type> implements ApiConnectorInterface<Type> 
   }
 
   getDataBetweenAndStationAsObservable(dateFrom: Date, dateTo: Date, station: Station, url: string): Observable<Type> {
-    const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const dateFromStr = moment(dateFrom).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const dateToStr = moment(dateTo).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<Type>(`${url}/data?dateFrom=${dateFromStr}&dateTo=${dateToStr}&stationId=${station.id}`);
   }
 
