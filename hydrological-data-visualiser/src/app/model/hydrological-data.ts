@@ -1,4 +1,4 @@
-export class PointData {
+export class HydrologicalData {
   constructor(
     public id: number,
     public stationId: number,

@@ -72,7 +72,7 @@
               </mat-form-field>
               <mat-form-field>
                 <mat-label>Animation Timestep [ms]</mat-label>
-                <input matInput type="number" id="timestep"
+                <input matInput type="number" id="timestep" [disabled]="!isFormSubmitted"
                        [(ngModel)]="animationModel.timestepMs" name="timestep [ms]" #timestep="ngModel">
               </mat-form-field>
               <div class="buttons mt-2">
@@ -185,10 +185,6 @@
         <button mat-raised-button color="primary" (click)="openOrHideSidePanel()">See Details</button>
         <div *ngIf="animationPlaying">
           <mat-form-field appearance="standard" class="content-no-underline">
-            <mat-label>Animation Length:</mat-label>
-            <input matInput value="{{animationLength}}" readonly>
-          </mat-form-field>
-          <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Animation Start:</mat-label>
             <input matInput value="{{animationStart | date:'medium'}}" readonly>
           </mat-form-field>
@@ -210,9 +206,6 @@
       <mat-progress-bar mode="determinate" color="primary" value="{{animationPercentage}}"
                         [attr.aria-valuenow]="animationPercentage"
                         aria-valuemin="0" aria-valuemax="100" role="progressbar"></mat-progress-bar>
-
-      <!--      <div class="progress-bar bg-dark" style="width: {{animationPercentage}}%" role="progressbar"-->
-      <!--           [attr.aria-valuenow]="animationPercentage" aria-valuemin="0" aria-valuemax="100"></div>-->
     </div>
     <div class="container-fluid">
       <app-map></app-map>
