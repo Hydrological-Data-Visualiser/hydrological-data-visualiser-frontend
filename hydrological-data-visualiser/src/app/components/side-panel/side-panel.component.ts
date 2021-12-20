@@ -9,7 +9,7 @@ import {Color} from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {ChartConfiguration, ChartData} from 'chart.js';
 import {BaseChartDirective} from 'ng2-charts';
-import {PointData} from '../../model/point-data';
+import {HydrologicalData} from "../../model/hydrological-data";
 
 @Component({
   selector: 'app-side-panel',
@@ -417,7 +417,7 @@ export class SidePanelComponent implements OnInit {
       this.dataProvider.getActualService()
         .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate,
           this.clickedData.station, this.dataProvider.getActualService().url)
-        .subscribe((data: PointData[]) => {
+        .subscribe((data: HydrologicalData[]) => {
           this.createDataChart(data.filter(a => a.date));
         });
     }

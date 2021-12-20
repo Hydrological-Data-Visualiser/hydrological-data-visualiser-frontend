@@ -7,18 +7,18 @@ import {DataServiceInterface} from '../data.service.interface';
 import {DataModelBase} from '../../model/data-model-base';
 import {ColorService} from '../color.service';
 import {CustomMarkers} from '../custom-markers';
-import {PolylineData} from '../../model/polyline-data';
 import {Station} from '../../model/station';
 import {ApiConnector} from '../api-connector';
+import {HydrologicalData} from '../../model/hydrological-data';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class RiverService extends ApiConnector<PolylineData> implements DataServiceInterface<PolylineData> {
+export abstract class RiverService extends ApiConnector<HydrologicalData> implements DataServiceInterface<HydrologicalData> {
   public map!: L.Map;
   public info!: DataModelBase;
   public url!: string;
-  public lastClickedData: [PolylineData, L.LatLng] | undefined = undefined;
+  public lastClickedData: [HydrologicalData, L.LatLng] | undefined = undefined;
 
   public status = false;
   public marker: L.Marker | undefined = undefined;
@@ -53,27 +53,27 @@ export abstract class RiverService extends ApiConnector<PolylineData> implements
   draw(date: Date): void {
     this.sidePanelService.finishEmitter.emit(true);
     this.clear();
-    this.getDataFromDateAsObservableUsingInstant(date, this.url).subscribe(polylineDataArr => {
-      polylineDataArr.forEach(polylineData => {
-        const polyline = this.stationList.find(a => a.id === polylineData.polylineId);
+    this.getDataFromDateAsObservableUsingInstant(date, this.url).subscribe(HydrologicalDataArr => {
+      HydrologicalDataArr.forEach(hydrologicalData => {
+        const polyline = this.stationList.find(a => a.id === hydrologicalData.stationId);
         if (polyline) {
           const river =
             [new L.LatLng(polyline.points[0][0], polyline.points[0][1]), new L.LatLng(polyline.points[1][0], polyline.points[1][1])];
-          const color = this.colorService.getColor(polylineData.value);
+          const color = this.colorService.getColor(hydrologicalData.value);
           const lPolyline = new L.Polyline(river, {
             color,
             fillColor: color,
             opacity: this.opacity,
             fillOpacity: this.opacity
           })
-            .bindPopup(`${polylineData.value} ${this.info.metricLabel}`)
+            .bindPopup(`${hydrologicalData.value} ${this.info.metricLabel}`)
             .on('click', (event: any) => {
               const coords = event.latlng;
               this.addMarkerOnDataClick(coords);
               this.emitData(
-                new EmitData(polyline, coords.lat, coords.lng, polylineData.date, polylineData.value, this.info.metricLabel)
+                new EmitData(polyline, coords.lat, coords.lng, hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
               );
-              this.lastClickedData = [polylineData, coords];
+              this.lastClickedData = [hydrologicalData, coords];
             });
           this.riverLayer.addLayer(lPolyline);
           this.polyLines.set(polyline, lPolyline);
@@ -86,28 +86,28 @@ export abstract class RiverService extends ApiConnector<PolylineData> implements
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(polylineDataArr => {
-      polylineDataArr.forEach(polylineData => {
-        const station = this.stationList.find(a => a.id === polylineData.polylineId);
+    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(HydrologicalDataArr => {
+      HydrologicalDataArr.forEach(hydrologicalData => {
+        const station = this.stationList.find(a => a.id === hydrologicalData.stationId);
         if (station) {
           const polyline = this.polyLines.get(station);
           if (polyline) {
-            const color = this.colorService.getColor(polylineData.value);
+            const color = this.colorService.getColor(hydrologicalData.value);
             polyline.setStyle({color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity});
-            polyline.bindPopup(`${polylineData.value} ${this.info.metricLabel}`)
+            polyline.bindPopup(`${hydrologicalData.value} ${this.info.metricLabel}`)
               .on('click', (event: any) => {
                 const coords = event.latlng;
-                this.lastClickedData = [polylineData, coords];
+                this.lastClickedData = [hydrologicalData, coords];
                 this.emitData(
-                  new EmitData(undefined, coords.lat, coords.lng, polylineData.date, polylineData.value, this.info.metricLabel)
+                  new EmitData(undefined, coords.lat, coords.lng, hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
                 );
                 this.addMarkerOnDataClick(coords);
               });
             if (this.lastClickedData) {
-              if (this.lastClickedData[0].polylineId === polylineData.polylineId) {
+              if (this.lastClickedData[0].stationId === hydrologicalData.stationId) {
                 this.emitData(new EmitData(
                   station, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
-                  polylineData.date, polylineData.value, this.info.metricLabel)
+                  hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
                 );
               }
             }

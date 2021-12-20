@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Station} from '../../model/station';
 import * as L from 'leaflet';
-import {PointData} from '../../model/point-data';
 import 'leaflet.markercluster';
 import {ColorService} from '../color.service';
 import {EmitData} from '../../model/emit-data';
@@ -12,11 +11,12 @@ import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../../model/data-model-base';
 import {CustomMarkers} from '../custom-markers';
 import {ApiConnector} from '../api-connector';
+import {HydrologicalData} from '../../model/hydrological-data';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class MarkerCreatorService extends ApiConnector<PointData> implements DataServiceInterface<PointData> {
+export abstract class MarkerCreatorService extends ApiConnector<HydrologicalData> implements DataServiceInterface<HydrologicalData> {
   public url!: string;
   public info!: DataModelBase;
   public map!: L.Map;
@@ -25,7 +25,7 @@ export abstract class MarkerCreatorService extends ApiConnector<PointData> imple
     maxClusterRadius: zoom => 140 - zoom * 10
   });
   public stationList: Station[] = [];
-  public lastClickedData: [PointData, L.LatLng] | undefined = undefined;
+  public lastClickedData: [HydrologicalData, L.LatLng] | undefined = undefined;
   public marker: L.Marker | undefined = undefined;
   public opacity = 0.5;
   private markers: Map<Station, L.Marker> = new Map<Station, L.Marker>();
@@ -35,7 +35,7 @@ export abstract class MarkerCreatorService extends ApiConnector<PointData> imple
     this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
-  putMarkers(stations: Station[], data: Observable<PointData[]>, metricLabel: string, date: Date): void {
+  putMarkers(stations: Station[], data: Observable<HydrologicalData[]>, metricLabel: string, date: Date): void {
     this.sidePanelService.finishEmitter.emit(true);
     this.clear();
 
@@ -68,7 +68,7 @@ export abstract class MarkerCreatorService extends ApiConnector<PointData> imple
         .bindPopup(station.name + ' ' + rainValue.toString() + ` ${metricLabel}`)
         .on('click', event => {
           this.lastClickedData =
-            [new PointData(station.id, station.id, date, rainValue), new L.LatLng(latitude, longitude)];
+            [new HydrologicalData(station.id, station.id, date, rainValue), new L.LatLng(latitude, longitude)];
           this.emitData(
             new EmitData(station, latitude, longitude, date, rainValue, metricLabel)
           );
@@ -141,8 +141,8 @@ export abstract class MarkerCreatorService extends ApiConnector<PointData> imple
     });
   }
 
-  getData(): Observable<PointData[]> {
-    return this.http.get<PointData[]>(`${this.url}/data`);
+  getData(): Observable<HydrologicalData[]> {
+    return this.http.get<HydrologicalData[]>(`${this.url}/data`);
   }
 
   draw(date: Date): void {

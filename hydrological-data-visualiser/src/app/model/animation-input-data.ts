@@ -5,4 +5,3 @@ export class AnimationInputData {
       public timestepMs: number
     ) {}
   }
-  
