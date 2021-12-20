@@ -10,12 +10,15 @@ import {AbstractControl, FormControl, Validators} from '@angular/forms';
 import {ChartDataSets, ChartOptions} from 'chart.js';
 import {BaseChartDirective, Label} from 'ng2-charts';
 import {HydrologicalData} from '../../model/hydrological-data';
+import 'moment/locale/pl';
+import {DateAdapter, MAT_DATE_LOCALE} from '@angular/material/core';
 
 @Component({
   selector: 'app-side-panel',
   templateUrl: './side-panel.component.html',
   styleUrls: ['./side-panel.component.css'],
   encapsulation: ViewEncapsulation.None,
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'pl-PL'}]
 })
 export class SidePanelComponent implements OnInit {
   // details attributes
@@ -75,7 +78,8 @@ export class SidePanelComponent implements OnInit {
   };
 
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
-              private sidePanelService: SidePanelService) {
+              private sidePanelService: SidePanelService, private adapter: DateAdapter<any>) {
+    this.adapter.setLocale('pl');
   }
 
   ngOnInit(): void {
@@ -104,6 +108,7 @@ export class SidePanelComponent implements OnInit {
       document.getElementById('nav-form-tab').click();
       this.stopAnimation();
       this.showingDate = undefined;
+      this.clearChart();
 
       this.init();
     });
@@ -202,7 +207,6 @@ export class SidePanelComponent implements OnInit {
       this.clearAfterAnimationDate();
       this.blockedAnimationHourDropdown = false;
       this.updateHourList(this.selectedAnimationDate, this.animationHourDropDownList, this.getSelectedTime());
-      this.getDataToChart();
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -228,6 +232,7 @@ export class SidePanelComponent implements OnInit {
       this.selectedHour = moment(hour).format('HH:mm:ss');
       this.isDateAndHourSelected = true;
       this.selectedAnimationHour = undefined;
+      this.clearChart();
     }
   }
 
@@ -235,6 +240,7 @@ export class SidePanelComponent implements OnInit {
     if (event.isUserInput) {
       this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
       this.isAnimationDateAndHourSelected = true;
+      this.getDataToChart();
     }
   }
 
@@ -243,6 +249,7 @@ export class SidePanelComponent implements OnInit {
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
     this.updateHourList(new Date(event.value), this.hourDropDownList, undefined);
+    this.clearChart();
   }
 
   onAnimationDateChange(event: any): void {
@@ -250,7 +257,7 @@ export class SidePanelComponent implements OnInit {
     this.blockedAnimationHourDropdown = false;
     this.selectedAnimationDate = event.value;
     this.updateHourList(new Date(event.value), this.animationHourDropDownList, this.getSelectedTime());
-    this.getDataToChart();
+    this.clearChart();
   }
 
   // animation methods
@@ -407,9 +414,11 @@ export class SidePanelComponent implements OnInit {
     this.barChartLabels = [];
     this.barChartData = [];
     if (
-      this.clickedData.station && this.selectedDate && this.selectedAnimationDate) {
+      this.clickedData.station && this.selectedDate && this.selectedAnimationDate && this.selectedHour && this.selectedAnimationHour) {
+      const startDate: Date = new Date(moment(this.selectedDate).format('YYYY-MM-DD[T]') + this.selectedHour);
+      const finishDate: Date = new Date(moment(this.selectedAnimationDate).format('YYYY-MM-DD[T]') + this.selectedAnimationHour);
       this.dataProvider.getActualService()
-        .getDataBetweenAndStationAsObservable(this.selectedDate, this.selectedAnimationDate,
+        .getDataBetweenAndStationAsObservable(startDate, finishDate,
           this.clickedData.station, this.dataProvider.getActualService().url)
         .subscribe((data: HydrologicalData[]) => {
           this.createDataChart(data.filter(a => a.date));
@@ -460,6 +469,12 @@ export class SidePanelComponent implements OnInit {
           });
       });
     }
+  }
+
+  clearChart(): void {
+    this.barChartLabels = [];
+    this.barChartData = [];
+    this.chart?.update();
   }
 }
 

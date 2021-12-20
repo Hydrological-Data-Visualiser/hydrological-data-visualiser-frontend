@@ -161,7 +161,7 @@
               <input matInput value="{{clickedData.date | date: 'medium'}}" readonly>
             </mat-form-field>
           </div>
-          <div *ngIf=" selectedDate && selectedAnimationDate">
+          <div *ngIf="selectedDate && selectedAnimationDate && selectedAnimationHour && selectedHour && barChartData[0]">
             <div>
               <canvas baseChart
                       [datasets]="barChartData"
