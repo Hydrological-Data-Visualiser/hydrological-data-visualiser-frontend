@@ -8,7 +8,7 @@ import {ColorService} from '../color.service';
   providedIn: 'root'
 })
 export class ModflowService extends PolygonsService {
-  public url = 'https://imgw-mock.herokuapp.com//modflow';
+  public url = 'https://imgw-mock.herokuapp.com/modflow';
 
   constructor(public http: HttpClient, public sidePanelService: SidePanelService, colorService: ColorService) {
     super(sidePanelService, http, colorService);

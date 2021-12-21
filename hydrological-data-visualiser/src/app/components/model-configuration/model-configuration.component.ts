@@ -22,34 +22,36 @@ export class ModelConfigurationComponent implements OnInit {
     this.urlAdded = false;
     this.checkIfUrlAlreadyAdded();
     if (!this.urlAdded) {
-      this.dataProvider.apis.push(this.url);
-      this.http.get<DataModelBase>(`${this.url}/info`).subscribe(data => {
-        this.dataProvider.addedModelUrls.set(data.name, this.url);
+      const urlCopy = this.url;
+      this.dataProvider.apis.push(urlCopy);
+      this.http.get<DataModelBase>(`${urlCopy}/info`).subscribe(data => {
+        this.dataProvider.addedModelUrls.set(data.name, urlCopy);
         switch (data.dataType) {
           case DataType.LINE: {
             this.dataProvider.addedModels.set(data.name, DataType.LINE);
-            this.dataProvider.getUniversalLineService().setUrl(this.url);
+            this.dataProvider.getUniversalLineService().setUrl(urlCopy);
             break;
           }
           case DataType.POINTS: {
             this.dataProvider.addedModels.set(data.name, DataType.POINTS);
-            this.dataProvider.getUniversalMarkerCreatorService().setUrl(this.url);
+            this.dataProvider.getUniversalMarkerCreatorService().setUrl(urlCopy);
             break;
           }
           case DataType.POLYGON: {
             this.dataProvider.addedModels.set(data.name, DataType.POLYGON);
-            this.dataProvider.getUniversalPolygonsService().setUrl(this.url);
+            this.dataProvider.getUniversalPolygonsService().setUrl(urlCopy);
             break;
           }
         }
       }, error => {
-        console.log('cannot get ' + this.url + '/info.');
+        console.log('cannot get ' + urlCopy + '/info.');
         this.dataProvider.apis.pop();
       });
       this.dataProvider.getModels();
       // @ts-ignore -
       document.getElementById('dismissButtonModalLabel').click();
     }
+    this.url = '';
   }
 
   checkIfUrlAlreadyAdded(): void {
