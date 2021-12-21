@@ -140,7 +140,8 @@
           </div>
           <div id="longLang" *ngIf="clickedOnMap === true">
             <br>
-            <mat-form-field *ngIf="clickedData.station && clickedData.station.name" appearance="standard" class="content-no-underline m-3">
+            <mat-form-field *ngIf="clickedData.station && clickedData.station.name" appearance="standard"
+                            class="content-no-underline m-3">
               <mat-label>Name</mat-label>
               <input matInput value="{{clickedData.station.name}}" readonly>
             </mat-form-field>
@@ -161,8 +162,10 @@
               <input matInput value="{{clickedData.date | date: 'medium'}}" readonly>
             </mat-form-field>
           </div>
-          <div *ngIf="selectedDate && selectedAnimationDate && selectedAnimationHour && selectedHour && barChartData[0]">
+          <div
+            *ngIf="selectedDate && selectedAnimationDate && selectedAnimationHour && selectedHour && barChartData[0]">
             <div>
+              <br>
               <canvas baseChart
                       [datasets]="barChartData"
                       [labels]="barChartLabels"
@@ -170,9 +173,15 @@
                       [options]="barChartOptions"
                       [plugins]="barChartPlugins"
                       [chartType]="'bar'"
-                     >
+              >
               </canvas>
             </div>
+          </div>
+          <div
+            *ngIf=" clickedOnMap === true && (!selectedDate || !selectedAnimationDate || !selectedAnimationHour || !selectedHour || !barChartData[0])">
+            <br>
+            <p class="text-center">If you want to see a chart of this place, select the date and time of the animation
+              in the form tab - it will be used as the end date of the chart. </p>
           </div>
         </div>
 
