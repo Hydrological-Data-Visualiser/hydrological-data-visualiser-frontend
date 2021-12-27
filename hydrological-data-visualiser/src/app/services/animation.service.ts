@@ -80,7 +80,7 @@ class PlayData {
       }
 
       this.currentStep = (this.currentStep + 1) % this.steps;
-      this.dataService.getTimePointAfterAsObservable(this.startStep, this.currentStep).subscribe(frameDate => {
+      this.dataService.getTimePointAfterAsObservable(this.startStep, this.currentStep, this.dataService.url).subscribe(frameDate => {
         const date = new Date(frameDate);
         const utcDate = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
           date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());

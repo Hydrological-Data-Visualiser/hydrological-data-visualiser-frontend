@@ -11,18 +11,19 @@ import {DataServiceInterface} from '../data.service.interface';
 import {HttpClient} from '@angular/common/http';
 import {DataModelBase} from '../../model/data-model-base';
 import {CustomMarkers} from '../custom-markers';
+import {ApiConnector} from '../api-connector';
 import {HydrologicalData} from '../../model/hydrological-data';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class MarkerCreatorService implements DataServiceInterface<HydrologicalData> {
+export abstract class MarkerCreatorService extends ApiConnector<HydrologicalData> implements DataServiceInterface<HydrologicalData> {
   public url!: string;
   public info!: DataModelBase;
   public map!: L.Map;
   public group = new L.MarkerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: zoom => 120 - zoom * 10
+    maxClusterRadius: zoom => 140 - zoom * 10
   });
   public stationList: Station[] = [];
   public lastClickedData: [HydrologicalData, L.LatLng] | undefined = undefined;
@@ -31,6 +32,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   private markers: Map<Station, L.Marker> = new Map<Station, L.Marker>();
 
   protected constructor(protected colorService: ColorService, protected sidePanelService: SidePanelService, public http: HttpClient) {
+    super(http);
     this.sidePanelService.modelEmitter.subscribe(() => this.opacity = 0.5);
   }
 
@@ -69,7 +71,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
           this.lastClickedData =
             [new HydrologicalData(station.id, station.id, date, rainValue), new L.LatLng(latitude, longitude)];
           this.emitData(
-            new EmitData(station.name, latitude, longitude, date, rainValue, metricLabel)
+            new EmitData(station, latitude, longitude, date, rainValue, metricLabel)
           );
         });
       this.markers.set(station, marker);
@@ -78,7 +80,7 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(d => {
+    return this.getDataFromDateAsObservableUsingInstant(date, this.url).toPromise().then(d => {
       d.forEach(rainData => {
         const rainValue = rainData.value;
         const filteredStations = this.stationList.filter(station => station.id === rainData.stationId); // stationsList ok?
@@ -100,13 +102,13 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
       marker.setPopupContent(station.name + ' ' + rainValue.toString() + this.info.metricLabel);
       marker
         .on('click', () => this.emitData(
-          new EmitData(station.name, latitude, longitude, date, rainValue, this.info.metricLabel))
+          new EmitData(station, latitude, longitude, date, rainValue, this.info.metricLabel))
         );
     }
     if (this.lastClickedData) {
       if (this.lastClickedData[0].stationId === station.id) {
         this.emitData(
-          new EmitData(station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
+          new EmitData(station, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
             date, rainValue, this.info.metricLabel)
         );
       }
@@ -133,12 +135,9 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     this.sidePanelService.emitData(data);
   }
 
-  getStationsObservable(): Observable<Station[]> {
-    return this.http.get<Station[]>(`${this.url}/stations`);
-  }
 
   getStations(): void {
-    this.getStationsObservable().subscribe(data => {
+    this.getStationsObservable(this.url).subscribe(data => {
       this.stationList = data;
     });
   }
@@ -147,37 +146,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     return this.http.get<HydrologicalData[]>(`${this.url}/data`);
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<HydrologicalData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return this.http.get<HydrologicalData[]>
-    (`${this.url}/data?date=${formattedDate}`);
-  }
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<HydrologicalData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<HydrologicalData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
-  }
-
-  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
-  }
-
-  getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
-    const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
-  }
-
-  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
-    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
-  }
-
   draw(date: Date): void {
     this.putMarkers(
       this.getDistinctLatLongStations(this.stationList),
-      this.getDataFromDateAsObservableUsingInstant(date),
+      this.getDataFromDateAsObservableUsingInstant(date, this.url),
       this.info.metricLabel,
       date
     );
@@ -185,10 +157,6 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
 
   getInfo(): void {
     this.http.get<DataModelBase>(`${this.url}/info`).subscribe(info => this.info = info);
-  }
-
-  getInfoObservable(): Observable<DataModelBase> {
-    return this.http.get<DataModelBase>(`${this.url}/info`);
   }
 
   clear(): void {
@@ -212,18 +180,10 @@ export abstract class MarkerCreatorService implements DataServiceInterface<Hydro
     return retVal;
   }
 
-  getMinValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/min?instantFrom=${begin}&length=${length}`);
-  }
-
-  getMaxValue(begin: string, length: number): Observable<number> {
-    return this.http.get<number>(`${this.url}/max?instantFrom=${begin}&length=${length}`);
-  }
-
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void {
-    this.getMinValue(begin, length).subscribe(minValue =>
-      this.getMaxValue(begin, length).subscribe(maxValue => {
+    this.getMinValue(begin, length, this.url).subscribe(minValue =>
+      this.getMaxValue(begin, length, this.url).subscribe(maxValue => {
         this.colorService.setColorMap(minValue, maxValue, this.info.minColour, this.info.maxColour, this.info.metricLabel);
         callback();
       })

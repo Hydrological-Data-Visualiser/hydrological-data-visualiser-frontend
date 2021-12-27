@@ -21,8 +21,7 @@ export class StationsComponent implements OnInit {
     this.sidePanelService.modelEmitter.subscribe(name => {
       this.allStations = [];
       if (this.dataProvider.getActualService().info.dataType === DataType.POINTS) {
-        // @ts-ignore
-        this.dataProvider.getActualService().getStationsObservable()
+        this.dataProvider.getActualService().getStationsObservable(this.dataProvider.getActualService().url)
           .subscribe((stations: any[]) => stations.forEach(station => this.allStations.push(station)));
       }
     });

@@ -1,10 +1,10 @@
 import {DataModelBase} from '../model/data-model-base';
-import {Observable} from 'rxjs';
 import {Station} from '../model/station';
 import * as L from 'leaflet';
 import {EmitData} from '../model/emit-data';
+import {ApiConnectorInterface} from './api-connector-interface';
 
-export interface DataServiceInterface<Type> {
+export interface DataServiceInterface<Type> extends ApiConnectorInterface<Type> {
   readonly url: string;
   info: DataModelBase;
   map: L.Map;
@@ -16,34 +16,16 @@ export interface DataServiceInterface<Type> {
 
   update(date: Date): Promise<void>;
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<Type[]>;
-
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<Type[]>;
-
-  getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date>;
-
-  getDayTimePointsAsObservable(date: Date): Observable<Date[]>;
-
   getInfo(): void;
-
-  getInfoObservable(): Observable<DataModelBase>;
 
   // tslint:disable-next-line:ban-types
   setScaleAndColour(begin: string, length: number, callback: Function): void;
-
-  getStationsObservable(): Observable<Station[]>;
 
   getStations(): void;
 
   clear(): void;
 
   emitData(data: EmitData): void;
-
-  getMinValue(begin: string, length: number): Observable<number>;
-
-  getMaxValue(begin: string, length: number): Observable<number>;
-
-  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number>;
 
   changeOpacity(opacity: number): void;
 

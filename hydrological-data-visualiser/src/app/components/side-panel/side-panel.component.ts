@@ -1,18 +1,24 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
 import {SidePanelService} from './side-panel-service';
 import {EmitData} from '../../model/emit-data';
-import {Color} from '@angular-material-components/color-picker';
+import * as PickerColor from '@angular-material-components/color-picker';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
+import {ChartDataSets, ChartOptions} from 'chart.js';
+import {BaseChartDirective, Label} from 'ng2-charts';
+import {HydrologicalData} from '../../model/hydrological-data';
+import 'moment/locale/pl';
+import {DateAdapter, MAT_DATE_LOCALE} from '@angular/material/core';
 
 @Component({
   selector: 'app-side-panel',
   templateUrl: './side-panel.component.html',
   styleUrls: ['./side-panel.component.css'],
   encapsulation: ViewEncapsulation.None,
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'pl-PL'}]
 })
 export class SidePanelComponent implements OnInit {
   // details attributes
@@ -48,14 +54,32 @@ export class SidePanelComponent implements OnInit {
 
   clickedData: EmitData = new EmitData(undefined, undefined, undefined, undefined, undefined, undefined);
   opacity = 50;
-  minColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
-  maxColorCtr: AbstractControl = new FormControl(new Color(255, 243, 0), [Validators.required]);
+  minColorCtr: AbstractControl = new FormControl(new PickerColor.Color(255, 243, 0), [Validators.required]);
+  maxColorCtr: AbstractControl = new FormControl(new PickerColor.Color(255, 243, 0), [Validators.required]);
 
   showLoadingScreen = false;
   selected: any;
 
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+
+  public barChartData: ChartDataSets[] = [];
+  public barChartLabels: Label[] = [];
+  public barChartPlugins = [];
+  public barChartOptions: ChartOptions = {
+    responsive: true,
+    legend: {
+      display: false
+    },
+    scales: {
+      xAxes: [{
+        display: false,
+      }]
+    }
+  };
+
   constructor(private dataProvider: DataProviderService, private animationService: AnimationService,
-              private sidePanelService: SidePanelService) {
+              private sidePanelService: SidePanelService, private adapter: DateAdapter<any>) {
+    this.adapter.setLocale('pl');
   }
 
   ngOnInit(): void {
@@ -77,21 +101,24 @@ export class SidePanelComponent implements OnInit {
 
       const newMinColor = this.hexToRgb(this.dataProvider.getActualService().info.minColour);
       const newMaxColor = this.hexToRgb(this.dataProvider.getActualService().info.maxColour);
-      this.minColorCtr = new FormControl(new Color(newMinColor[0], newMinColor[1], newMinColor[2]));
-      this.maxColorCtr = new FormControl(new Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
+      this.minColorCtr = new FormControl(new PickerColor.Color(newMinColor[0], newMinColor[1], newMinColor[2]));
+      this.maxColorCtr = new FormControl(new PickerColor.Color(newMaxColor[0], newMaxColor[1], newMaxColor[2]));
 
       // @ts-ignore - open details tab
       document.getElementById('nav-form-tab').click();
       this.stopAnimation();
       this.showingDate = undefined;
+      this.clearChart();
 
       this.init();
     });
 
     this.sidePanelService.dataEmitter.subscribe(data => {
+      let showChart = false;
       if (data.latitude !== this.clickedData.latitude && data.longitude !== this.clickedData.longitude) {
         // @ts-ignore - open details tab
         document.getElementById('nav-details-tab').click();
+        showChart = true;
       }
       if (data.latitude === undefined && data.longitude === undefined) {
         this.clickedOnMap = false;
@@ -103,6 +130,9 @@ export class SidePanelComponent implements OnInit {
       }
       if (!this.animationPaused) {
         this.sidePanelShowStatus = false;
+      }
+      if (showChart) {
+        this.getDataToChart();
       }
     });
 
@@ -144,7 +174,7 @@ export class SidePanelComponent implements OnInit {
     const dataProvider = this.dataProvider.getActualService();
 
     if (dataProvider) {
-      dataProvider.getDayTimePointsAsObservable(formattedDate).subscribe(
+      dataProvider.getDayTimePointsAsObservable(formattedDate, dataProvider.url).subscribe(
         (data: Date[]) => {
           data.forEach(d => {
             const date = new Date(d);
@@ -172,6 +202,11 @@ export class SidePanelComponent implements OnInit {
       this.isFormSubmitted = true;
       this.blockedAnimationRange = false;
       this.showingDate = drawDate;
+      this.selectedAnimationDate = new Date(this.dataProvider.getActualService().info
+        .availableDates[this.dataProvider.getActualService().info.availableDates.length - 1]);
+      this.clearAfterAnimationDate();
+      this.blockedAnimationHourDropdown = false;
+      this.updateHourList(this.selectedAnimationDate, this.animationHourDropDownList, this.getSelectedTime());
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -197,6 +232,7 @@ export class SidePanelComponent implements OnInit {
       this.selectedHour = moment(hour).format('HH:mm:ss');
       this.isDateAndHourSelected = true;
       this.selectedAnimationHour = undefined;
+      this.clearChart();
     }
   }
 
@@ -204,6 +240,7 @@ export class SidePanelComponent implements OnInit {
     if (event.isUserInput) {
       this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
       this.isAnimationDateAndHourSelected = true;
+      this.getDataToChart();
     }
   }
 
@@ -212,6 +249,7 @@ export class SidePanelComponent implements OnInit {
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
     this.updateHourList(new Date(event.value), this.hourDropDownList, undefined);
+    this.clearChart();
   }
 
   onAnimationDateChange(event: any): void {
@@ -219,6 +257,7 @@ export class SidePanelComponent implements OnInit {
     this.blockedAnimationHourDropdown = false;
     this.selectedAnimationDate = event.value;
     this.updateHourList(new Date(event.value), this.animationHourDropDownList, this.getSelectedTime());
+    this.clearChart();
   }
 
   // animation methods
@@ -235,7 +274,8 @@ export class SidePanelComponent implements OnInit {
       this.animationEnd = endDate;
       this.animationNow = startDate;
 
-      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe(length => {
+      this.dataProvider.getActualService()
+        .getLengthBetweenObservable(startDate, endDate, this.dataProvider.getActualService().url).subscribe(length => {
         this.setAnimationLength(length);
 
         const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
@@ -358,16 +398,44 @@ export class SidePanelComponent implements OnInit {
       this.clickedData.value = data.value;
       this.clickedData.longitude = data.longitude;
       this.clickedData.latitude = data.latitude;
-      this.clickedData.name = data.name;
+      this.clickedData.station = data.station;
       this.clickedData.metricLabel = data.metricLabel;
     } else {
       this.clickedData.date = undefined;
       this.clickedData.value = undefined;
       this.clickedData.longitude = undefined;
       this.clickedData.latitude = undefined;
-      this.clickedData.name = undefined;
+      this.clickedData.station = undefined;
       this.clickedData.metricLabel = undefined;
     }
+  }
+
+  getDataToChart(): void {
+    this.barChartLabels = [];
+    this.barChartData = [];
+    if (
+      this.clickedData.station && this.selectedDate && this.selectedAnimationDate && this.selectedHour && this.selectedAnimationHour) {
+      const startDate: Date = new Date(moment(this.selectedDate).format('YYYY-MM-DD[T]') + this.selectedHour);
+      const finishDate: Date = new Date(moment(this.selectedAnimationDate).format('YYYY-MM-DD[T]') + this.selectedAnimationHour);
+      this.dataProvider.getActualService()
+        .getDataBetweenAndStationAsObservable(startDate, finishDate,
+          this.clickedData.station, this.dataProvider.getActualService().url)
+        .subscribe((data: HydrologicalData[]) => {
+          this.createDataChart(data.filter(a => a.date));
+        });
+    }
+  }
+
+  createDataChart(data: HydrologicalData[]): void {
+    data = data.sort((a, b) => a.date < b.date ? -1 : 1);
+    this.barChartData.push({
+      data: data.map(item => item.value),
+      label: this.dataProvider.getActualService().info.metricLabel,
+      backgroundColor: 'rgba(63, 81, 181)',
+      hoverBackgroundColor: 'rgba(255, 68, 132)'
+    });
+    data.map(item => moment(item.date).format('YYYY-MM-DD HH:mm:ss')).forEach(a => this.barChartLabels.push(a));
+    this.chart?.update();
   }
 
   init(): void {
@@ -375,11 +443,11 @@ export class SidePanelComponent implements OnInit {
     this.hourDropDownList.hourList = [];
     const dataProvider = this.dataProvider.getActualService();
     if (dataProvider) {
-      dataProvider.getStationsObservable().subscribe(stations => {
+      dataProvider.getStationsObservable(this.dataProvider.getActualService().url).subscribe(stations => {
         dataProvider.stationList = stations;
         this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
         this.updateHourList(this.selectedDate, this.hourDropDownList, undefined);
-        dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
+        dataProvider.getDayTimePointsAsObservable(this.selectedDate, this.dataProvider.getActualService().url).subscribe(
           (data: Date[]) => {
             this.hourDropDownList.hourList = [];
             data.forEach(d => {
@@ -401,6 +469,12 @@ export class SidePanelComponent implements OnInit {
           });
       });
     }
+  }
+
+  clearChart(): void {
+    this.barChartLabels = [];
+    this.barChartData = [];
+    this.chart?.update();
   }
 }
 
