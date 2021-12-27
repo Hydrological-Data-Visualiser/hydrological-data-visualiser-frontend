@@ -41,7 +41,8 @@
                 <mat-select *ngIf="blockedHourDropdown" disabled>
                 </mat-select>
                 <mat-select *ngIf="!blockedHourDropdown" [(value)]="selected">
-                  <mat-option *ngFor="let hour of hourDropDownList.sort()" (onSelectionChange)="onHourChange(hour)"
+                  <mat-option (onSelectionChange)="onHourChange(hour, $event);"
+                              *ngFor="let hour of hourDropDownList.hourList.sort()"
                               [value]="hour">
                     {{hour | date :'HH:mm:ss'}}
 
@@ -65,11 +66,35 @@
                 </button>
               </div>
               <br>
-              <mat-form-field>
-                <mat-label>Animation span</mat-label>
-                <input matInput type="number" id="days" [(ngModel)]="animationModel.steps"
-                       name="days" #days="ngModel">
+              <mat-form-field class="example-full-width" appearance="fill">
+                <mat-label>Choose animation range</mat-label>
+                <input matInput [matDatepicker]="animationPicker"
+                       [disabled]="!isFormSubmitted || blockedAnimationRange"
+                       (dateInput)="onAnimationDateChange($event)"
+                       [matDatepickerFilter]="animationDateFilter" [value]="selectedAnimationDate"
+                       [min]="minDate"
+                       [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="animationPicker"></mat-datepicker-toggle>
+                <mat-datepicker #animationPicker>
+                  <mat-datepicker-actions>
+                    <button mat-button matDatepickerCancel>Cancel</button>
+                    <button mat-raised-button color="primary" matDatepickerApply>Apply</button>
+                  </mat-datepicker-actions>
+                </mat-datepicker>
               </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>Choose hour</mat-label>
+                <mat-select [disabled]="blockedAnimationHourDropdown">
+                  <mat-option (onSelectionChange)="onAnimationHourChange(animationHour, $event);"
+                              *ngFor="let animationHour of animationHourDropDownList.hourList.sort()"
+                              [value]="animationHour">
+                    {{animationHour | date :'HH:mm:ss'}}
+
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
               <mat-form-field>
                 <mat-label>Animation Timestep [ms]</mat-label>
                 <input matInput type="number" id="timestep" [disabled]="!isFormSubmitted"
@@ -87,11 +112,13 @@
                 </button>
 
                 <button mat-mini-fab color="primary" *ngIf="animationPaused && animationPlaying" class="m-2"
-                        [disabled]="!isFormSubmitted" (click)="pauseAnimation()">
+                        [disabled]="!isFormSubmitted || blockedAnimationHourDropdown || !isAnimationDateAndHourSelected"
+                        (click)="pauseAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
 
-                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2" [disabled]="!isFormSubmitted"
+                <button mat-mini-fab color="primary" *ngIf="!animationPlaying" class="m-2"
+                        [disabled]="!isFormSubmitted || blockedAnimationHourDropdown || !isAnimationDateAndHourSelected"
                         (click)="playAnimation()">
                   <mat-icon>play_arrow</mat-icon>
                 </button>
@@ -104,6 +131,8 @@
             </form>
           </div>
         </div>
+
+
         <div class="tab-pane fade" id="nav-details" role="tabpanel" aria-labelledby="nav-details-tab">
           <div *ngIf="clickedOnMap === false">
             <br>
@@ -134,6 +163,7 @@
           </div>
         </div>
 
+
         <div class="tab-pane fade" id="nav-conf" role="tabpanel" aria-labelledby="nav-conf-tab">
           <mat-form-field floatLabel="always" appearance="'nope'" class="m-2 mu-4 mt-4 w-100">
             <mat-label>Opacity</mat-label>
@@ -161,7 +191,6 @@
             <ngx-mat-color-picker #minColorPicker></ngx-mat-color-picker>
           </mat-form-field>
 
-
           <mat-form-field class="m-2">
             <mat-label>Maximal Color</mat-label>
             <input matInput [ngxMatColorPicker]="maxColorPicker" [formControl]="maxColorCtr"
@@ -178,6 +207,8 @@
       </div>
     </div>
   </div>
+
+
   <div id="page-content-wrapper">
     <nav class="navbar navbar-expand-lg">
 
@@ -187,6 +218,10 @@
           <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Animation Start:</mat-label>
             <input matInput value="{{animationStart | date:'medium'}}" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="standard" class="content-no-underline">
+            <mat-label>Animation End:</mat-label>
+            <input matInput value="{{animationEnd | date:'medium'}}" readonly>
           </mat-form-field>
           <mat-form-field appearance="standard" class="content-no-underline">
             <mat-label>Showing:</mat-label>

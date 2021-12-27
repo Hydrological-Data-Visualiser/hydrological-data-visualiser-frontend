@@ -137,18 +137,24 @@ export abstract class RiverService implements DataServiceInterface<HydrologicalD
   }
 
   getDataFromDateAsObservableUsingInstant(date: Date): Observable<HydrologicalData[]> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<HydrologicalData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
-    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+    const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
     return this.http.get<Date>(`${this.url}/timePointsAfter?instantFrom=${formattedDate}&step=${steps.toString()}`);
   }
 
   getDayTimePointsAsObservable(date: Date): Observable<Date[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
     return this.http.get<Date[]>(`${this.url}/dayTimePoints?date=${formattedDate}`);
+  }
+
+  getLengthBetweenObservable(startDate: Date, endDate: Date): Observable<number> {
+    const formattedStartDate = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    const formattedEndDate = (moment(endDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+    return this.http.get<number>(`${this.url}/length?instantFrom=${formattedStartDate}&&instantTo=${formattedEndDate}`);
   }
 
   getMinValue(begin: string, length: number): Observable<number> {

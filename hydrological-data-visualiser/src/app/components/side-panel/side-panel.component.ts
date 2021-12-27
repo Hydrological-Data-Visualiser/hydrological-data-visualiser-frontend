@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import {AnimationInputData} from 'src/app/model/animation-input-data';
 import {AnimationService} from 'src/app/services/animation.service';
 import {DataProviderService} from '../../services/data-provider.service';
@@ -27,15 +27,22 @@ export class SidePanelComponent implements OnInit {
   isModelSelected = false;
   isDateAndHourSelected = false;
   isFormSubmitted = false;
-  hourDropDownList: Date[] = [];
+  hourDropDownList: HourListContainer = new HourListContainer([]);
   // animation
+  blockedAnimationHourDropdown = true;
+  animationHourDropDownList: HourListContainer = new HourListContainer([]);
+  isAnimationDateAndHourSelected = false;
   animationPlaying = false;
   animationPaused = false;
   animationModel = new AnimationInputData(10, 100);
   animationStart: Date | undefined;
+  animationEnd: Date | undefined;
   animationLength: number | undefined;
   animationNow: Date | undefined;
   animationPercentage: number | undefined;
+  selectedAnimationDate: Date | undefined;
+  selectedAnimationHour: string | undefined;
+  blockedAnimationRange = true;
   // non animation
   showingDate: Date | undefined; // used for showing displayed non animation data
 
@@ -102,12 +109,26 @@ export class SidePanelComponent implements OnInit {
     this.sidePanelService.finishEmitter.subscribe(value => this.showLoadingScreen = value);
   }
 
+  clearAfterAnimationDate(): void {
+    this.isAnimationDateAndHourSelected = false;
+    this.selectedAnimationHour = undefined;
+  }
+
+  clearAfterHour(): void {
+    this.animationHourDropDownList.hourList = [];
+    this.selectedAnimationDate = undefined;
+    this.blockedAnimationHourDropdown = true;
+    this.clearAfterAnimationDate();
+  }
+
   clear(): void {
-    this.hourDropDownList = [];
+    this.hourDropDownList.hourList = [];
     this.selectedHour = undefined;
     this.selectedDate = undefined;
     this.blockedHourDropdown = true;
+    this.blockedAnimationRange = true;
     this.isDateAndHourSelected = false;
+    this.clearAfterHour();
   }
 
   setClicked(newItem: boolean): void {
@@ -118,8 +139,8 @@ export class SidePanelComponent implements OnInit {
     this.sidePanelShowStatus = !this.sidePanelShowStatus;
   }
 
-  updateHourList(formattedDate: Date): void {
-    this.hourDropDownList = [];
+  updateHourList(formattedDate: Date, hourListContainer: HourListContainer, notBeforeHour: Date | undefined): void {
+    hourListContainer.hourList = [];
     const dataProvider = this.dataProvider.getActualService();
 
     if (dataProvider) {
@@ -129,11 +150,13 @@ export class SidePanelComponent implements OnInit {
             const date = new Date(d);
             const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
               date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-            this.hourDropDownList.push(nowUtc);
+            if (!notBeforeHour || notBeforeHour.getTime() <= nowUtc.getTime()) {
+              hourListContainer.hourList.push(nowUtc);
+            }
 
             // distinct and sort
             // tslint:disable-next-line:no-shadowed-variable
-            this.hourDropDownList = [...new Set(this.hourDropDownList)].sort((a, b) => {
+            hourListContainer.hourList = [...new Set(hourListContainer.hourList)].sort((a, b) => {
               return (new Date(b) as any) - (new Date(a) as any);
             });
           });
@@ -144,58 +167,116 @@ export class SidePanelComponent implements OnInit {
 
   onSubmit(): void {
     if (this.selectedDate) {
-      this.selectedDate
-        .setHours(
-          // tslint:disable:no-non-null-assertion
-          Number.parseInt(this.selectedHour!.substr(0, 2), 10),
-          Number.parseInt(this.selectedHour!.substr(3, 2), 10),
-          Number.parseInt(this.selectedHour!.substr(6, 2), 10)
-        );
+      const drawDate = this.getSelectedTime();
       this.stopAnimation();
       this.isFormSubmitted = true;
-      this.showingDate = this.selectedDate;
-      const formattedDate = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      this.blockedAnimationRange = false;
+      this.showingDate = drawDate;
+      const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
-          if (this.selectedDate) {
-            this.dataProvider.getActualService().draw(this.selectedDate);
+          if (drawDate) {
+            this.dataProvider.getActualService().draw(drawDate);
           }
         });
+      this.animationDateFilter = (date: Date): boolean => {
+        const selectedTimelessDate =
+          // tslint:disable-next-line: no-non-null-assertion
+          new Date(drawDate!.getFullYear(), drawDate!.getMonth(), drawDate!.getDate());
+
+        // tslint:disable-next-line:no-non-null-assertion
+        return date >= selectedTimelessDate! && this.dataProvider.getActualService().info.availableDates.sort()
+          .map(a => moment(a).format('YYYY-MM-DD')).includes(moment(date).format('YYYY-MM-DD'));
+      };
     }
   }
 
-  onHourChange(hour: Date): void {
-    this.selectedHour = moment(hour).format('HH:mm:SS');
-    this.isDateAndHourSelected = true;
+  onHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      this.clearAfterHour();
+      this.selectedHour = moment(hour).format('HH:mm:ss');
+      this.isDateAndHourSelected = true;
+      this.selectedAnimationHour = undefined;
+    }
+  }
+
+  onAnimationHourChange(hour: Date, event: any): void {
+    if (event.isUserInput) {
+      this.selectedAnimationHour = moment(hour).format('HH:mm:ss');
+      this.isAnimationDateAndHourSelected = true;
+    }
   }
 
   onValueChange(event: any): void {
     this.clear();
     this.blockedHourDropdown = false;
     this.selectedDate = event.value;
-    this.updateHourList(new Date(event.value));
+    this.updateHourList(new Date(event.value), this.hourDropDownList, undefined);
+  }
+
+  onAnimationDateChange(event: any): void {
+    this.clearAfterAnimationDate();
+    this.blockedAnimationHourDropdown = false;
+    this.selectedAnimationDate = event.value;
+    this.updateHourList(new Date(event.value), this.animationHourDropDownList, this.getSelectedTime());
   }
 
   // animation methods
   playAnimation(): void {
-    this.animationPaused = false;
-    const date = this.selectedDate;
-    this.animationPlaying = true;
-    this.animationStart = date;
-    this.animationNow = date;
-    this.animationLength = this.animationModel.steps;
     this.animationService.stop();
+    this.animationPaused = false;
+    if (this.selectedDate !== undefined && this.selectedAnimationDate !== undefined) {
+      // tslint:disable-next-line: no-non-null-assertion
+      const startDate = this.getSelectedTime()!;
+      // tslint:disable-next-line: no-non-null-assertion
+      const endDate = this.getSelectedAnimationTime()!;
+      this.animationPlaying = true;
+      this.animationStart = startDate;
+      this.animationEnd = endDate;
+      this.animationNow = startDate;
 
-    const formattedStart = (moment(this.selectedDate)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
-    this.dataProvider.getActualService().setScaleAndColour(formattedStart, this.animationLength,
-      () => {
-        if (date) {
-          this.animationService.setAnimation(
-            date, this.animationModel.steps, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
-          );
-        }
-        this.animationService.play();
+      this.dataProvider.getActualService().getLengthBetweenObservable(startDate, endDate).subscribe(length => {
+        this.setAnimationLength(length);
+
+        const formattedStart = (moment(startDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
+        this.dataProvider.getActualService().setScaleAndColour(formattedStart, length,
+          () => {
+            if (startDate) {
+              this.animationService.setAnimation(
+                startDate, length, this.animationModel.timestepMs, this, this.dataProvider.getActualService()
+              );
+            }
+            this.animationService.play();
+          });
       });
+    }
+  }
+
+  getParsedTime(date: Date, time: string): Date {
+    const copiedDate = new Date(date.getTime());
+    copiedDate.setHours(
+      // tslint:disable:no-non-null-assertion
+      Number.parseInt(time.substr(0, 2), 10),
+      Number.parseInt(time.substr(3, 2), 10),
+      Number.parseInt(time.substr(6, 2), 10)
+    );
+    return copiedDate;
+  }
+
+  getSelectedTime(): Date | undefined {
+    if (this.selectedDate && this.selectedHour) {
+      return this.getParsedTime(this.selectedDate!, this.selectedHour);
+    } else {
+      return undefined;
+    }
+  }
+
+  getSelectedAnimationTime(): Date | undefined {
+    if (this.selectedAnimationDate && this.selectedAnimationHour) {
+      return this.getParsedTime(this.selectedAnimationDate!, this.selectedAnimationHour!);
+    } else {
+      return undefined;
+    }
   }
 
   // called by animationService
@@ -205,6 +286,10 @@ export class SidePanelComponent implements OnInit {
       this.animationPercentage = currentFrame * 100 / (this.animationLength - 1);
     }
     this.animationNow = animationNow;
+  }
+
+  setAnimationLength(length: number): void {
+    this.animationLength = length;
   }
 
   pauseAnimation(): void {
@@ -217,7 +302,7 @@ export class SidePanelComponent implements OnInit {
     this.stopAnimation();
 
     if (date !== undefined) {
-      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:SS[Z]');
+      const formattedDate = (moment(date)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
           if (date) {
@@ -231,12 +316,17 @@ export class SidePanelComponent implements OnInit {
     this.animationService.stop();
     this.animationPlaying = false;
     this.animationStart = undefined;
+    this.animationEnd = undefined;
     this.animationLength = undefined;
     this.animationNow = undefined;
     this.animationPercentage = 0;
   }
 
   dateFilter = (date: Date) => {
+    return false;
+  }
+
+  animationDateFilter = (date: Date) => {
     return false;
   }
 
@@ -247,8 +337,9 @@ export class SidePanelComponent implements OnInit {
   changeColor(minColorCtr: AbstractControl, maxColorCtr: AbstractControl): void {
     this.dataProvider.getActualService().info.minColour = '#' + minColorCtr.value.hex;
     this.dataProvider.getActualService().info.maxColour = '#' + maxColorCtr.value.hex;
-    if (this.selectedDate) {
-      this.dataProvider.getActualService().updateColor(this.selectedDate);
+    const selectedDate = this.getSelectedTime();
+    if (selectedDate) {
+      this.dataProvider.getActualService().updateColor(selectedDate);
     }
     this.opacity = 50;
   }
@@ -281,34 +372,39 @@ export class SidePanelComponent implements OnInit {
 
   init(): void {
     this.blockedHourDropdown = false;
-    this.hourDropDownList = [];
+    this.hourDropDownList.hourList = [];
     const dataProvider = this.dataProvider.getActualService();
     if (dataProvider) {
       dataProvider.getStationsObservable().subscribe(stations => {
         dataProvider.stationList = stations;
         this.selectedDate = new Date(this.dataProvider.getActualService().info.availableDates[0]);
-        this.updateHourList(this.selectedDate);
+        this.updateHourList(this.selectedDate, this.hourDropDownList, undefined);
         dataProvider.getDayTimePointsAsObservable(this.selectedDate).subscribe(
           (data: Date[]) => {
-            this.hourDropDownList = [];
+            this.hourDropDownList.hourList = [];
             data.forEach(d => {
               const date = new Date(d);
               const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
                 date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-              this.hourDropDownList.push(nowUtc);
+              this.hourDropDownList.hourList.push(nowUtc);
 
               // distinct and sort
               // tslint:disable-next-line:no-shadowed-variable
-              this.hourDropDownList = [...new Set(this.hourDropDownList)].sort((a, b) => {
+              this.hourDropDownList.hourList = [...new Set(this.hourDropDownList.hourList)].sort((a, b) => {
                 return (new Date(b) as any) - (new Date(a) as any);
               });
             });
-            this.selectedHour = moment(this.hourDropDownList.sort()[0]).format('HH:mm:ss');
-            this.selected = this.hourDropDownList.sort()[0];
+            this.selectedHour = moment(this.hourDropDownList.hourList.sort()[0]).format('HH:mm:ss');
+            this.selected = this.hourDropDownList.hourList.sort()[0];
             this.isDateAndHourSelected = true;
             this.onSubmit();
           });
       });
     }
+  }
+}
+
+export class HourListContainer {
+  constructor(public hourList: Date[]) {
   }
 }
