@@ -435,11 +435,11 @@ export class SidePanelComponent implements OnInit {
   }
 
   getDataToChart(): void {
-    this.loadingChart = true;
     this.barChartLabels = [];
     this.barChartData = [];
     if (
       this.clickedData.station && this.selectedDate && this.selectedAnimationDate && this.selectedHour && this.selectedAnimationHour) {
+      this.loadingChart = true;
       const startDate: Date = new Date(moment(this.selectedDate).format('YYYY-MM-DD[T]') + this.selectedHour);
       const finishDate: Date = new Date(moment(this.selectedAnimationDate).format('YYYY-MM-DD[T]') + this.selectedAnimationHour);
       this.dataProvider.getActualService()
