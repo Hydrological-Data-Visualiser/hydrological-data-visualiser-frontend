@@ -4,7 +4,7 @@ import {Observable} from 'rxjs';
 import {MarkerCreatorService} from './marker-creator.service';
 import {ColorService} from '../color.service';
 import {SidePanelService} from '../../components/side-panel/side-panel-service';
-import {PointData} from '../../model/point-data';
+import {HydrologicalData} from '../../model/hydrological-data';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class PrecipitationService extends MarkerCreatorService {
     this.getInfo();
   }
 
-  getData(): Observable<PointData[]> {
-    return this.http.get<PointData[]>(`${this.url}/data`);
+  getData(): Observable<HydrologicalData[]> {
+    return this.http.get<HydrologicalData[]>(`${this.url}/data`);
   }
 }

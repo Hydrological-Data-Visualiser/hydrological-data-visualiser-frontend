@@ -9,17 +9,17 @@ import {DataModelBase} from '../../model/data-model-base';
 import {HttpClient} from '@angular/common/http';
 import {ColorService} from '../color.service';
 import {CustomMarkers} from '../custom-markers';
-import {PolygonData} from '../../model/polygon-data';
 import {Station} from 'src/app/model/station';
+import {HydrologicalData} from '../../model/hydrological-data';
 
 @Injectable({
   providedIn: 'root'
 })
-export abstract class PolygonsService implements DataServiceInterface<PolygonData> {
+export abstract class PolygonsService implements DataServiceInterface<HydrologicalData> {
   public map!: L.Map;
   public status = false;
   public url!: string;
-  public lastClickedData: [PolygonData, L.LatLng] | undefined = undefined;
+  public lastClickedData: [HydrologicalData, L.LatLng] | undefined = undefined;
   public polygonLayer = new L.FeatureGroup();
   public markerLayer = new L.FeatureGroup();
   public info!: DataModelBase;
@@ -48,24 +48,24 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   draw(date: Date): void {
     this.sidePanelService.finishEmitter.emit(true);
     this.clear();
-    this.getDataFromDateAsObservableUsingInstant(date).subscribe(polygonDataArr => {
-      polygonDataArr.forEach(polygonData => {
-        const polygon = this.stationList.find(a => a.id === polygonData.polygonId);
+    this.getDataFromDateAsObservableUsingInstant(date).subscribe(HydrologicalDataArr => {
+      HydrologicalDataArr.forEach(hydrologicalData => {
+        const polygon = this.stationList.find(a => a.id === hydrologicalData.stationId);
         if (polygon) {
           const latlngs: L.LatLng[] = polygon.points.map(points => new L.LatLng(points[0], points[1]));
-          const color = this.colorService.getColor(polygonData.value);
+          const color = this.colorService.getColor(hydrologicalData.value);
           const lPolygon = new L.Polygon(latlngs, {
             color,
             fillColor: color,
             opacity: this.opacity,
             fillOpacity: this.opacity
           })
-            .bindPopup(`${polygonData.value} ${this.info.metricLabel}`)
+            .bindPopup(`${hydrologicalData.value} ${this.info.metricLabel}`)
             .on('click', (event: any) => {
               const coords: L.LatLng = event.latlng;
-              this.lastClickedData = [polygonData, coords];
+              this.lastClickedData = [hydrologicalData, coords];
               this.emitData(
-                new EmitData(polygon.name, coords.lat, coords.lng, polygonData.date, polygonData.value, this.info.metricLabel)
+                new EmitData(polygon.name, coords.lat, coords.lng, hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
               );
               this.addMarkerOnDataClick(coords);
             });
@@ -80,28 +80,28 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
   }
 
   update(date: Date): Promise<void> {
-    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(polygonDataArr => {
-      polygonDataArr.forEach(polygonData => {
-        const station = this.stationList.find(a => a.id === polygonData.polygonId);
+    return this.getDataFromDateAsObservableUsingInstant(date).toPromise().then(HydrologicalDataArr => {
+      HydrologicalDataArr.forEach(hydrologicalData => {
+        const station = this.stationList.find(a => a.id === hydrologicalData.stationId);
         if (station) {
           const polygon = this.polygons.get(station);
           if (polygon) {
-            const color = this.colorService.getColor(polygonData.value);
+            const color = this.colorService.getColor(hydrologicalData.value);
             polygon.setStyle({color, fillColor: color, opacity: this.opacity, fillOpacity: this.opacity});
-            polygon.bindPopup(`${polygonData.value} ${this.info.metricLabel}`)
+            polygon.bindPopup(`${hydrologicalData.value} ${this.info.metricLabel}`)
               .on('click', (event: any) => {
                 const coords = event.latlng;
-                this.lastClickedData = [polygonData, coords];
+                this.lastClickedData = [hydrologicalData, coords];
                 this.emitData(
-                  new EmitData(undefined, coords.lat, coords.lng, polygonData.date, polygonData.value, this.info.metricLabel)
+                  new EmitData(undefined, coords.lat, coords.lng, hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
                 );
                 this.addMarkerOnDataClick(coords);
               });
             if (this.lastClickedData) {
-              if (this.lastClickedData[0].polygonId === polygonData.polygonId) {
+              if (this.lastClickedData[0].stationId === hydrologicalData.stationId) {
                 this.emitData(new EmitData(
                   station.name, this.lastClickedData[1].lat, this.lastClickedData[1].lng,
-                  polygonData.date, polygonData.value, this.info.metricLabel)
+                  hydrologicalData.date, hydrologicalData.value, this.info.metricLabel)
                 );
               }
             }
@@ -121,14 +121,14 @@ export abstract class PolygonsService implements DataServiceInterface<PolygonDat
     );
   }
 
-  getDataFromDateAsObservableUsingDate(date: Date): Observable<PolygonData[]> {
+  getDataFromDateAsObservableUsingDate(date: Date): Observable<HydrologicalData[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD');
-    return this.http.get<PolygonData[]>(`${this.url}/data?date=${formattedDate}`);
+    return this.http.get<HydrologicalData[]>(`${this.url}/data?date=${formattedDate}`);
   }
 
-  getDataFromDateAsObservableUsingInstant(date: Date): Observable<PolygonData[]> {
+  getDataFromDateAsObservableUsingInstant(date: Date): Observable<HydrologicalData[]> {
     const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-    return this.http.get<PolygonData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
+    return this.http.get<HydrologicalData[]>(`${this.url}/data?dateInstant=${formattedDate}`);
   }
 
   getTimePointAfterAsObservable(date: Date, steps: number): Observable<Date> {
