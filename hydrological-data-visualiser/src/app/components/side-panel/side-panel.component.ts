@@ -225,11 +225,12 @@ export class SidePanelComponent implements OnInit {
               return (new Date(b) as any) - (new Date(a) as any);
             });
           });
-          this.selectedAnimationHour =
-            moment(this.animationHourDropDownList.hourList.sort()[this.animationHourDropDownList.hourList.length - 1])
-              .format('HH:mm:ss');
-          this.selectedAnimationHourDefault =
-            this.animationHourDropDownList.hourList.sort()[this.animationHourDropDownList.hourList.length - 1];
+          const animationHour = this.animationHourDropDownList.hourList.sort()[this.animationHourDropDownList.hourList.length - 1];
+
+          this.selectedAnimationHourDefault = animationHour;
+          this.selectedAnimationHour = moment(animationHour).format('HH:mm:ss');
+          this.isAnimationDateAndHourSelected = true;
+          this.getDataToChart();
         });
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
