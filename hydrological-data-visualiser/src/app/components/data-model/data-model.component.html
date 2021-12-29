@@ -6,11 +6,14 @@
         <mat-card-title class="modal-title" id="exampleModalLabel">Data Models</mat-card-title>
         <button type="button" id="dismissButton" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-
-      <div class="d-flex justify-content-center m-5" *ngIf="getModels().length<getModelCount()">
-        <mat-spinner></mat-spinner>
+      <div *ngIf="getModels().length<getModelCount()">
+        <div class="d-flex justify-content-center m-5">
+          <mat-spinner></mat-spinner>
+        </div>
+        <div>
+          <p>Getting data models, please wait</p>
+        </div>
       </div>
-
       <div class="modal-body" *ngIf="getModels().length>=getModelCount()">
         <mat-label class=" font-weight-bold">Choose data model</mat-label>
         <mat-radio-group

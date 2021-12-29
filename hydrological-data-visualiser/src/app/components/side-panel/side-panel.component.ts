@@ -59,6 +59,8 @@ export class SidePanelComponent implements OnInit {
 
   showLoadingScreen = false;
   selected: any;
+  selectedAnimationHourDefault: any;
+  loadingChart = false;
 
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
@@ -206,7 +208,30 @@ export class SidePanelComponent implements OnInit {
         .availableDates[this.dataProvider.getActualService().info.availableDates.length - 1]);
       this.clearAfterAnimationDate();
       this.blockedAnimationHourDropdown = false;
-      this.updateHourList(this.selectedAnimationDate, this.animationHourDropDownList, this.getSelectedTime());
+      // this.updateHourList(this.selectedAnimationDate, this.animationHourDropDownList, this.getSelectedTime());
+      const dataProvider = this.dataProvider.getActualService();
+      dataProvider.getDayTimePointsAsObservable(this.selectedDate, this.dataProvider.getActualService().url).subscribe(
+        (data: Date[]) => {
+          this.animationHourDropDownList.hourList = [];
+          data.forEach(d => {
+            const date = new Date(d);
+            const nowUtc = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+              date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+            this.animationHourDropDownList.hourList.push(nowUtc);
+
+            // distinct and sort
+            // tslint:disable-next-line:no-shadowed-variable
+            this.animationHourDropDownList.hourList = [...new Set(this.animationHourDropDownList.hourList)].sort((a, b) => {
+              return (new Date(b) as any) - (new Date(a) as any);
+            });
+          });
+          const animationHour = this.animationHourDropDownList.hourList.sort()[this.animationHourDropDownList.hourList.length - 1];
+
+          this.selectedAnimationHourDefault = animationHour;
+          this.selectedAnimationHour = moment(animationHour).format('HH:mm:ss');
+          this.isAnimationDateAndHourSelected = true;
+          this.getDataToChart();
+        });
       const formattedDate = (moment(drawDate)).format('YYYY-MM-DD[T]HH:mm:ss[Z]');
       this.dataProvider.getActualService().setScaleAndColour(formattedDate, 1,
         () => {
@@ -415,6 +440,7 @@ export class SidePanelComponent implements OnInit {
     this.barChartData = [];
     if (
       this.clickedData.station && this.selectedDate && this.selectedAnimationDate && this.selectedHour && this.selectedAnimationHour) {
+      this.loadingChart = true;
       const startDate: Date = new Date(moment(this.selectedDate).format('YYYY-MM-DD[T]') + this.selectedHour);
       const finishDate: Date = new Date(moment(this.selectedAnimationDate).format('YYYY-MM-DD[T]') + this.selectedAnimationHour);
       this.dataProvider.getActualService()
@@ -436,6 +462,7 @@ export class SidePanelComponent implements OnInit {
     });
     data.map(item => moment(item.date).format('YYYY-MM-DD HH:mm:ss')).forEach(a => this.barChartLabels.push(a));
     this.chart?.update();
+    this.loadingChart = false;
   }
 
   init(): void {
