@@ -15,8 +15,6 @@ export class MapComponent implements AfterViewInit {
   long: number;
   clicked = false;
   marker: L.Marker<any> | undefined;
-  // @Output() latLngEventEmitter = new EventEmitter<L.LatLng>();
-  // @Output() clickedEmitter = new EventEmitter<boolean>();
 
   constructor(private dataProvider: DataProviderService) {
     this.lat = 0;
@@ -25,7 +23,6 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.initMap();
-    // this.onClick();
 
     this.dataProvider.getAllServices().forEach(service => service.map = this.map);
   }
@@ -50,27 +47,4 @@ export class MapComponent implements AfterViewInit {
 
     tiles.addTo(this.map);
   }
-
-  // private onClick(): void {
-  //   this.map.on('click', (e: any) => {
-  //     const coord = e.latlng;
-  //     this.lat = coord.lat;
-  //     this.long = coord.lng;
-  //     this.latLngEventEmitter.emit(new L.LatLng(this.lat, this.long));
-  //     this.clickedEmitter.emit(true);
-  //     this.addMarker(coord);
-  //   });
-  // }
-
-  // addMarker(latlng: LatLngExpression): void {
-  //   if (this.marker) {
-  //     this.map.removeLayer(this.marker);
-  //   }
-  //   this.marker = L.marker(latlng, {icon: this.redIcon}).addTo(this.map).on('click', a => {
-  //     this.map.removeLayer(this.marker);
-  //     this.marker = undefined;
-  //     this.latLngEventEmitter.emit(undefined);
-  //     this.clickedEmitter.emit(false);
-  //   });
-  // }
 }

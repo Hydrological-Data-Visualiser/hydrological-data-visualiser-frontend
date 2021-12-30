@@ -10,7 +10,7 @@ import {HydrologicalData} from '../../model/hydrological-data';
   providedIn: 'root'
 })
 export class PrecipitationService extends MarkerCreatorService {
-  public url = 'https://imgw-mock.herokuapp.com//imgw';
+  public url = 'https://imgw-mock.herokuapp.com/imgw';
 
   constructor(http: HttpClient, colorService: ColorService, protected sidePanelService: SidePanelService) {
     super(colorService, sidePanelService, http);

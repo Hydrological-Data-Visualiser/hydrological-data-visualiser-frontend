@@ -11,6 +11,7 @@ import {UniversalPolygonsService} from './dataType.polygon/universal-polygons.se
 import {UniversalLineService} from './dataType.line/universal-line.service';
 import {UniversalMarkerCreatorService} from './dataType.points/universal-marker-creator.service';
 import {DataType} from '../model/data-type';
+import {ModflowService} from './dataType.polygon/modflow.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,8 @@ export class DataProviderService {
     this.getPolygonsRandomService(),
     this.getUniversalMarkerCreatorService(),
     this.getUniversalPolygonsService(),
-    this.getUniversalLineService()
+    this.getUniversalLineService(),
+    this.getModflowService()
   ];
 
   apis: string[] = [
@@ -35,6 +37,7 @@ export class DataProviderService {
     this.kocinkaSurfaceHeightService.url,
     this.kocinkaTemperatureService.url,
     this.polygonsRandomService.url,
+    this.modflowService.url,
   ];
 
   addedModels: Map<string, DataType> = new Map<string, DataType>();
@@ -51,7 +54,8 @@ export class DataProviderService {
     private polygonsRandomService: PolygonsRandomService,
     private universalMarkerCreatorService: UniversalMarkerCreatorService,
     private universalPolygonsService: UniversalPolygonsService,
-    private universalLineService: UniversalLineService
+    private universalLineService: UniversalLineService,
+    private modflowService: ModflowService
   ) {
     this.getModels();
   }
@@ -75,6 +79,11 @@ export class DataProviderService {
   getPolygonsRandomService(): PolygonsRandomService {
     return this.polygonsRandomService;
   }
+
+  getModflowService(): ModflowService {
+    return this.modflowService;
+  }
+
 
   getUniversalMarkerCreatorService(): UniversalMarkerCreatorService {
     return this.universalMarkerCreatorService;
